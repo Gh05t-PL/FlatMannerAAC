@@ -193,6 +193,7 @@ class AccountController extends Controller
         $startStats = [
             'level' => 8,
             'magiclevel' => 5,
+            'cap' => 200,
             'health' => 250,
             'mana' => 250,
             'skill' => 10
@@ -243,6 +244,7 @@ class AccountController extends Controller
                     $player->setVocation($formData['vocation']);
                     $player->setAccount($this->getDoctrine()->getRepository(Accounts::class)->find($session->get('account_id')));
                     $player->setLevel($startStats['level']);
+                    $player->setCap($startStats['cap']);
                     $player->setMaglevel($startStats['magiclevel']);
                     $player->setHealth($startStats['health']);
                     $player->setHealthmax($startStats['health']);
