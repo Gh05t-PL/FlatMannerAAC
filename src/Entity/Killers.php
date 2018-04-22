@@ -24,7 +24,7 @@ class Killers
      *
      * @ORM\Column(name="unjustified", type="boolean", nullable=false)
      */
-    public $unjustified = '0';
+    private $unjustified = '0';
 
     /**
      * @var int
@@ -33,7 +33,7 @@ class Killers
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    public $id;
+    private $id;
 
     /**
      * @var \App\Entity\PlayerDeaths
@@ -43,7 +43,74 @@ class Killers
      *   @ORM\JoinColumn(name="death_id", referencedColumnName="id")
      * })
      */
-    public $death;
+    private $death;
+
+    /**
+     * @return bool
+     */
+    public function isFinalHit()
+    {
+        return $this->finalHit;
+    }
+
+    /**
+     * @param bool $finalHit
+     */
+    public function setFinalHit($finalHit)
+    {
+        $this->finalHit = $finalHit;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isUnjustified()
+    {
+        return $this->unjustified;
+    }
+
+    /**
+     * @param bool $unjustified
+     */
+    public function setUnjustified($unjustified)
+    {
+        $this->unjustified = $unjustified;
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * @return PlayerDeaths
+     */
+    public function getDeath()
+    {
+        return $this->death;
+    }
+
+    /**
+     * @param PlayerDeaths $death
+     */
+    public function setDeath($death)
+    {
+        $this->death = $death;
+    }
+
+
+
 
 
 }

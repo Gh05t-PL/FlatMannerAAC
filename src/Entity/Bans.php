@@ -98,5 +98,206 @@ class Bans
      */
     private $id;
 
+    /**
+     * @return bool
+     */
+    public function isType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param bool $type
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * @return int
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    /**
+     * @param int $value
+     */
+    public function setValue($value)
+    {
+        $this->value = $value;
+    }
+
+    /**
+     * @return int
+     */
+    public function getParam()
+    {
+        return $this->param;
+    }
+
+    /**
+     * @param int $param
+     */
+    public function setParam($param)
+    {
+        $this->param = $param;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isActive()
+    {
+        return $this->active;
+    }
+
+    /**
+     * @param bool $active
+     */
+    public function setActive($active)
+    {
+        $this->active = $active;
+    }
+
+    /**
+     * @return int
+     */
+    public function getExpires()
+    {
+        return $this->expires;
+    }
+
+    /**
+     * @param int $expires
+     */
+    public function setExpires($expires)
+    {
+        $this->expires = $expires;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAdded()
+    {
+        return $this->added;
+    }
+
+    /**
+     * @param int $added
+     */
+    public function setAdded($added)
+    {
+        $this->added = $added;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAdminId()
+    {
+        return $this->adminId;
+    }
+
+    /**
+     * @param int $adminId
+     */
+    public function setAdminId($adminId)
+    {
+        $this->adminId = $adminId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getComment()
+    {
+        return $this->comment;
+    }
+
+    /**
+     * @param string $comment
+     */
+    public function setComment($comment)
+    {
+        $this->comment = $comment;
+    }
+
+    /**
+     * @return int
+     */
+    public function getReason()
+    {
+        return $this->reason;
+    }
+
+    /**
+     * @param int $reason
+     */
+    public function setReason($reason)
+    {
+        $this->reason = $reason;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAction()
+    {
+        return $this->action;
+    }
+
+    /**
+     * @param int $action
+     */
+    public function setAction($action)
+    {
+        $this->action = $action;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStatement()
+    {
+        return $this->statement;
+    }
+
+    /**
+     * @param string $statement
+     */
+    public function setStatement($statement)
+    {
+        $this->statement = $statement;
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+
+
+
+
+
+
+
+
+
 
 }

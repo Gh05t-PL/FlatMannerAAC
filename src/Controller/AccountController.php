@@ -192,8 +192,13 @@ class AccountController extends Controller
         /**
          * [TODO] get vocations, gains of cap and health/mana from vocation.xml
          */
-        $startLevel = 8;
-
+        $startStats = [
+            'level' => 8,
+            'magiclevel' => 5,
+            'health' => 250,
+            'mana' => 250,
+            'skill' => 10
+        ];
         $vocations = [
             'Sorcerer' => 1,
             'Druid' => 2,
@@ -235,17 +240,22 @@ class AccountController extends Controller
 
                     $player = new Players();
 
-                    $player->name = $formData['name'];
-                    $player->sex = $formData['sex'];
-                    $player->vocation = $formData['vocation'];
-                    $player->account = $this->getDoctrine()->getRepository(Accounts::class)->find($session->get('account_id'));
-                    $player->level = $startLevel;
+                    $player->setName($formData['name']);
+                    $player->setSex($formData['sex']);
+                    $player->setVocation($formData['vocation']);
+                    $player->setAccount($this->getDoctrine()->getRepository(Accounts::class)->find($session->get('account_id')));
+                    $player->setLevel($startStats['level']);
+                    $player->setMaglevel($startStats['magiclevel']);
+                    $player->setHealth($startStats['health']);
+                    $player->setHealthmax($startStats['health']);
+                    $player->setMana($startStats['mana']);
+                    $player->setManamax($startStats['mana']);
 
                     function expToLevel($level){
                         return ((50 * ($level - 1)**3 - 150 * ($level - 1)**2 + 400 * ($level - 1)) / 3);
                     }
 
-                    $player->exp = expToLevel($startLevel);
+                    $player->setExperience(expToLevel($startStats['level']));
 
                     $em = $this->getDoctrine()->getManager();
                     $em->persist($player);
@@ -259,10 +269,10 @@ class AccountController extends Controller
                         new PlayerSkill()
                     ];
                     foreach ($skills as $key => $value) {
-                        $value->player = $player;
-                        $value->skillid = $key;
-                        $value->value = 10;
-                        $value->count = 0;
+                        $value->setPlayer($player);
+                        $value->setSkillid($key);
+                        $value->setValue($startStats['skill']);
+                        $value->setCount(0);
                         $em->persist($value);
                     }
                     $em->flush();
@@ -317,7 +327,7 @@ class AccountController extends Controller
             if ( empty($errors) ){
                 $account = $this->getDoctrine()->getRepository(Accounts::class)->find($session->get('account_id'));
 
-                $account->password = $formData['password'];
+                $account->setPassword($formData['password']);
 
                 $em = $this->getDoctrine()->getManager();
                 $em->persist($account);
@@ -363,7 +373,7 @@ class AccountController extends Controller
             if ( empty($errors) ){
                 $account = $this->getDoctrine()->getRepository(Accounts::class)->find($session->get('account_id'));
 
-                $account->email = $formData['email'];
+                $account->setEmail($formData['email']);
 
                 $em = $this->getDoctrine()->getManager();
                 $em->persist($account);

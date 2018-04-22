@@ -45,5 +45,71 @@ class GuildRanks
      */
     private $guild;
 
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLevel()
+    {
+        return $this->level;
+    }
+
+    /**
+     * @param int $level
+     */
+    public function setLevel($level)
+    {
+        $this->level = $level;
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * @return Guilds
+     */
+    public function getGuild()
+    {
+        return $this->guild;
+    }
+
+    /**
+     * @param Guilds $guild
+     */
+    public function setGuild($guild)
+    {
+        $this->guild = $guild;
+    }
+
+
+
 
 }

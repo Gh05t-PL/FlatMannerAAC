@@ -8,7 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 class BanishmentsController extends Controller
 {
     /**
-     * @Route("/banishments", name="banishments")
+     * @Route("/bans", name="banishments")
      */
     public function index()
     {

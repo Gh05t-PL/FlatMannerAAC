@@ -19,7 +19,7 @@ class PlayerSkill
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    public $id;
+    private $id;
 
     /**
      * @var App\Entity\Players
@@ -27,43 +27,115 @@ class PlayerSkill
      * @ORM\OneToOne(targetEntity="App\Entity\Players")
      * @ORM\JoinColumn(name="`player_id`", referencedColumnName="id")
      */
-    public $player;
+    private $player;
 
     /**
      * @var int
      *
      * @ORM\Column(name="skillid", type="integer", nullable=false)
      */
-    public $skillid;
+    private $skillid;
 
     /**
      * @var int
      *
      * @ORM\Column(name="value", type="integer", nullable=false)
      */
-    public $value;
+    private $value;
 
     /**
      * @var int
      *
      * @ORM\Column(name="count", type="integer", nullable=false)
      */
-    public $count;
+    private $count;
 
 
 
 
 
-
-
-
-
-
-
-
-
+    /**
+     * @return int
+     */
     public function getId()
     {
         return $this->id;
     }
+
+    /**
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * @return App\Entity\Players
+     */
+    public function getPlayer()
+    {
+        return $this->player;
+    }
+
+    /**
+     * @param App\Entity\Players $player
+     */
+    public function setPlayer($player)
+    {
+        $this->player = $player;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSkillid()
+    {
+        return $this->skillid;
+    }
+
+    /**
+     * @param int $skillid
+     */
+    public function setSkillid($skillid)
+    {
+        $this->skillid = $skillid;
+    }
+
+    /**
+     * @return int
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    /**
+     * @param int $value
+     */
+    public function setValue($value)
+    {
+        $this->value = $value;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCount()
+    {
+        return $this->count;
+    }
+
+    /**
+     * @param int $count
+     */
+    public function setCount($count)
+    {
+        $this->count = $count;
+    }
+
+
+
+
+
 }

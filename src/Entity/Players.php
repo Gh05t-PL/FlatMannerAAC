@@ -17,7 +17,7 @@ class Players
      *
      * @ORM\Column(name="name", type="string", length=255, nullable=false)
      */
-    public $name;
+    private $name;
 
     /**
      * @var bool
@@ -38,14 +38,14 @@ class Players
      *
      * @ORM\Column(name="level", type="integer", nullable=false, options={"default"="1"})
      */
-    public $level = '1';
+    private $level = '1';
 
     /**
      * @var int
      *
      * @ORM\Column(name="vocation", type="integer", nullable=false)
      */
-    public $vocation = '0';
+    private $vocation = '0';
 
     /**
      * @var int
@@ -66,7 +66,7 @@ class Players
      *
      * @ORM\Column(name="experience", type="bigint", nullable=false)
      */
-    public $experience = '0';
+    private $experience = '0';
 
     /**
      * @var int
@@ -115,7 +115,7 @@ class Players
      *
      * @ORM\Column(name="maglevel", type="integer", nullable=false)
      */
-    public $maglevel = '0';
+    private $maglevel = '0';
 
     /**
      * @var int
@@ -192,7 +192,7 @@ class Players
      *
      * @ORM\Column(name="sex", type="integer", nullable=false)
      */
-    public $sex = '0';
+    private $sex = '0';
 
     /**
      * @var int
@@ -362,7 +362,7 @@ class Players
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    public $id;
+    private $id;
 
     /**
      * @var \App\Entity\Accounts
@@ -372,7 +372,830 @@ class Players
      *   @ORM\JoinColumn(name="account_id", referencedColumnName="id")
      * })
      */
-    public $account;
+    private $account;
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isWorldId()
+    {
+        return $this->worldId;
+    }
+
+    /**
+     * @param bool $worldId
+     */
+    public function setWorldId($worldId)
+    {
+        $this->worldId = $worldId;
+    }
+
+    /**
+     * @return int
+     */
+    public function getGroupId()
+    {
+        return $this->groupId;
+    }
+
+    /**
+     * @param int $groupId
+     */
+    public function setGroupId($groupId)
+    {
+        $this->groupId = $groupId;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLevel()
+    {
+        return $this->level;
+    }
+
+    /**
+     * @param int $level
+     */
+    public function setLevel($level)
+    {
+        $this->level = $level;
+    }
+
+    /**
+     * @return int
+     */
+    public function getVocation()
+    {
+        return $this->vocation;
+    }
+
+    /**
+     * @param int $vocation
+     */
+    public function setVocation($vocation)
+    {
+        $this->vocation = $vocation;
+    }
+
+    /**
+     * @return int
+     */
+    public function getHealth()
+    {
+        return $this->health;
+    }
+
+    /**
+     * @param int $health
+     */
+    public function setHealth($health)
+    {
+        $this->health = $health;
+    }
+
+    /**
+     * @return int
+     */
+    public function getHealthmax()
+    {
+        return $this->healthmax;
+    }
+
+    /**
+     * @param int $healthmax
+     */
+    public function setHealthmax($healthmax)
+    {
+        $this->healthmax = $healthmax;
+    }
+
+    /**
+     * @return int
+     */
+    public function getExperience()
+    {
+        return $this->experience;
+    }
+
+    /**
+     * @param int $experience
+     */
+    public function setExperience($experience)
+    {
+        $this->experience = $experience;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLookbody()
+    {
+        return $this->lookbody;
+    }
+
+    /**
+     * @param int $lookbody
+     */
+    public function setLookbody($lookbody)
+    {
+        $this->lookbody = $lookbody;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLookfeet()
+    {
+        return $this->lookfeet;
+    }
+
+    /**
+     * @param int $lookfeet
+     */
+    public function setLookfeet($lookfeet)
+    {
+        $this->lookfeet = $lookfeet;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLookhead()
+    {
+        return $this->lookhead;
+    }
+
+    /**
+     * @param int $lookhead
+     */
+    public function setLookhead($lookhead)
+    {
+        $this->lookhead = $lookhead;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLooklegs()
+    {
+        return $this->looklegs;
+    }
+
+    /**
+     * @param int $looklegs
+     */
+    public function setLooklegs($looklegs)
+    {
+        $this->looklegs = $looklegs;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLooktype()
+    {
+        return $this->looktype;
+    }
+
+    /**
+     * @param int $looktype
+     */
+    public function setLooktype($looktype)
+    {
+        $this->looktype = $looktype;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLookaddons()
+    {
+        return $this->lookaddons;
+    }
+
+    /**
+     * @param int $lookaddons
+     */
+    public function setLookaddons($lookaddons)
+    {
+        $this->lookaddons = $lookaddons;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaglevel()
+    {
+        return $this->maglevel;
+    }
+
+    /**
+     * @param int $maglevel
+     */
+    public function setMaglevel($maglevel)
+    {
+        $this->maglevel = $maglevel;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMana()
+    {
+        return $this->mana;
+    }
+
+    /**
+     * @param int $mana
+     */
+    public function setMana($mana)
+    {
+        $this->mana = $mana;
+    }
+
+    /**
+     * @return int
+     */
+    public function getManamax()
+    {
+        return $this->manamax;
+    }
+
+    /**
+     * @param int $manamax
+     */
+    public function setManamax($manamax)
+    {
+        $this->manamax = $manamax;
+    }
+
+    /**
+     * @return int
+     */
+    public function getManaspent()
+    {
+        return $this->manaspent;
+    }
+
+    /**
+     * @param int $manaspent
+     */
+    public function setManaspent($manaspent)
+    {
+        $this->manaspent = $manaspent;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSoul()
+    {
+        return $this->soul;
+    }
+
+    /**
+     * @param int $soul
+     */
+    public function setSoul($soul)
+    {
+        $this->soul = $soul;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTownId()
+    {
+        return $this->townId;
+    }
+
+    /**
+     * @param int $townId
+     */
+    public function setTownId($townId)
+    {
+        $this->townId = $townId;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPosx()
+    {
+        return $this->posx;
+    }
+
+    /**
+     * @param int $posx
+     */
+    public function setPosx($posx)
+    {
+        $this->posx = $posx;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPosy()
+    {
+        return $this->posy;
+    }
+
+    /**
+     * @param int $posy
+     */
+    public function setPosy($posy)
+    {
+        $this->posy = $posy;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPosz()
+    {
+        return $this->posz;
+    }
+
+    /**
+     * @param int $posz
+     */
+    public function setPosz($posz)
+    {
+        $this->posz = $posz;
+    }
+
+    /**
+     * @return string
+     */
+    public function getConditions()
+    {
+        return $this->conditions;
+    }
+
+    /**
+     * @param string $conditions
+     */
+    public function setConditions($conditions)
+    {
+        $this->conditions = $conditions;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCap()
+    {
+        return $this->cap;
+    }
+
+    /**
+     * @param int $cap
+     */
+    public function setCap($cap)
+    {
+        $this->cap = $cap;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSex()
+    {
+        return $this->sex;
+    }
+
+    /**
+     * @param int $sex
+     */
+    public function setSex($sex)
+    {
+        $this->sex = $sex;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLastlogin()
+    {
+        return $this->lastlogin;
+    }
+
+    /**
+     * @param int $lastlogin
+     */
+    public function setLastlogin($lastlogin)
+    {
+        $this->lastlogin = $lastlogin;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLastip()
+    {
+        return $this->lastip;
+    }
+
+    /**
+     * @param int $lastip
+     */
+    public function setLastip($lastip)
+    {
+        $this->lastip = $lastip;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSave()
+    {
+        return $this->save;
+    }
+
+    /**
+     * @param bool $save
+     */
+    public function setSave($save)
+    {
+        $this->save = $save;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSkull()
+    {
+        return $this->skull;
+    }
+
+    /**
+     * @param bool $skull
+     */
+    public function setSkull($skull)
+    {
+        $this->skull = $skull;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSkulltime()
+    {
+        return $this->skulltime;
+    }
+
+    /**
+     * @param int $skulltime
+     */
+    public function setSkulltime($skulltime)
+    {
+        $this->skulltime = $skulltime;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRankId()
+    {
+        return $this->rankId;
+    }
+
+    /**
+     * @param int $rankId
+     */
+    public function setRankId($rankId)
+    {
+        $this->rankId = $rankId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getGuildnick()
+    {
+        return $this->guildnick;
+    }
+
+    /**
+     * @param string $guildnick
+     */
+    public function setGuildnick($guildnick)
+    {
+        $this->guildnick = $guildnick;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLastlogout()
+    {
+        return $this->lastlogout;
+    }
+
+    /**
+     * @param int $lastlogout
+     */
+    public function setLastlogout($lastlogout)
+    {
+        $this->lastlogout = $lastlogout;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isBlessings()
+    {
+        return $this->blessings;
+    }
+
+    /**
+     * @param bool $blessings
+     */
+    public function setBlessings($blessings)
+    {
+        $this->blessings = $blessings;
+    }
+
+    /**
+     * @return int
+     */
+    public function getBalance()
+    {
+        return $this->balance;
+    }
+
+    /**
+     * @param int $balance
+     */
+    public function setBalance($balance)
+    {
+        $this->balance = $balance;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStamina()
+    {
+        return $this->stamina;
+    }
+
+    /**
+     * @param int $stamina
+     */
+    public function setStamina($stamina)
+    {
+        $this->stamina = $stamina;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDirection()
+    {
+        return $this->direction;
+    }
+
+    /**
+     * @param int $direction
+     */
+    public function setDirection($direction)
+    {
+        $this->direction = $direction;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLossExperience()
+    {
+        return $this->lossExperience;
+    }
+
+    /**
+     * @param int $lossExperience
+     */
+    public function setLossExperience($lossExperience)
+    {
+        $this->lossExperience = $lossExperience;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLossMana()
+    {
+        return $this->lossMana;
+    }
+
+    /**
+     * @param int $lossMana
+     */
+    public function setLossMana($lossMana)
+    {
+        $this->lossMana = $lossMana;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLossSkills()
+    {
+        return $this->lossSkills;
+    }
+
+    /**
+     * @param int $lossSkills
+     */
+    public function setLossSkills($lossSkills)
+    {
+        $this->lossSkills = $lossSkills;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLossContainers()
+    {
+        return $this->lossContainers;
+    }
+
+    /**
+     * @param int $lossContainers
+     */
+    public function setLossContainers($lossContainers)
+    {
+        $this->lossContainers = $lossContainers;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLossItems()
+    {
+        return $this->lossItems;
+    }
+
+    /**
+     * @param int $lossItems
+     */
+    public function setLossItems($lossItems)
+    {
+        $this->lossItems = $lossItems;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPremend()
+    {
+        return $this->premend;
+    }
+
+    /**
+     * @param int $premend
+     */
+    public function setPremend($premend)
+    {
+        $this->premend = $premend;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOnline()
+    {
+        return $this->online;
+    }
+
+    /**
+     * @param bool $online
+     */
+    public function setOnline($online)
+    {
+        $this->online = $online;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMarriage()
+    {
+        return $this->marriage;
+    }
+
+    /**
+     * @param int $marriage
+     */
+    public function setMarriage($marriage)
+    {
+        $this->marriage = $marriage;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPromotion()
+    {
+        return $this->promotion;
+    }
+
+    /**
+     * @param int $promotion
+     */
+    public function setPromotion($promotion)
+    {
+        $this->promotion = $promotion;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDeleted()
+    {
+        return $this->deleted;
+    }
+
+    /**
+     * @param bool $deleted
+     */
+    public function setDeleted($deleted)
+    {
+        $this->deleted = $deleted;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * @return Accounts
+     */
+    public function getAccount()
+    {
+        return $this->account;
+    }
+
+    /**
+     * @param Accounts $account
+     */
+    public function setAccount($account)
+    {
+        $this->account = $account;
+    }
+
+
+
+
+
+
+
 
 
 }

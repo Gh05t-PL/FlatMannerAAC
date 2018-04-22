@@ -41,13 +41,13 @@ class PlayersController extends Controller
             $playerSkills = $this->getDoctrine()
             ->getRepository(PlayerSkill::class)
             ->findBy([
-                'player' => $result->id,
+                'player' => $result->getId(),
             ]);
             //Player Kills
             $playerPK = $this->getDoctrine()
             ->getRepository(PlayerKiller::class)
             ->findBy([
-                'killer' => $result->id,
+                'killer' => $result->getId(),
             ]);
 
             //Deaths by Player

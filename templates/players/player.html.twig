@@ -251,11 +251,11 @@ color: #b5b5b5;
             <div id="equipment" class="skillWindow">
                 <div class="exp">{{ player.experience }}</div>
                 <div class="level">{{ player.level }}</div>
-                <div class="hitPoints"><font style="text-shadow: -1px -1px 0 rgba(0,0,0,0.50),1px -1px 0 rgba(0,0,0,0.50),-1px 1px 0 rgba(0,0,0,0.50),1px 1px 0 rgba(0,0,0,0.50);" color="red">1157</font></div>
-                <div class="mana"><font style="text-shadow: -1px -1px 0 rgba(0,0,0,0.50),1px -1px 0 rgba(0,0,0,0.50),-1px 1px 0 rgba(0,0,0,0.50),1px 1px 0 rgba(0,0,0,0.50);" color="DodgerBlue">2264</font></div>
-                <div class="soul">200</div>
-                <div class="cap">2,015</div>
-                <div class="stamina"><font style="text-shadow: -1px -1px 0 rgba(0,0,0,0.50),1px -1px 0 rgba(0,0,0,0.50),-1px 1px 0 rgba(0,0,0,0.50),1px 1px 0 rgba(0,0,0,0.50);">10:49</font></div>
+                <div class="hitPoints"><font style="text-shadow: -1px -1px 0 rgba(0,0,0,0.50),1px -1px 0 rgba(0,0,0,0.50),-1px 1px 0 rgba(0,0,0,0.50),1px 1px 0 rgba(0,0,0,0.50);" color="red">{{ player.health ~ '/' ~ player.healthmax }}</font></div>
+                <div class="mana"><font style="text-shadow: -1px -1px 0 rgba(0,0,0,0.50),1px -1px 0 rgba(0,0,0,0.50),-1px 1px 0 rgba(0,0,0,0.50),1px 1px 0 rgba(0,0,0,0.50);" color="DodgerBlue">{{ player.mana ~ '/' ~ player.manamax }}</font></div>
+                <div class="soul">{{ player.soul }}</div>
+                <div class="cap">{{ player.cap }}</div>
+                <div class="stamina"><font style="text-shadow: -1px -1px 0 rgba(0,0,0,0.50),1px -1px 0 rgba(0,0,0,0.50),-1px 1px 0 rgba(0,0,0,0.50),1px 1px 0 rgba(0,0,0,0.50);">{{ player.stamina / 3600000 ~ ':' ~ (((player.stamina % 3600000) < 10) ? ('0' ~ (player.stamina % 3600000)) : (player.stamina % 3600000)) }}</font></div>
                 <div class="magicLevel">{{ player.maglevel }}</div>
                 <div class="fist">{{ playerSkills[0].value }}</div>
                 <div class="club">{{ playerSkills[1].value }}</div>

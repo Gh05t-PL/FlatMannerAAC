@@ -17,14 +17,14 @@ class PlayerDeaths
      *
      * @ORM\Column(name="date", type="bigint", nullable=false, options={"unsigned"=true})
      */
-    public $date;
+    private $date;
 
     /**
      * @var int
      *
      * @ORM\Column(name="level", type="integer", nullable=false, options={"unsigned"=true})
      */
-    public $level;
+    private $level;
 
     /**
      * @var int
@@ -43,7 +43,76 @@ class PlayerDeaths
      *   @ORM\JoinColumn(name="player_id", referencedColumnName="id")
      * })
      */
-    public $player;
+    private $player;
+
+    /**
+     * @return int
+     */
+    public function getDate()
+    {
+        return $this->date;
+    }
+
+    /**
+     * @param int $date
+     */
+    public function setDate($date)
+    {
+        $this->date = $date;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLevel()
+    {
+        return $this->level;
+    }
+
+    /**
+     * @param int $level
+     */
+    public function setLevel($level)
+    {
+        $this->level = $level;
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * @return Players
+     */
+    public function getPlayer()
+    {
+        return $this->player;
+    }
+
+    /**
+     * @param Players $player
+     */
+    public function setPlayer($player)
+    {
+        $this->player = $player;
+    }
+
+
+
+
+
 
 
 }
