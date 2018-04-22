@@ -10,19 +10,15 @@
 </style>
 
 <div class="example-wrapper">
-    <h1>Helloaaaaa! ✅</h1>
     {% for error in errors %}
         <p>{{ error }}</p>
     {% endfor %}
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>src/Controller/AccountController.php</code></li>
-        <li>Your template at <code>templates/account/account_create.html.twig</code></li>
+    <h1>Register</h1>
+
 
         {{ form_start(form) }}
         {{ form_widget(form) }}
         {{ form_end(form) }}
 
-    </ul>
 </div>
 {% endblock %}

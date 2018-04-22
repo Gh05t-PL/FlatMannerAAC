@@ -11,11 +11,11 @@
 
 <div class="example-wrapper">
     <a href="/account">&lt; Back</a>
-    {% if errors %}
-        {% for error in errors %}
-            <p>{{error}}</p>
-        {% endfor %}
-    {% endif %}
+
+    {% for error in errors %}
+        <p>{{error}}</p>
+    {% endfor %}
+
     <h1>Change {{ action }}</h1>
 
         {{ form_start(form) }}

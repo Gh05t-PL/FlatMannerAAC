@@ -19,7 +19,7 @@ class PlayerSkill
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    private $id;
+    public $id;
 
     /**
      * @var App\Entity\Players
@@ -34,7 +34,7 @@ class PlayerSkill
      *
      * @ORM\Column(name="skillid", type="integer", nullable=false)
      */
-    private $skillid;
+    public $skillid;
 
     /**
      * @var int
@@ -48,7 +48,7 @@ class PlayerSkill
      *
      * @ORM\Column(name="count", type="integer", nullable=false)
      */
-    private $count;
+    public $count;
 
 
 

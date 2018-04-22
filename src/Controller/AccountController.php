@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use App\Entity\Accounts;
 use App\Entity\Players;
+use App\Entity\PlayerSkill;
 
 class AccountController extends Controller
 {
@@ -92,30 +93,38 @@ class AccountController extends Controller
         ->getForm();
 
         $form->handleRequest($request);
-
+        $errors =[];
         if ( $form->isSubmitted() && $form->isValid() ) {
             //echo $request;
-            echo "<br>";
-
-            $account = $this->getDoctrine()
-                ->getRepository(Accounts::class)
-            ->findOneBy([
-                'name' => $form->getData()['Account'],
-                'password' => $form->getData()['Password']
-            ]);
 
 
-            if ( $account !== NULL ){
-                $session->set('account_id', $account->getId());
-                echo "SETTED ".$account->getId();
+            // Checking for errors
+            if ( $account = $this->getDoctrine()->getRepository(Accounts::class)->findOneBy(['name' => $form->getData()['Account'],'password' => $form->getData()['Password']]) === NULL )
+                $errors[] = "Wrong Account Name or/and Password";
+
+            // No errors found
+            if ( empty($errors) ){
+                $account = $this->getDoctrine()
+                    ->getRepository(Accounts::class)
+                ->findOneBy([
+                    'name' => $form->getData()['Account'],
+                    'password' => $form->getData()['Password']
+                ]);
+
+
+                if ( $account !== NULL ){
+                    $session->set('account_id', $account->getId());
+                    echo "SETTED ".$account->getId();
+                }
+                return $this->redirectToRoute('account');
             }
-            return $this->redirectToRoute('account');
         }
 
-        echo "accId: ".$session->get('account_id');
+
         return $this->render('account/account_login.html.twig', [
             'form' => $form->createView(),
             'request' => $request,
+            'errors' => $errors
         ]);
     }
 
@@ -181,69 +190,101 @@ class AccountController extends Controller
         // this variable defines how big level is on start
 
         /**
-         * [TODO] get gains of cap and health/mana from vocation.xml
+         * [TODO] get vocations, gains of cap and health/mana from vocation.xml
          */
         $startLevel = 8;
+
+        $vocations = [
+            'Sorcerer' => 1,
+            'Druid' => 2,
+            'Paladin' => 3,
+            'Knight' => 4
+        ];
 
 
 
         if ($session->get('account_id') !== NULL){
-        $form = $this->createFormBuilder()
-            ->add('name', TextType::class, ['label' => 'Name', 'attr' => ['display' => 'block']])
-            ->add('sex', ChoiceType::class, [
-                'label' => 'Sex',
-                'choices' => [
-                    'Male' => 1,
-                    'Female' => 2
-                ]
-            ])
-            ->add('vocation', ChoiceType::class, [
-                'label' => 'Vocation',
-                'choices' => [
-                    'Sorcerer' => 1,
-                    'Druid' => 2,
-                    'Paladin' => 3,
-                    'Knight' => 4
-                ]
-            ])
-            ->add('Create', SubmitType::class, ['label' => 'Create'])
-        ->getForm();
+            $form = $this->createFormBuilder()
+                ->add('name', TextType::class, ['label' => 'Name', 'attr' => ['display' => 'block']])
+                ->add('sex', ChoiceType::class, [
+                    'label' => 'Sex',
+                    'choices' => [
+                        'Male' => 1,
+                        'Female' => 2
+                    ]
+                ])
+                ->add('vocation', ChoiceType::class, [
+                    'label' => 'Vocation',
+                    'choices' => $vocations
+                ])
+                ->add('Create', SubmitType::class, ['label' => 'Create'])
+            ->getForm();
 
-        $form->handleRequest($request);
+            $form->handleRequest($request);
 
-        $errors = [];
-        if ( $form->isSubmitted() && $form->isValid() ) {
-            $formData = $form->getData();
+            $errors = [];
+            if ( $form->isSubmitted() && $form->isValid() ) {
+                $formData = $form->getData();
+            
+                // Checking for errors
+                if ( $this->getDoctrine()->getRepository(Players::class)->findOneBy(['name' => $formData['name']]) !== NULL )
+                    $errors[] = "Name taken";
 
-            $player = new Players();
+                // No errors found
+                if ( empty($errors) ){
 
-            $player->name = $formData['name'];
-            $player->sex = $formData['sex'];
-            $player->vocation = $formData['vocation'];
-            $player->account = $this->getDoctrine()->getRepository(Accounts::class)->find($session->get('account_id'));
-            $player->level = $startLevel;
+                    $player = new Players();
 
-            function expToLevel($level){
-                return ((50 * ($level - 1)**3 - 150 * ($level - 1)**2 + 400 * ($level - 1)) / 3);
+                    $player->name = $formData['name'];
+                    $player->sex = $formData['sex'];
+                    $player->vocation = $formData['vocation'];
+                    $player->account = $this->getDoctrine()->getRepository(Accounts::class)->find($session->get('account_id'));
+                    $player->level = $startLevel;
+
+                    function expToLevel($level){
+                        return ((50 * ($level - 1)**3 - 150 * ($level - 1)**2 + 400 * ($level - 1)) / 3);
+                    }
+
+                    $player->exp = expToLevel($startLevel);
+
+                    $em = $this->getDoctrine()->getManager();
+                    $em->persist($player);
+                    $skills = [
+                        new PlayerSkill(),
+                        new PlayerSkill(),
+                        new PlayerSkill(),
+                        new PlayerSkill(),
+                        new PlayerSkill(),
+                        new PlayerSkill(),
+                        new PlayerSkill()
+                    ];
+                    foreach ($skills as $key => $value) {
+                        $value->player = $player;
+                        $value->skillid = $key;
+                        $value->value = 10;
+                        $value->count = 0;
+                        $em->persist($value);
+                    }
+                    $em->flush();
+                    return $this->redirectToRoute('account');
+                }
+
+                return $this->render('account/account_create_character.html.twig', [
+                    'form' => $form->createView(),
+                    'request' => $request,
+                    'errors' => $errors,
+                ]);
             }
-
-            $player->exp = expToLevel($startLevel);
-
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($player);
-            $em->flush();
-            return $this->redirectToRoute('account');
+            return $this->render('account/account_create_character.html.twig', [
+                'form' => $form->createView(),
+                'request' => $request,
+                'errors' => $errors,
+            ]);
         }
-
-        return $this->render('account/account_create_character.html.twig', [
-            'form' => $form->createView(),
-            'request' => $request,
-            'errors' => $errors,
-        ]);
-        }else{
+        
+        else{
             return $this->redirectToRoute('account_login');
         }
-
     }
 
     /**
