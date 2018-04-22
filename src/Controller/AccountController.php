@@ -238,7 +238,7 @@ class AccountController extends Controller
 
                     $player = new Players();
 
-                    $player->setName($formData['name']);
+                    $player->setName(ucwords($formData['name']));
                     $player->setSex($formData['sex']);
                     $player->setVocation($formData['vocation']);
                     $player->setAccount($this->getDoctrine()->getRepository(Accounts::class)->find($session->get('account_id')));
