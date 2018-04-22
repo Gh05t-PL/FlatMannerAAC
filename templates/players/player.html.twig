@@ -258,7 +258,7 @@ color: #b5b5b5;
                 <div class="mana"><font style="text-shadow: -1px -1px 0 rgba(0,0,0,0.50),1px -1px 0 rgba(0,0,0,0.50),-1px 1px 0 rgba(0,0,0,0.50),1px 1px 0 rgba(0,0,0,0.50);" color="DodgerBlue">{{ player.mana ~ '/' ~ player.manamax }}</font></div>
                 <div class="soul">{{ player.soul }}</div>
                 <div class="cap">{{ player.cap }}</div>
-                <div class="stamina"><font style="text-shadow: -1px -1px 0 rgba(0,0,0,0.50),1px -1px 0 rgba(0,0,0,0.50),-1px 1px 0 rgba(0,0,0,0.50),1px 1px 0 rgba(0,0,0,0.50);">{{ player.stamina / 3600000 ~ ':' ~ (((player.stamina % 3600000) < 10) ? ('0' ~ (player.stamina % 3600000)) : (player.stamina % 3600000)) }}</font></div>
+                <div class="stamina"><font style="text-shadow: -1px -1px 0 rgba(0,0,0,0.50),1px -1px 0 rgba(0,0,0,0.50),-1px 1px 0 rgba(0,0,0,0.50),1px 1px 0 rgba(0,0,0,0.50);">{{ (player.stamina / 3600000)|round(0, 'floor') ~ ':' ~ ((((player.stamina / (60 * 1000)) % 60)|round(0, 'ceil') < 10) ? ('0' ~ ((player.stamina / (60 * 1000)) % 60)|round(0, 'ceil')) : ((player.stamina / (60 * 1000)) % 60)|round(0, 'ceil')) }}</font></div>
                 <div class="magicLevel">{{ player.maglevel }}</div>
                 <div class="fist">{{ playerSkills[0].value }}</div>
                 <div class="club">{{ playerSkills[1].value }}</div>
