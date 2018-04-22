@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        {% block stylesheets %}{% endblock %}
+        <style>
+        body {
+            background-color: #FFECDE;
+        }
+        .wrapper {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-gap: 10px;
+            margin: 0 10%;
+        }
+        .header {
+            grid-column: 1/-1;
+        }
+        .header > img {
+            width: 100%;
+        }
+        .menus {
+            grid-column: 1/2;
+        }
+        .menus > div {
+            /* margin-bottom: 5px; */
+        }
+        .menus > .top-menu, .status > .top-menu {
+            /* background: url(/img/menu-top.svg) center no-repeat; */
+            /* background-size: cover; */
+            border-radius: 20px 20px 0 0;
+            height: 30px;
+            padding: 8px 0px 0px 10px;
+            color: white;
+            font-weight: 700;
+            background: linear-gradient(#1E38AA,#111111);
+        }
+        .menu-item > a, .status > .status-menu {
+            display: block;
+            background: #0075A7;
+            margin: 0 0px;
+            padding: 4px 0 4px 12px;
+            border-bottom: solid 1px black;
+        }
+        .status > .status-menu {
+            padding-left: 0;
+        }
+        .menu-item > a:last-child, .status > .status-menu {
+            border-bottom: unset;
+        }
+        .menus > .bot-menu, .status > .bot-menu {
+            /* background: url(/img/menu-bot.jpg) bottom no-repeat;
+            background-size: cover;
+            height: 11px;
+            padding: 8px 0px 0px 10px; */
+            border-radius: 0 0 20px 20px;
+            height: 17px;
+            padding: 8px 0px 0px 10px;
+            color: white;
+            font-weight: 700;
+            background: linear-gradient(#111111,#1E38AA);
+            margin-bottom: 5px;
+        }
+        .main {
+            grid-column: 2/5;
+        }
+        .main > .top {
+            /* background-color: #f3f3f3; */
+            background: url(/img/big-edgess.png) top no-repeat;
+            background-size: cover;
+            height: 30px;
+            padding: 5px 10px;
+        }
+        .main > .mid {
+            /* background-color: #f3f3f3; */
+            background: url(/img/big-mid.png) top repeat-y;
+            background-size: contain;
+            padding: 5px 10px;
+            min-height: 600px;
+        }
+        .main > .bot {
+            background: url(/img/big-edgess.png) bottom no-repeat;
+            background-size: cover;
+            height: 58px;
+        }
+        .status {
+            grid-column: 5/6;
+        }
+        </style>
+    </head>
+    <body>
+        <div class="wrapper">
+            <div class="header">
+                <img src="/img/header.gif" alt="">
+            </div>
+            <div class="menus">
+
+                <div class="top-menu">Account</div>
+                <div class="account menu-item">
+                    {% if getSesssion().get('account_id') %}
+                        <a href="/account">Account</a>
+                        <a href="/account/logout">Logout</a>
+                    {% else %}
+                        <a href="/account/login">Login</a>
+                    {% endif %}
+                    <a href="/account/create">Register</a>
+                </div>
+                <div class="bot-menu"></div>
+
+                <div class="top-menu">Server</div>
+                <div class="server menu-item">
+                    <a href="">Server Info</a>
+                    <a href="/player">Find Player</a>
+                    <a href="">Players Online</a>
+                    <a href="/highscores">Highscores</a>
+                    <a href="/bans">Banishments</a>
+                </div>
+                <div class="bot-menu"></div>
+
+                <div class="top-menu">Library</div>
+                <div class="library menu-item">
+                    <a href="">Spells</a>
+                    <a href="">Monsters</a>
+                </div>
+                <div class="bot-menu"></div>
+
+            </div>
+            <div class="main">
+                <div class="top">kontenty</div>
+                <div class="mid">
+                        {% block body %}{% endblock %}
+                </div>
+                <div class="bot"></div>
+            </div>
+            <div class="status">
+
+                <div class="top-menu">Status</div>
+                <div class="server status-menu">
+                    <center>
+
+                    
+                    <p class="online">ONLINE</p>
+                    <p class="players">123/1000</p>
+                    <p class="ip">wermox.no-ip.pl</p>
+                </center>
+                </div>
+                <div class="bot-menu"></div>
+
+            </div>
+        </div>
+
+
+        {% block javascripts %}{% endblock %}
+    </body>
+</html>

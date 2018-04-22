@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello {{ controller_name }}!{% endblock %}
+
+{% block body %}
+<style>
+    .highscores-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+    tr:nth-child(even) {
+        background: #dddddd;
+    }
+    th:nth-child(3) {
+        width: 1%;
+    }
+    td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+    table {
+        width: 100%;
+    }
+
+</style>
+{#
+0:Fist
+1:Club
+2:Sword
+3:Axe
+4: Distance
+5:Shield
+6:Fishing
+#}
+<div class="highscores-wrapper">
+    <p style="display: inline-block">Filter: </p><select style="display: inline-block" name="filter" id="filter" onchange="highscoreFilter(this)">
+        <option value="level">Level</option>
+        <option value="mlvl">Magic Level</option>
+        <option value="fist">Fist Fighting</option>
+        <option value="club">Club Fighting</option>
+        <option value="sword">Sword Fighting</option>
+        <option value="axe">Axe Fighting</option>
+        <option value="distance">Distance Fighting</option>
+        <option value="shielding">Shielding</option>
+        <option value="fishing">Fishing</option>
+        <option value="" disabled selected>Select</option>
+    </select>
+    <table>
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>{{ filterName }}</th>
+        </tr>
+        {% for player in players %}
+        <tr>
+            <td>{{ loop.index + (page - 1) * resultsLimit }}</td>
+            {% if filter == "level" or filter == "mlvl" %}
+                <td><a href="/player/{{ player.name }}">{{ player.name }}</a></td>
+                <td>{{ filter == "mlvl" ? attribute(player, "maglevel") : attribute(player, filter) }}</td>
+            {% else %}
+                <td><a href="/player/{{ player.player.name }}">{{ player.player.name }}</a></td>
+                <td>{{ player.value }}</td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </table>
+    <h1>Hello {{ controller_name }}! ✅</h1>
+
+    This friendly message is coming from:
+    <ul>
+        <li>Your controller at <code>src/Controller/HighscoresController.php</code></li>
+        <li>Your template at <code>templates/highscores/index.html.twig</code></li>
+    </ul>
+</div>
+<script>
+    function highscoreFilter(select){
+        if (select.value != "")
+        window.location.replace("/highscores/"+select.value)
+    }
+</script>
+{% endblock %}
