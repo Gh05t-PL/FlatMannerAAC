@@ -257,20 +257,43 @@ class AccountController extends Controller
 
                     $em = $this->getDoctrine()->getManager();
                     $em->persist($player);
-                    $skills = [
-                        new PlayerSkill(),
-                        new PlayerSkill(),
-                        new PlayerSkill(),
-                        new PlayerSkill(),
-                        new PlayerSkill(),
-                        new PlayerSkill(),
-                        new PlayerSkill()
-                    ];
+                    //$em->flush();
+                    // $skills = [
+                    //     new PlayerSkill(),
+                    //     new PlayerSkill(),
+                    //     new PlayerSkill(),
+                    //     new PlayerSkill(),
+                    //     new PlayerSkill(),
+                    //     new PlayerSkill(),
+                    //     new PlayerSkill()
+                    // ];
+                    // for ($i=1; $i < 7; $i++) { 
+                    //     $skills[$i]->setPlayer($player);
+                    //     $skills[$i]->setSkillid($i);
+                    //     $skills[$i]->setValue($startStats['skill']);
+                    //     $skills[$i]->setCount(0);
+                    //     $em->persist($skills[$i]);
+                    // }
+                    // // foreach ($skills as $key => $value) {
+                    // //     $value->setPlayer($player);
+                    // //     echo $key.'<br>';
+                    // //     $value->setSkillid($key);
+                    // //     echo $key.'<br>';
+                    // //     $value->setValue($startStats['skill']);
+                    // //     $value->setCount(0);
+                    // //     $em->persist($value);
+                    // // }
+                    // var_dump($skills);
+                    $em->flush();
+
+                    $skills = $this->getDoctrine()
+                    ->getRepository(PlayerSkill::class)
+                    ->findBy([
+                        'player' => $player,
+                    ]);
+
                     foreach ($skills as $key => $value) {
-                        $value->setPlayer($player);
-                        $value->setSkillid($key);
                         $value->setValue($startStats['skill']);
-                        $value->setCount(0);
                         $em->persist($value);
                     }
                     $em->flush();

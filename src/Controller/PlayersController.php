@@ -63,7 +63,6 @@ class PlayersController extends Controller
             $playerKillers = $this->getDoctrine()->getEntityManager()
                 ->createNativeQuery("SELECT id,name,t4.level,`date` FROM players t3 INNER JOIN (SELECT t2.player_id,level,`date` FROM (SELECT id,level,`date` FROM player_deaths WHERE player_id = {$result->getId()}) t1 INNER JOIN (SELECT kill_id, player_id FROM player_killers) t2 on t1.id = t2.kill_id) t4 on t3.id = t4.player_id", $rsm)
             ->getArrayResult();
-                var_dump($playerKillers);
             //Deaths by Monsters
             $rsm = new ResultSetMapping;
             $rsm->addScalarResult('name', 'name');
