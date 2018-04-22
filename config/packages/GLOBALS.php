@@ -12,5 +12,6 @@ $container->loadFromExtension('twig', [
             7 => "Royal Paladin",
             8 =>  "Elite Knight",
         ],
+        'otsName' => "OTSNAME"
     ],
 ]);
