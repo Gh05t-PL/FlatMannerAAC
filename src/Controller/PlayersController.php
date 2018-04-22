@@ -5,6 +5,7 @@ namespace App\Controller;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use App\Entity\Players;
+use App\Entity\Accounts;
 use App\Entity\PlayerSkill;
 use App\Entity\PlayerKiller;
 use App\Entity\PlayerDeaths;
@@ -60,7 +61,7 @@ class PlayersController extends Controller
 
             //WHY getResult returns 1 element?
             //SELECT name,level,`date` from players WHERE id = t2.player_id (SELECT t2.player_id,level,`date` FROM (SELECT id,level,`date` FROM player_deaths WHERE player_id = {$result->getId()}) t1 INNER JOIN (SELECT kill_id, player_id FROM player_killers) t2 on t1.id = t2.kill_id
-            $playerKillers = $this->getDoctrine()->getEntityManager()
+            $playerKillers = $this->getDoctrine()->getManager()
                 ->createNativeQuery("SELECT id,name,t4.level,`date` FROM players t3 INNER JOIN (SELECT t2.player_id,level,`date` FROM (SELECT id,level,`date` FROM player_deaths WHERE player_id = {$result->getId()}) t1 INNER JOIN (SELECT kill_id, player_id FROM player_killers) t2 on t1.id = t2.kill_id) t4 on t3.id = t4.player_id", $rsm)
             ->getArrayResult();
             //Deaths by Monsters
@@ -69,7 +70,7 @@ class PlayersController extends Controller
             $rsm->addScalarResult('level', 'level');
             $rsm->addScalarResult('date', 'date');
 
-            $monsterKillers = $this->getDoctrine()->getEntityManager()
+            $monsterKillers = $this->getDoctrine()->getManager()
                 ->createNativeQuery("SELECT name,level,date FROM (SELECT id,level,date FROM player_deaths WHERE player_id = {$result->getId()}) t1 INNER JOIN (SELECT kill_id, name FROM environment_killers) t2 on t1.id = t2.kill_id", $rsm)
             ->getResult();
 
