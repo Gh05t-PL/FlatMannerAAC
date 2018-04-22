@@ -1,7 +1,10 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Player - {{ player.name }}{% endblock %}
-
+{% if player %}
+    {% set title = "Player - " ~ player.name %}
+{% else %}
+    {% set title = "Player - Not Found" %}
+{% endif %}
+    {% block title %}{{ title }}{% endblock %}
 {% block body %}
 <style>
     .highscores-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
