@@ -8,18 +8,17 @@ Automated Account Maker created for Open Tibia Servers with Symfony 4 MVC framew
 <br>
 <br>
 <h1>Installation</h1>
-<pre>
 Edit .env file and change
-
-                             user      password             database name
+<pre>
+                        user      password             database name
                          V           V                     V
 DATABASE_URL="mysql://db_user:db_password@127.0.0.1:3306/db_name"
 
 to get database connection
 </pre>
 <br>
-<pre>
 Edit \config\packages\GLOBALS.php 
+<pre>
 for own vocation names and server name
 </pre>
 <br>
