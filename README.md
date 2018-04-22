@@ -31,4 +31,6 @@ IN YOUR DB execute this query
 ALTER TABLE player_skills ADD id INT (11) NOT NULL AUTO_INCREMENT PRIMARY KEY;
 ALTER TABLE player_killers ADD id INT (11) NOT NULL AUTO_INCREMENT PRIMARY KEY;
 </pre>
+
+Tested with TFS 0.3.6
 </div>
