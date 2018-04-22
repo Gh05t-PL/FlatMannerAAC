@@ -178,7 +178,11 @@ class AccountController extends Controller
      * @Route("/account/create/character", name="account_create_character")
      */
     public function createCharacter(Request $request, SessionInterface $session){
+        // this variable defines how big level is on start
 
+        /**
+         * [TODO] get gains of cap and health/mana from vocation.xml
+         */
         $startLevel = 8;
 
 
@@ -240,6 +244,97 @@ class AccountController extends Controller
             return $this->redirectToRoute('account_login');
         }
 
+    }
+
+    /**
+     * @Route("/account/change/password", name="account_change_password")
+     */
+    public function changePassword(Request $request, SessionInterface $session){
+        $action = 'Password';
+
+
+        $form = $this->createFormBuilder()
+            ->add('currentPassword', TextType::class, ['label' => 'Current Password'])
+            ->add('password', TextType::class, ['label' => 'Password'])
+            ->add('repeatPassword', TextType::class, ['label' => 'Repeat Password'])
+            ->add('Create', SubmitType::class, ['label' => 'Change'])
+        ->getForm();
+
+        $form->handleRequest($request);
+
+        $errors = [];
+        if ( $form->isSubmitted() && $form->isValid() ) {
+            $formData = $form->getData();
+            
+            // Checking for errors
+            if ( $this->getDoctrine()->getRepository(Accounts::class)->findOneBy(['id' => $session->get('account_id'), 'password' => $formData['password']]) !== NULL )
+                $errors[] = "Password incorrect";
+            if ( $formData['password'] != $formData['repeatPassword'])
+                $errors[] = "Passwords don't match";
+
+            // No errors found
+            if ( empty($errors) ){
+                $account = $this->getDoctrine()->getRepository(Accounts::class)->find($session->get('account_id'));
+
+                $account->password = $formData['password'];
+
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($account);
+                $em->flush();
+            }
+        }
+        return $this->render('account/account_change.html.twig', [
+            'form' => $form->createView(),
+            'request' => $request,
+            'action' => $action,
+            'errors' => $errors,
+        ]);
+    }
+
+
+    /**
+     * @Route("/account/change/email", name="account_change_email")
+     */
+    public function changeEmail(Request $request, SessionInterface $session){
+        $action = 'Email';
+
+
+        $form = $this->createFormBuilder()
+            ->add('email', TextType::class, ['label' => 'New Email'])
+            ->add('repeatEmail', TextType::class, ['label' => 'Repeat Email'])
+            ->add('password', TextType::class, ['label' => 'Password'])
+            ->add('Create', SubmitType::class, ['label' => 'Change'])
+        ->getForm();
+
+        $form->handleRequest($request);
+
+        $errors = [];
+        if ( $form->isSubmitted() && $form->isValid() ) {
+            $formData = $form->getData();
+            
+            // Checking for errors
+            if ( $this->getDoctrine()->getRepository(Accounts::class)->findOneBy(['id' => $session->get('account_id'), 'password' => $formData['password']]) == NULL )
+                $errors[] = "Password incorrect";
+            if ( $formData['email'] != $formData['repeatEmail'])
+                $errors[] = "Emails don't match";
+
+            // No errors found
+            if ( empty($errors) ){
+                $account = $this->getDoctrine()->getRepository(Accounts::class)->find($session->get('account_id'));
+
+                $account->email = $formData['email'];
+
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($account);
+                $em->flush();
+            }
+        }
+        return $this->render('account/account_change.html.twig', [
+            'form' => $form->createView(),
+            'request' => $request,
+            'action' => $action,
+            'errors' => $errors,
+        ]);
     }
 
 }

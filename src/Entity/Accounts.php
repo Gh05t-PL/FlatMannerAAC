@@ -24,7 +24,7 @@ class Accounts
      *
      * @ORM\Column(name="password", type="string", length=255, nullable=false)
      */
-    private $password;
+    public $password;
 
     /**
      * @var int

@@ -11,7 +11,12 @@
 
 <div class="example-wrapper">
     <a href="/account">&lt; Back</a>
-    <h1>Create Character</h1>
+    {% if errors %}
+        {% for error in errors %}
+            <p>{{error}}</p>
+        {% endfor %}
+    {% endif %}
+    <h1>Change {{ action }}</h1>
 
         {{ form_start(form) }}
         {{ form_widget(form) }}
