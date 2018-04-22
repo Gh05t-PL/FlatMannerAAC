@@ -233,6 +233,8 @@ class AccountController extends Controller
                 // Checking for errors
                 if ( $this->getDoctrine()->getRepository(Players::class)->findOneBy(['name' => $formData['name']]) !== NULL )
                     $errors[] = "Name taken";
+                if ( strlen($formData['name']) > 20 )
+                    $errors[] = "Name longer than 20 char";
 
                 // No errors found
                 if ( empty($errors) ){
@@ -355,6 +357,7 @@ class AccountController extends Controller
                     $em = $this->getDoctrine()->getManager();
                     $em->persist($account);
                     $em->flush();
+                    return $this->redirectToRoute('account');
                 }
             }
             return $this->render('account/account_change.html.twig', [
@@ -404,6 +407,7 @@ class AccountController extends Controller
                     $em = $this->getDoctrine()->getManager();
                     $em->persist($account);
                     $em->flush();
+                    return $this->redirectToRoute('account');
                 }
             }
             return $this->render('account/account_change.html.twig', [
