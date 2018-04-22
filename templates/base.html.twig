@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
+        <title>OTSNAME - {% block title %}{% endblock %}</title>
         {% block stylesheets %}{% endblock %}
         <style>
         body {
@@ -39,6 +39,8 @@
         .menu-item > a, .status > .status-menu {
             display: block;
             background: #0075A7;
+            color: white;
+            text-decoration: none;
             margin: 0 0px;
             padding: 4px 0 4px 12px;
             border-bottom: solid 1px black;
@@ -112,7 +114,7 @@
                 <div class="server menu-item">
                     <a href="">Server Info</a>
                     <a href="/player">Find Player</a>
-                    <a href="">Players Online</a>
+                    <a href="/players/online">Players Online</a>
                     <a href="/highscores">Highscores</a>
                     <a href="/bans">Banishments</a>
                 </div>
@@ -127,7 +129,7 @@
 
             </div>
             <div class="main">
-                <div class="top">kontenty</div>
+                <div class="top"></div>
                 <div class="mid">
                         {% block body %}{% endblock %}
                 </div>

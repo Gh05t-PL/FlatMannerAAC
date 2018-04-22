@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Players Online{% endblock %}
+
+{% block body %}
+<style>
+    .highscores-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+    tr:nth-child(even) {
+        background: #dddddd;
+    }
+    th:nth-child(1) {
+        width: 10%;
+    }
+    th:nth-child(2) {
+        width: 60%;
+    }
+    th:nth-child(3) {
+        width: 20%;
+    }
+    td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+    table {
+        width: 100%;
+    }
+
+
+</style>
+
+<div class="highscores-wrapper">
+    {% if onlines %}
+        <div class="online">
+            <p class="label">Online Players: <strong>{{ onlines|length }}</strong></p>
+            <table>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Vocation</th>
+                </tr>
+                {% for online in onlines %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td><strong><a href="/player/{{ online.name }}">{{ online.name }}</a></strong></td>
+                        <td>{{ vocations[online.vocation] }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% endif %}
+
+</div>
+<script>
+    function search(){
+        if (document.querySelector("#search").value != "")
+            window.location.replace("/player/"+document.querySelector("#search").value)
+    }
+    function enterSearch(event){
+        if (event.keyCode == 13){
+            window.location.replace("/player/"+document.querySelector("#search").value)
+        }
+    }
+</script>
+{% endblock %}

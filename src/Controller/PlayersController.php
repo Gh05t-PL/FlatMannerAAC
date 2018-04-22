@@ -84,4 +84,22 @@ class PlayersController extends Controller
             'monsterKillers' => @$monsterKillers,
         ]);
     }
+
+
+    /**
+     * @Route("/players/online", name="player_online")
+     */
+    public function playerOnline()
+    {
+        $onlines = $this->getDoctrine()
+            ->getRepository(Players::class)
+        ->findBy([
+            'online' => 1,
+        ]);
+
+        return $this->render('players/online.html.twig', [
+            'controller_name' => 'PlayersController',
+            'onlines' => @$onlines,
+        ]);
+    }
 }

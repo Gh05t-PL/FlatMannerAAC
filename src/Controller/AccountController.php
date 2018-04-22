@@ -25,11 +25,9 @@ class AccountController extends Controller
     public function account(SessionInterface $session){
 
         // if session['account_id'] !== NULL AND loginIp == CurrentIp then
+        // LOGGED IN
         if ( $session->get('account_id') !== NULL ){
-            // siemka jestem logniety, no zapraszam zapraszam zaraz dam ci info o twoim koncie
-            echo 'Logged IN as ' . $session->get('account_id');
 
-            // tu twoje oczekiwane info
             $account = $this->getDoctrine()
                 ->getRepository(\App\Entity\Accounts::class)
             ->find($session->get('account_id'));
@@ -44,7 +42,7 @@ class AccountController extends Controller
             ]);
         }
         else{
-            // no nie jestes zalogowany a to zle, przekierowuje 301 perm
+            
             return $this->redirectToRoute('account_login', [], 301);
         }
     }
@@ -302,44 +300,47 @@ class AccountController extends Controller
      */
     public function changePassword(Request $request, SessionInterface $session){
         $action = 'Password';
+        if ( $session->get('account_id') !== NULL ){
 
+            $form = $this->createFormBuilder()
+                ->add('currentPassword', TextType::class, ['label' => 'Current Password'])
+                ->add('password', TextType::class, ['label' => 'Password'])
+                ->add('repeatPassword', TextType::class, ['label' => 'Repeat Password'])
+                ->add('Create', SubmitType::class, ['label' => 'Change'])
+            ->getForm();
 
-        $form = $this->createFormBuilder()
-            ->add('currentPassword', TextType::class, ['label' => 'Current Password'])
-            ->add('password', TextType::class, ['label' => 'Password'])
-            ->add('repeatPassword', TextType::class, ['label' => 'Repeat Password'])
-            ->add('Create', SubmitType::class, ['label' => 'Change'])
-        ->getForm();
+            $form->handleRequest($request);
 
-        $form->handleRequest($request);
+            $errors = [];
+            if ( $form->isSubmitted() && $form->isValid() ) {
+                $formData = $form->getData();
+                
+                // Checking for errors
+                if ( $this->getDoctrine()->getRepository(Accounts::class)->findOneBy(['id' => $session->get('account_id'), 'password' => $formData['password']]) !== NULL )
+                    $errors[] = "Password incorrect";
+                if ( $formData['password'] != $formData['repeatPassword'])
+                    $errors[] = "Passwords don't match";
 
-        $errors = [];
-        if ( $form->isSubmitted() && $form->isValid() ) {
-            $formData = $form->getData();
-            
-            // Checking for errors
-            if ( $this->getDoctrine()->getRepository(Accounts::class)->findOneBy(['id' => $session->get('account_id'), 'password' => $formData['password']]) !== NULL )
-                $errors[] = "Password incorrect";
-            if ( $formData['password'] != $formData['repeatPassword'])
-                $errors[] = "Passwords don't match";
+                // No errors found
+                if ( empty($errors) ){
+                    $account = $this->getDoctrine()->getRepository(Accounts::class)->find($session->get('account_id'));
 
-            // No errors found
-            if ( empty($errors) ){
-                $account = $this->getDoctrine()->getRepository(Accounts::class)->find($session->get('account_id'));
+                    $account->setPassword($formData['password']);
 
-                $account->setPassword($formData['password']);
-
-                $em = $this->getDoctrine()->getManager();
-                $em->persist($account);
-                $em->flush();
+                    $em = $this->getDoctrine()->getManager();
+                    $em->persist($account);
+                    $em->flush();
+                }
             }
+            return $this->render('account/account_change.html.twig', [
+                'form' => $form->createView(),
+                'request' => $request,
+                'action' => $action,
+                'errors' => $errors,
+            ]);
+        }else{
+            return $this->redirectToRoute('account_login');
         }
-        return $this->render('account/account_change.html.twig', [
-            'form' => $form->createView(),
-            'request' => $request,
-            'action' => $action,
-            'errors' => $errors,
-        ]);
     }
 
 
@@ -348,44 +349,47 @@ class AccountController extends Controller
      */
     public function changeEmail(Request $request, SessionInterface $session){
         $action = 'Email';
+        if ( $session->get('account_id') !== NULL ){
 
+            $form = $this->createFormBuilder()
+                ->add('email', TextType::class, ['label' => 'New Email'])
+                ->add('repeatEmail', TextType::class, ['label' => 'Repeat Email'])
+                ->add('password', TextType::class, ['label' => 'Password'])
+                ->add('Create', SubmitType::class, ['label' => 'Change'])
+            ->getForm();
 
-        $form = $this->createFormBuilder()
-            ->add('email', TextType::class, ['label' => 'New Email'])
-            ->add('repeatEmail', TextType::class, ['label' => 'Repeat Email'])
-            ->add('password', TextType::class, ['label' => 'Password'])
-            ->add('Create', SubmitType::class, ['label' => 'Change'])
-        ->getForm();
+            $form->handleRequest($request);
 
-        $form->handleRequest($request);
+            $errors = [];
+            if ( $form->isSubmitted() && $form->isValid() ) {
+                $formData = $form->getData();
+                
+                // Checking for errors
+                if ( $this->getDoctrine()->getRepository(Accounts::class)->findOneBy(['id' => $session->get('account_id'), 'password' => $formData['password']]) == NULL )
+                    $errors[] = "Password incorrect";
+                if ( $formData['email'] != $formData['repeatEmail'])
+                    $errors[] = "Emails don't match";
 
-        $errors = [];
-        if ( $form->isSubmitted() && $form->isValid() ) {
-            $formData = $form->getData();
-            
-            // Checking for errors
-            if ( $this->getDoctrine()->getRepository(Accounts::class)->findOneBy(['id' => $session->get('account_id'), 'password' => $formData['password']]) == NULL )
-                $errors[] = "Password incorrect";
-            if ( $formData['email'] != $formData['repeatEmail'])
-                $errors[] = "Emails don't match";
+                // No errors found
+                if ( empty($errors) ){
+                    $account = $this->getDoctrine()->getRepository(Accounts::class)->find($session->get('account_id'));
 
-            // No errors found
-            if ( empty($errors) ){
-                $account = $this->getDoctrine()->getRepository(Accounts::class)->find($session->get('account_id'));
+                    $account->setEmail($formData['email']);
 
-                $account->setEmail($formData['email']);
-
-                $em = $this->getDoctrine()->getManager();
-                $em->persist($account);
-                $em->flush();
+                    $em = $this->getDoctrine()->getManager();
+                    $em->persist($account);
+                    $em->flush();
+                }
             }
+            return $this->render('account/account_change.html.twig', [
+                'form' => $form->createView(),
+                'request' => $request,
+                'action' => $action,
+                'errors' => $errors,
+            ]);
+        }else{
+            return $this->redirectToRoute('account_login');
         }
-        return $this->render('account/account_change.html.twig', [
-            'form' => $form->createView(),
-            'request' => $request,
-            'action' => $action,
-            'errors' => $errors,
-        ]);
     }
 
 }
