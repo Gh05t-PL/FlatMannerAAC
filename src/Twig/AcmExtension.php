@@ -18,11 +18,10 @@ class AcmExtension extends \Twig_Extension
     ///FUNCTION FROM NICAW AAC EDITED BY GHOST ornot
     public function getServerStatus(){
 
-        $cfg['status_update_interval'] = 2;
+        $cfg['status_update_interval'] = 5; //SECONDS
         $cfg['server_ip'] = '127.0.0.1';
         $cfg['server_port'] = 7171;
-        $cfg['statusDir'] = 'C:\xampp\htdocs\fmaac2\src\Controller\status.xml';
-        
+        $cfg['statusDir'] = 'status.xml';
         $a = function ($host='127.0.0.1',$port=7171){
             // connects to server
             $errorCode;
@@ -55,9 +54,6 @@ class AcmExtension extends \Twig_Extension
             return null;
             
         };
-        
-        if ($cfg['status_update_interval'] < 60)
-            $cfg['status_update_interval'] = 10;
 
         $modtime = filemtime($cfg['statusDir']);
 
@@ -97,8 +93,8 @@ class AcmExtension extends \Twig_Extension
             if ($m < 10) {$m = "0".$m;}
 
             $array = [
-                'uptime' => $up,
-                'online' => $online,
+                'uptime' => "{$h}:{$m}",
+                'online' => "$online",
                 'max' => $max
             ];
 

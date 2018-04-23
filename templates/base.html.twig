@@ -141,10 +141,10 @@
                 <div class="server status-menu">
                     <center>
 
-                    
                     {% if getServerStatus() %}
                         <p class="online">ONLINE</p>
                         <p class="players">{{ getServerStatus()['online'] }}/1000</p>
+                        <p class="players">{{ getServerStatus()['uptime'] }}</p>
                         <p class="ip">firefun.dyn.pl</p>
                     {% else %}
                         <p class="online offline">OFFLINE</p>
