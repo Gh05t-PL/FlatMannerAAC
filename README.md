@@ -8,7 +8,7 @@ Automated Account Maker created for Open Tibia Servers with Symfony 4 MVC framew
 <br>
 <br>
 <h1>Installation</h1>
-1. Download Composer click!<br>
+1. Download Composer <a href="https://getcomposer.org/download/">Click!</a><br>
 2. Download fmAAC<br>
 3. Unpack it to desired server folder<br>
 4. Edit \.env.dist and change:<br>
