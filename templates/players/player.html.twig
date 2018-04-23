@@ -287,12 +287,21 @@ color: #b5b5b5;
 
                 <p class="label">Deaths</p>
                 <p style="font-size: small;">By Players</p>
-                {% if playerPK %}
+                {% if playerKillers %}
                 <table>
 
                     {% for death in playerKillers %}
                     <tr>
-                        <td>Killed by <a href="/player/{{ death[0].name }}">{{ death[0].name }}</a> on Level {{ death.level }} on {{ death.date|date("d.m.Y H:i:s") }}</td>
+                        {% set namess = death.names|split(',') %}
+                        <td>Killed by 
+                            {% for name in namess %}
+                                {% if loop.last %}
+                                    <a href="/player/{{ name }}">{{ name }}</a>
+                                {% else %}
+                                    <a href="/player/{{ name }}">{{ name }}</a>,
+                                {% endif %}
+                            {% endfor %}
+                        on Level {{ death.level }} on {{ death.date|date("d.m.Y H:i:s") }}</td>
                     </tr>
                     {% endfor %}
                 </table>
@@ -306,7 +315,7 @@ color: #b5b5b5;
 
                     {% for death in monsterKillers %}
                     <tr>
-                        <td>Killed by {{ death.name }} on Level {{ death.level }} on {{ death.date|date("d.m.Y H:i:s") }}</td>
+                        <td>Killed by {{ death.killers }} on Level {{ death.level }} on {{ death.date|date("d.m.Y H:i:s") }}</td>
                     </tr>
                     {% endfor %}
                 </table>
