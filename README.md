@@ -26,6 +26,7 @@ to get database connection</pre>
 <pre>
 composer install
 </pre>
+<br>
 7. Edit Apache server DocumentRoot to "public" folder of AAC
 <br>
 <br>
