@@ -275,9 +275,9 @@ class AccountController extends Controller
                     $player->setManamax($startStats['mana']);
                     $player->setTownId($formData['city']);
 
-                    $player->setPosx($citiesPos[$formData['city']]);
-                    $player->setPosy($citiesPos[$formData['city']]);
-                    $player->setPosz($citiesPos[$formData['city']]);
+                    $player->setPosx($citiesPos[$formData['city']]['x']);
+                    $player->setPosy($citiesPos[$formData['city']]['y']);
+                    $player->setPosz($citiesPos[$formData['city']]['z']);
 
                     function expToLevel($level){
                         return ((50 * ($level - 1)**3 - 150 * ($level - 1)**2 + 400 * ($level - 1)) / 3);
