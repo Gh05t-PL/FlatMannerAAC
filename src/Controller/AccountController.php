@@ -256,6 +256,10 @@ class AccountController extends Controller
                     $errors[] = "Name taken";
                 if ( strlen($formData['name']) > 20 )
                     $errors[] = "Name longer than 20 char";
+                if ( preg_match("/^([A-z ])+$/", $formData['name']) === 0 )
+                    $errors[] = "Name can only contain letters from [A-Z][a-z] and spaces";
+                    //var_dump(preg_match("/^([A-z ])+$/", $formData['name']));
+
 
                 // No errors found
                 if ( empty($errors) ){
@@ -273,8 +277,8 @@ class AccountController extends Controller
                     $player->setHealthmax($startStats['health']);
                     $player->setMana($startStats['mana']);
                     $player->setManamax($startStats['mana']);
-                    $player->setTownId($formData['city']);
 
+                    $player->setTownId($formData['city']);
                     $player->setPosx($citiesPos[$formData['city']]['x']);
                     $player->setPosy($citiesPos[$formData['city']]['y']);
                     $player->setPosz($citiesPos[$formData['city']]['z']);
@@ -316,18 +320,21 @@ class AccountController extends Controller
                     // var_dump($skills);
                     $em->flush();
 
+                    // GET SKILLS
                     $skills = $this->getDoctrine()
                     ->getRepository(PlayerSkill::class)
                     ->findBy([
                         'player' => $player,
                     ]);
-
+                        
+                    // SET STARTING SKILLS
                     foreach ($skills as $key => $value) {
                         $value->setValue($startStats['skill']);
                         $em->persist($value);
                     }
+
                     $em->flush();
-                    return $this->redirectToRoute('account');
+                    //return $this->redirectToRoute('account');
                 }
 
                 return $this->render('account/account_create_character.html.twig', [
