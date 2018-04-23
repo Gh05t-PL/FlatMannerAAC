@@ -142,9 +142,14 @@
                     <center>
 
                     
-                    <p class="online">ONLINE</p>
-                    <p class="players">123/1000</p>
-                    <p class="ip">firefun.dyn.pl</p>
+                    {% if getServerStatus() %}
+                        <p class="online">ONLINE</p>
+                        <p class="players">{{ getServerStatus()['online'] }}/1000</p>
+                        <p class="ip">firefun.dyn.pl</p>
+                    {% else %}
+                        <p class="online offline">OFFLINE</p>
+                        <p class="ip">firefun.dyn.pl</p>
+                    {% endif %}
                 </center>
                 </div>
                 <div class="bot-menu"></div>
