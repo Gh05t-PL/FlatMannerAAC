@@ -204,6 +204,23 @@ class AccountController extends Controller
             'Paladin' => 3,
             'Knight' => 4
         ];
+        $cities = [
+            "Thais" => 1,
+            "Kazordoon" => 2,
+            "Venore" => 3,
+        ];
+        $citiesPos = [
+            1 => [
+                "x" => 95,
+                "y" => 126,
+                "z" => 7,
+            ],
+            2 => [
+                "x" => 201,
+                "y" => 497,
+                "z" => 7,
+            ],
+        ];
 
 
 
@@ -220,6 +237,10 @@ class AccountController extends Controller
                 ->add('vocation', ChoiceType::class, [
                     'label' => 'Vocation',
                     'choices' => $vocations
+                ])
+                ->add('city', ChoiceType::class, [
+                    'label' => 'City',
+                    'choices' => $cities,
                 ])
                 ->add('Create', SubmitType::class, ['label' => 'Create'])
             ->getForm();
@@ -252,6 +273,11 @@ class AccountController extends Controller
                     $player->setHealthmax($startStats['health']);
                     $player->setMana($startStats['mana']);
                     $player->setManamax($startStats['mana']);
+                    $player->setTownId($formData['city']);
+
+                    $player->setPosx($citiesPos[$formData['city']]);
+                    $player->setPosy($citiesPos[$formData['city']]);
+                    $player->setPosz($citiesPos[$formData['city']]);
 
                     function expToLevel($level){
                         return ((50 * ($level - 1)**3 - 150 * ($level - 1)**2 + 400 * ($level - 1)) / 3);
