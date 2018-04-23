@@ -18,7 +18,7 @@ class AcmExtension extends \Twig_Extension
     ///FUNCTION FROM NICAW AAC EDITED BY GHOST ornot
     public function getServerStatus(){
 
-        $cfg['status_update_interval'] = 5; //SECONDS
+        $cfg['status_update_interval'] = 60; //SECONDS
         $cfg['server_ip'] = '127.0.0.1';
         $cfg['server_port'] = 7171;
         $cfg['statusDir'] = 'status.xml';
