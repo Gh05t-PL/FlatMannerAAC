@@ -8,25 +8,30 @@ Automated Account Maker created for Open Tibia Servers with Symfony 4 MVC framew
 <br>
 <br>
 <h1>Installation</h1>
-Edit .env file and change
+1. Download Composer click!
+2. Download fmAAC
+3. Unpack it to desired server folder
+4. Edit \.env.dist and change:
 <pre>
+APP_ENV=prod
                         user      password             database name
                          V           V                     V
 DATABASE_URL="mysql://db_user:db_password@127.0.0.1:3306/db_name"
 
-to get database connection
-</pre>
+to get database connection</pre>
 <br>
-Edit \config\packages\GLOBALS.php 
+5. Edit \config\packages\GLOBALS.php with your own vocation data and server name(to edit player stats go to \src\Controller\AccountController.php and go to createCharacter function and find $startStats)
+6. Open command line and navigate to aac root folder and type
 <pre>
-for own vocation names and server name
+composer install
 </pre>
+7. Edit Apache server DocumentRoot to "public" folder of AAC
 <br>
 <br>
 <br>
 
 
-IN YOUR DB execute this query
+8. In your DataBase execute this query
 <pre>
 ALTER TABLE player_skills ADD id INT (11) NOT NULL AUTO_INCREMENT PRIMARY KEY;
 ALTER TABLE player_killers ADD id INT (11) NOT NULL AUTO_INCREMENT PRIMARY KEY;
