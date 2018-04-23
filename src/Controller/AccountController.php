@@ -231,7 +231,7 @@ class AccountController extends Controller
                     'label' => 'Sex',
                     'choices' => [
                         'Male' => 1,
-                        'Female' => 2
+                        'Female' => 0
                     ]
                 ])
                 ->add('vocation', ChoiceType::class, [
