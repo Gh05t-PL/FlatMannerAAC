@@ -22,9 +22,23 @@ class HighscoresController extends Controller
     public function highscores($filter = "level", $page = 1, SessionInterface $session)
     {
         $resultsLimit = 15;
+
+        // GET COUNT OF POSSIBLE RESULTS
+        $possibleCount = count($this->getDoctrine()
+        ->getRepository(Players::class)
+        ->findBy([
+            'groupId' => 1,
+        ],[
+            'maglevel' => "DESC"
+        ]));
+
+        // GET POSSIBLE COUNT OF PAGES
+        $pagesCount = ceil(($possibleCount / $resultsLimit));
+        
         
         //----LEVEL AND MLVL
         if ($filter === "level"){
+
             $result = $this->getDoctrine()
                 ->getRepository(Players::class)
             ->findBy([
@@ -33,10 +47,12 @@ class HighscoresController extends Controller
                 'level' => "DESC"
             ], $resultsLimit ,$resultsLimit*($page-1));
 
+
             $filterName = "Level";
         }
 
         elseif ($filter === "mlvl"){
+
             $result = $this->getDoctrine()
                 ->getRepository(Players::class)
             ->findBy([
@@ -45,15 +61,6 @@ class HighscoresController extends Controller
                 'maglevel' => "DESC"
             ], $resultsLimit ,$resultsLimit*($page-1));
 
-            // if (count($result) == 0){
-            //     $qb = $this->getDoctrine()->getEntityManager()->createQueryBuilder();
-            //     $qb->select('count(player.id)');
-            //     $qb->from('App:Players','player');
-            //     $count = $qb->getQuery()->getSingleScalarResult();
-            //     //var_dump($count);
-            //     //echo $redirPage = ceil((int)$count/$resultsLimit.0);
-            //     return $this->redirectToRoute('highscores_level', ['page' => $redirPage]);
-            // }
 
             $filterName = "Magic Level";
         }
@@ -159,6 +166,7 @@ class HighscoresController extends Controller
             'filter' => $filter,
             'filterName' => $filterName,
             'resultsLimit' => $resultsLimit,
+            'pagesCount' => $pagesCount,
         ]);
     }
 
