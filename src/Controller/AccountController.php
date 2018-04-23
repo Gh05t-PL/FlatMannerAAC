@@ -334,7 +334,7 @@ class AccountController extends Controller
                     }
 
                     $em->flush();
-                    //return $this->redirectToRoute('account');
+                    return $this->redirectToRoute('account');
                 }
 
                 return $this->render('account/account_create_character.html.twig', [
