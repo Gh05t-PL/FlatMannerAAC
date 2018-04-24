@@ -59,11 +59,17 @@ class OtsExtension extends \Twig_Extension
         $cfg['server_ip'] = '127.0.0.1';
         $cfg['server_port'] = 7171;
         $cfg['statusDir'] = 'status.xml';
+
+        $socket = @fsockopen($cfg['server_ip'], 7172, $errorCode, $errorString, 0.3);
+        if ($socket == false){
+             return null;
+        }
+        fclose($socket);
         $a = function ($host='127.0.0.1',$port=7171){
             // connects to server
             $errorCode;
             $errorString;
-            $socket = @fsockopen('127.0.0.1',7171, $errorCode, $errorString, 0.3);
+            $socket = @fsockopen($host,$port, $errorCode, $errorString, 0.3);
             //var_dump($errorString);
             $data = '';
             // if connected then checking statistics
@@ -88,6 +94,7 @@ class OtsExtension extends \Twig_Extension
                 return $data;
             }
             //var_dump($data);
+
             return null;
             
         };
@@ -107,7 +114,7 @@ class OtsExtension extends \Twig_Extension
             //echo 'ccccccccccccccccccccccc '.(time() - $modtime).'<br>'.$modtime.'<br>';
             //var_dump($info);
             if (!empty($info)){
-            echo 'file put ';
+            //echo 'file put ';
                 file_put_contents($cfg['statusDir'],$info);
             }
 
@@ -124,6 +131,7 @@ class OtsExtension extends \Twig_Extension
             $up = (int)$infoXML->serverinfo['uptime'];
             $online = (int)$infoXML->players['online'];
             $max = (int)$infoXML->players['max'];
+            $ip = $infoXML->serverinfo['ip'];
             
             $h = floor($up/3600);
             $up = $up - $h*3600;
@@ -135,7 +143,8 @@ class OtsExtension extends \Twig_Extension
             $array = [
                 'uptime' => "{$h}:{$m}",
                 'online' => "$online",
-                'max' => $max
+                'max' => $max,
+                'ip' => $ip
             ];
 
             return $array;
@@ -143,10 +152,11 @@ class OtsExtension extends \Twig_Extension
         $array = [
             'uptime' => "NaN",
             'online' => "NaN",
-            'max' => "NaN"
+            'max' => "NaN",
+            'ip' => "NaS"
         ];
 
-        return $array;
+        return null;
     }
     
     public function getFunctions()
