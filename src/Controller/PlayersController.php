@@ -50,6 +50,7 @@ class PlayersController extends Controller
             ->findBy([
                 'killer' => $result->getId(),
             ]);
+            $result->kills = count($playerPK);
 
             //Deaths by Player
             $rsm = new ResultSetMapping;
