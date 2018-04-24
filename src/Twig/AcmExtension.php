@@ -18,7 +18,7 @@ class AcmExtension extends \Twig_Extension
     ///FUNCTION FROM NICAW AAC EDITED BY GHOST ornot
     public function getServerStatus(){
 
-        $cfg['status_update_interval'] = 60; //SECONDS
+        $cfg['status_update_interval'] = 5 * 60; //SECONDS
         $cfg['server_ip'] = '127.0.0.1';
         $cfg['server_port'] = 7171;
         $cfg['statusDir'] = 'status.xml';
@@ -59,12 +59,14 @@ class AcmExtension extends \Twig_Extension
 
         $test=(time() - $modtime);
         //echo "{$test} > {$cfg['status_update_interval']} ";
-        $info = $a($cfg['server_ip'], $cfg['server_port']);
+        $info = '';
         if ((time() - $modtime) > $cfg['status_update_interval']){
+            $info = $a($cfg['server_ip'], $cfg['server_port']);
             //var_dump($info);
             if ($info === null){
                 return null;
             }
+
             //echo 'ccccccccccccccccccccccc '.(time() - $modtime).'<br>'.$modtime.'<br>';
             //var_dump($info);
             if (!empty($info)){
@@ -77,6 +79,7 @@ class AcmExtension extends \Twig_Extension
             //echo 'file_get_contents ';
         }
         $infooo = file_get_contents($cfg['statusDir']);
+
         if (!empty($infooo)) {
             //echo 'aaaaaas';
             $infoXML = simplexml_load_string($infooo);
