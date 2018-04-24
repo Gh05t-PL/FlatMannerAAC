@@ -4,17 +4,54 @@ namespace App\Twig;
 
 use Extension\AbstractExtension;
 use Twig\TwigFilter;
+use Doctrine\ORM\Query\ResultSetMapping;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpFoundation\Session\Session;
 use \Twig_Function;
 
-class AcmExtension extends \Twig_Extension
+class OtsExtension extends \Twig_Extension
 {
-    public function getSesssion()
+    protected $doctrine;
+    // Retrieve doctrine from the constructor
+    //SELECT id,(t1.experience - expBefore) as expDiff FROM players t1 INNER JOIN (SELECT player_id, exp as expBefore FROM today_exp) t2 ON t1.id = t2.player_id ORDER BY expDiff DESC
+    public function __construct(RegistryInterface $doctrine)
     {
-        return $session = new Session();
+        $this->doctrine = $doctrine;
     }
+
+
+    public function getTop5()
+    {
+
+        $rsm = new ResultSetMapping;
+        $rsm->addScalarResult('name', 'name');
+        $rsm->addScalarResult('level', 'level');
+        
+        //WHY getResult returns 1 element?
+        //SELECT name,level,`date` from players WHERE id = t2.player_id (SELECT t2.player_id,level,`date` FROM (SELECT id,level,`date` FROM player_deaths WHERE player_id = {$result->getId()}) t1 INNER JOIN (SELECT kill_id, player_id FROM player_killers) t2 on t1.id = t2.kill_id
+        $top5 = $this->doctrine->getManager()
+            ->createNativeQuery("SELECT name, level FROM players ORDER BY level DESC LIMIT 5", $rsm)
+        ->getResult();
+
+
+        return $top5;
+    }
+
+/* //UNCOMMENT ONLY IF CRON PLUGIN DOWNLOADED
+    public function getPowerGamers()
+    {
+        $rsm = new ResultSetMapping;
+        $rsm->addScalarResult('name', 'name');
+        $rsm->addScalarResult('expDiff', 'expDiff');
+
+        $powerGamers = $this->doctrine->getManager()
+            ->createNativeQuery("SELECT name, level FROM players ORDER BY level DESC LIMIT 5", $rsm)
+        ->getResult();
+
+        return $powerGamers;
+    }
+*/
+
     ///FUNCTION FROM NICAW AAC EDITED BY GHOST ornot
     public function getServerStatus(){
 
@@ -70,7 +107,7 @@ class AcmExtension extends \Twig_Extension
             //echo 'ccccccccccccccccccccccc '.(time() - $modtime).'<br>'.$modtime.'<br>';
             //var_dump($info);
             if (!empty($info)){
-            //echo 'file put ';
+            echo 'file put ';
                 file_put_contents($cfg['statusDir'],$info);
             }
 
@@ -111,12 +148,13 @@ class AcmExtension extends \Twig_Extension
 
         return $array;
     }
-
+    
     public function getFunctions()
     {
         return array(
-            'getSesssion' => new Twig_Function('getSesssion', [$this, 'getSesssion']),
+            'getTop5' => new Twig_Function('getTop5', [$this, 'getTop5']),
             'getServerStatus' => new Twig_Function('getServerStatus', [$this, 'getServerStatus']),
+            // UNCOMMENT ONLY IF CRON PLUGIN DOWNLOADED  'getPowerGamers' => new Twig_Function('getPowerGamers', [$this, 'getPowerGamers']),
         );
     }
 }
