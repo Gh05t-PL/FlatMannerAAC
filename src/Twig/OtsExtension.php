@@ -8,7 +8,7 @@ use Doctrine\ORM\Query\ResultSetMapping;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 use \Twig_Function;
-
+use \Twig_Filter;
 class OtsExtension extends \Twig_Extension
 {
     protected $doctrine;
@@ -145,11 +145,72 @@ class OtsExtension extends \Twig_Extension
         return null;
     }
     
+    
     public function getFunctions()
     {
         return array(
             'getTop5' => new Twig_Function('getTop5', [$this, 'getTop5']),
             'getServerStatus' => new Twig_Function('getServerStatus', [$this, 'getServerStatus']),
+            'getPowerGamers' => new Twig_Function('getPowerGamers', [$this, 'getPowerGamers']),
         );
     }
+
+
+
+//     FILTERS
+
+    public function truncateHTML(string $html, int $length){
+        $truncatedText = substr($html, $length);
+        $pos = strpos($truncatedText, ">");
+        if($pos !== false)
+        {
+            $html = substr($html, 0,$length + $pos + 1);
+        }
+        else
+        {
+            $html = substr($html, 0,$length);
+        }
+
+        preg_match_all('#<(?!meta|img|br|hr|input\b)\b([a-z]+)(?: .*)?(?<![/|/ ])>#iU', $html, $result);
+        $openedtags = $result[1];
+
+        preg_match_all('#</([a-z]+)>#iU', $html, $result);
+        $closedtags = $result[1];
+
+        $len_opened = count($openedtags);
+
+        if (count($closedtags) == $len_opened)
+        {
+            return $html;
+        }
+
+        $openedtags = array_reverse($openedtags);
+        for ($i=0; $i < $len_opened; $i++)
+        {
+            if (!in_array($openedtags[$i], $closedtags))
+            {
+                $html .= '</'.$openedtags[$i].'>';
+            }
+            else
+            {
+                unset($closedtags[array_search($openedtags[$i], $closedtags)]);
+            }
+        }
+
+
+        return $html;
+    }
+
+
+    public function getFilters()
+    {
+
+        return array(
+            'truncateHTML' => new Twig_Filter('truncateHTML', [$this, 'truncateHTML']),
+        );
+
+
+
+    }
+
 }

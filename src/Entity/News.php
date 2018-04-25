@@ -41,7 +41,7 @@ class News
     /**
      * @var int
      *
-     * @ORM\Column(name="text", type="string", length=4000, nullable=false)
+     * @ORM\Column(name="text", type="text", nullable=false)
      */
     private $text;
 
