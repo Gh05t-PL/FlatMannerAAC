@@ -12,7 +12,7 @@ Automated Account Maker created for Open Tibia Servers with Symfony 4 MVC framew
 <pre>
  
 
-0. EXECUTE THIS QUERIES 
+0 EXECUTE THIS QUERIES 
 {
     ALTER TABLE player_skills ADD id INT (11) NOT NULL AUTO_INCREMENT PRIMARY KEY;
     ALTER TABLE player_killers ADD id INT (11) NOT NULL AUTO_INCREMENT PRIMARY KEY;
@@ -46,7 +46,7 @@ Automated Account Maker created for Open Tibia Servers with Symfony 4 MVC framew
 
 
 
-1. IN CONSOLE
+1 IN CONSOLE
 {
     sudo apt-get install p7zip-full
  
@@ -70,7 +70,7 @@ Automated Account Maker created for Open Tibia Servers with Symfony 4 MVC framew
  
  
  
-2. EDIT FILE /etc/apache2/sites-enabled/000-default.conf
+2 EDIT FILE /etc/apache2/sites-enabled/000-default.conf
 {
 CHANGE
     DocumentRoot /var/www/html
@@ -85,7 +85,7 @@ TO
  
  
  
-3. IN CONSOLE
+3 IN CONSOLE
 {
     cd /var/www/html
  
@@ -102,7 +102,7 @@ TO
  
  
  
-4. EDIT FILE aac/.env.dist
+4 EDIT FILE aac/.env.dist
 {
 edit DataBase Credentials db_user, db_password and db_name
     DATABASE_URL=mysql://db_user:db_password@127.0.0.1:3306/db_name
@@ -116,7 +116,7 @@ TO
  
  
  
-5. IN CONSOLE
+5 IN CONSOLE
 {
     composer install
  
