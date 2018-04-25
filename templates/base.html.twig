@@ -1,6 +1,23 @@
 <!DOCTYPE html>
 <html>
     <head>
+
+        <!-- highlight.js library -->
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/vs2015.min.css">
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+        <!-- Main Quill library -->
+        <script src="//cdn.quilljs.com/1.3.6/quill.js"></script>
+        <script src="//cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+        <!-- Theme included stylesheets -->
+        <link href="//cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+        <link href="//cdn.quilljs.com/1.3.6/quill.bubble.css" rel="stylesheet">
+        <!-- Main JQUERY library -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="/js/jquery.tablesorter.min.js"></script>
+        <!-- FONTS -->
+        <link href="https://fonts.googleapis.com/css?family=Cinzel+Decorative|Open+Sans" rel="stylesheet">
         <meta charset="UTF-8">
         <title>{{ otsName }} - {% block title %}{% endblock %}</title>
         {% block stylesheets %}{% endblock %}
@@ -12,7 +29,7 @@
             display: grid;
             grid-template-columns: 240px auto 240px;
             grid-gap: 10px;
-            margin: 0 10%;
+            margin: 0 7%;
         }
         .header {
             grid-column: 1/-1;
@@ -36,9 +53,22 @@
             font-weight: 700;
             background: linear-gradient(#1E38AA,#111111);
         }
+        .menu-item > center > a {
+            display: block;
+            background: #dddddd99;
+            color: white;
+            text-decoration: none;
+            /* margin: 0 17px; */
+            width: 90%;
+            padding: 4px 0 4px 0px;
+            border-bottom: solid 1px black;
+        }
+        .menu-item > center > a:hover {
+            background: #fff8dccc;
+        }
         .menu-item > a, .status > .status-menu {
             display: block;
-            background: #0075A7;
+            background: #dddddd99;
             color: white;
             text-decoration: none;
             margin: 0 0px;
@@ -64,8 +94,20 @@
             background: linear-gradient(#111111,#1E38AA);
             margin-bottom: 5px;
         }
+        .menu-item {
+            min-height: 20px;
+            padding: 19px 3px;
+            margin-bottom: 20px;
+            background-color: #0075a7;
+            border: 1px solid #0c0d0e;
+            border-radius: 4px;
+            -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+            
+        }
         .main {
             grid-column: 2/3;
+            min-width: 600px;
         }
         .main > .top {
             /* background-color: #f3f3f3; */
@@ -88,6 +130,7 @@
         }
         .status {
             grid-column: 3/-1;
+            
         }
         .top_player {
             display: grid;
@@ -115,11 +158,39 @@
             color: #1ea81e;
             font-family: sans-serif;
             font-weight: 800;
+            
+        }
+        .server-label {
+            margin: 0;
+        }
+        .server.status-menu {
+            min-height: 20px;
+            padding: 19px 3px;
+            margin-bottom: 20px;
+            background-color: #0075a7;
+            border: 1px solid #0c0d0e;
+            border-radius: 4px;
+            -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
         }
         .server.status-menu > center > .online.offline {
             color: #c33d3d;
             font-family: sans-serif;
             font-weight: 800;
+        }
+        h1.welcome {
+            font-family: "Cinzel Decorative",serif;
+            color: #9ae0bb;
+            font-weight: bold;
+            font-size: 44px;
+            text-shadow: 3px 3px 1px #d8c6c6;
+            margin-top: 50px;
+        }
+        .server-status > p {
+            margin: 0;
+        }
+        .server-status > div > p {
+            margin: 5px 0;
         }
         </style>
     </head>
@@ -129,38 +200,47 @@
                 <img src="/img/header.gif" alt="">
             </div>
             <div class="menus">
+<h2 class="server-label">Account</h2>
+<div class="account menu-item">
+    <center>
+    {% if app.session.get('account_id') %}
+        <a href="/account">Account</a>
+        <a href="/account/logout">Logout</a>
+    {% else %}
+        <a href="/account/login">Login</a>
+    {% endif %}
+    <a href="/account/create">Register</a>
+    </center>
+        </div>
 
-                <div class="top-menu">Account</div>
-                <div class="account menu-item">
-                    {% if app.session.get('account_id') %}
-                        <a href="/account">Account</a>
-                        <a href="/account/logout">Logout</a>
-                    {% else %}
-                        <a href="/account/login">Login</a>
-                    {% endif %}
-                    <a href="/account/create">Register</a>
-                </div>
-                <div class="bot-menu"></div>
 
-                <div class="top-menu">Server</div>
-                <div class="server menu-item">
-                    <a href="">Server Info</a>
-                    <a href="/player">Find Player</a>
-                    <a href="/players/online">Players Online</a>
-                    <a href="/highscores">Highscores</a>
-                    <a href="/bans">Banishments</a>
-                </div>
-                <div class="bot-menu"></div>
+        <h2 class="server-label">Server</h2>
+        <div class="server menu-item">
+            <center>
+            <a href="/news">News</a>
+            <a href="/server/info">Server Info</a>
+            <a href="/player">Find Player</a>
+            <a href="/players/online">Players Online</a>
+            <a href="/highscores">Highscores</a>
+            <a href="/bans">Banishments</a>
+            </center>
+        </div>
 
-                <div class="top-menu">Library</div>
-                <div class="library menu-item">
-                    <a href="/spells">Spells</a>
-                    <a href="">Monsters</a>
-                </div>
-                <div class="bot-menu"></div>
 
+        <h2 class="server-label">Library</h2>
+
+        <div class="library menu-item">
+            <center>
+            <a href="/spells">Spells</a>
+            <a href="">Monsters</a>
+            <center>
+        </div>
             </div>
             <div class="main">
+            <center>
+                <h1 class="welcome">Welcome To FireFun</h1>
+            </center>
+            
                 <div class="top"></div>
                 <div class="mid">
                         {% block content %}
@@ -171,35 +251,61 @@
             </div>
             <div class="status">
 
-                <div class="top-menu">Status</div>
+                <h2 class="server-label">Status</h2>
                 <div class="server status-menu">
-                    <center>
+                    <center class="server-status">
 
                     {% if getServerStatus() %}
                         <p class="online">ONLINE</p>
-                        <p class="players">{{ getServerStatus()['online'] }}/1000</p>
-                        <p class="players">{{ getServerStatus()['uptime'] }}</p>
-                        <p class="ip">firefun.dyn.pl</p>
+                        <div class="players">
+                            <p>Players</p>
+                            <p>{{ getServerStatus()['online'] }}/1000</p>
+                        </div>
+                        <div class="uptime">
+                            <p>Uptime</p>
+                            <p>{{ getServerStatus()['uptime'] }}</p>
+                        </div>
+                        <div class="ip">
+                            <p>IP</p>
+                            <p>{{ getServerStatus()['ip'] }}</p>
+                        </div>
                     {% else %}
                         <p class="online offline">OFFLINE</p>
                         <p class="ip">firefun.dyn.pl</p>
                     {% endif %}
                     </center>
                 </div>
-                <div class="bot-menu"></div>
+                
 
-                <div class="top-menu">Top 5 Players</div>
+                <h2 class="server-label">Top 5 Players</h2>
                 <div class="server status-menu">
                     <div>
                     {% for player in getTop5() %}
                         <div class="top_player">
-                            <p class="name">{{ loop.index }}. <a href="">{{ player.name }}</a></p>
-                            <p class="level">LvL. {{ player.level }}</p>
+                            <p class="name">{{ loop.index }}. <a href="/player/{{ player.name }}">{{ player.name }}</a></p>
+                            <p class="level" style="border-radius: 5px; background: #ff0000a1;">LvL. {{ player.level }}</p>
                         </div>
                     {% endfor %}
                     </div>
                 </div>
-                <div class="bot-menu"></div>
+                
+
+                <h2 class="server-label">Top 5 PowerGamers</h2>
+                <div class="server status-menu">
+                    <div>
+                    {% for player in getPowerGamers() %}
+                        <div class="top_player">
+                            <p class="name">{{ loop.index }}. <a href="/player/{{ player.name }}">{{ player.name }}</a></p>
+                        {% if player.expDiff > 99999999 %}
+                            <p class="level" style="font-size: 11px; padding-bottom: 0; border-radius: 5px; padding-top: 3px; background: green;">+{{ player.expDiff }} ExP</p>
+                        {% else %}
+                            <p class="level" style="background: green; border-radius: 5px;">+{{ player.expDiff }} ExP</p>
+                        {% endif %}
+                        </div>
+                    {% endfor %}
+                    </div>
+                </div>
+                
 
             </div>
         </div>

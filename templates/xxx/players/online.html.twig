@@ -1,8 +1,8 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Bans{% endblock %}
+{% block title %}Players Online{% endblock %}
 
-{% block content %}
+{% block body %}
 <style>
     .highscores-wrapper { margin: 1em auto;  width: 95%; font: 18px/1.5 sans-serif; }
     .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
@@ -16,7 +16,7 @@
         width: 60%;
     }
     th:nth-child(3) {
-        width: 30%;
+        width: 20%;
     }
     td, th {
         border: 1px solid #dddddd;
@@ -29,30 +29,30 @@
 
 
 </style>
+
 <div class="highscores-wrapper">
-<h1>Bans</h1>
-    {% if bans %}
+<h1>Online</h1>
+    {% if onlines %}
         <div class="online">
-            <p class="label">Bans: <strong>{{ bans|length }}</strong></p>
+            <p class="label">Online Players: <strong>{{ onlines|length }}</strong></p>
             <table>
                 <tr>
                     <th>#</th>
                     <th>Name</th>
-                    <th style="width: 30px">Expires</th>
+                    <th>Vocation</th>
                 </tr>
-                {% for ban in bans %}
+                {% for online in onlines %}
                     <tr>
                         <td>{{ loop.index }}</td>
-                        <td><strong><a href="/player/{{ ban[0].name }}">{{ ban[0].name }}</a></strong></td>
-                        <td>{{ ban.expires|date('d.m.Y H:i:s') }}</td>
+                        <td><strong><a href="/player/{{ online.name }}">{{ online.name }}</a></strong></td>
+                        <td>{{ vocations[online.vocation] }}</td>
                     </tr>
                 {% endfor %}
             </table>
         </div>
     {% else %}
         <div class="online">
-            <p class="label">No Bans... so far</p>
-            </table>
+            <p class="label">Online Players: <strong>None</strong></p>
         </div>
     {% endif %}
 

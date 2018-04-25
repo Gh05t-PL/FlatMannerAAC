@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Server Info{% endblock %}
+
+{% block content %}
+<style>
+    .example-wrapper { margin: 1em auto; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+
+        tr:nth-child(even) {
+        background: #dddddd;
+    }
+    th:nth-child(1) {
+        width: 40%;
+    }
+    th:nth-child(2) {
+        width: 60%;
+    }
+    td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+    table {
+        width: 100%;
+    }
+</style>
+
+<div class="example-wrapper">
+    <h1>Server Info</h1>
+    <table>
+        <tr>
+            <th>Info</th>
+            <th>Value</th>
+        </tr>
+        {% for key,info in serverInfo %}
+            <tr>
+                <td>{{ key }}</td>
+                <td>{{ info }}</td>
+            </tr>
+        {% endfor %}
+
+    </table>
+</div>
+{% endblock %}

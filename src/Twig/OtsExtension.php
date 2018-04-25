@@ -37,20 +37,6 @@ class OtsExtension extends \Twig_Extension
         return $top5;
     }
 
-/* //UNCOMMENT ONLY IF CRON PLUGIN DOWNLOADED
-    public function getPowerGamers()
-    {
-        $rsm = new ResultSetMapping;
-        $rsm->addScalarResult('name', 'name');
-        $rsm->addScalarResult('expDiff', 'expDiff');
-
-        $powerGamers = $this->doctrine->getManager()
-            ->createNativeQuery("SELECT name, level FROM players ORDER BY level DESC LIMIT 5", $rsm)
-        ->getResult();
-
-        return $powerGamers;
-    }
-*/
 
     ///FUNCTION FROM NICAW AAC EDITED BY GHOST ornot
     public function getServerStatus(){
@@ -164,7 +150,6 @@ class OtsExtension extends \Twig_Extension
         return array(
             'getTop5' => new Twig_Function('getTop5', [$this, 'getTop5']),
             'getServerStatus' => new Twig_Function('getServerStatus', [$this, 'getServerStatus']),
-            // UNCOMMENT ONLY IF CRON PLUGIN DOWNLOADED  'getPowerGamers' => new Twig_Function('getPowerGamers', [$this, 'getPowerGamers']),
         );
     }
 }

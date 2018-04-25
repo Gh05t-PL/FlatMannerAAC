@@ -2,7 +2,7 @@
 
 {% block title %}Account{% endblock %}
 
-{% block content %}
+{% block body %}
 <style>
     .example-wrapper { 
         margin: 1em auto; 
@@ -43,21 +43,10 @@
         display: inline-block;
         width: 100%;
     }
-    .admin_panel {
-        grid-column: span 2;
-    }
 </style>
 
 <div class="example-wrapper">
-    <h1 style="grid-column: span 2;">Account</h1>
-
-    {% if account.groupid >= 6 %}
-    <p>Admin Panel</p>
-    <div class="admin_panel">
-        You Are Admin
-    </div>
-    {% endif %}
-
+<h1 style="grid-column: span 2;">Account</h1>
     <div class="char_list">
         <p>Character List</p>
         <table>

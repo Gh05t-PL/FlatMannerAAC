@@ -414,6 +414,11 @@ class Players
         return $this->groupId;
     }
 
+    public function getKills()
+    {
+        return $this->kills;
+    }
+
     /**
      * @param int $groupId
      */

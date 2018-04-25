@@ -1,8 +1,8 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Account - Change {{ action }}{% endblock %}
+{% block title %}Account - Create Character{% endblock %}
 
-{% block content %}
+{% block body %}
 <style>
     .example-wrapper { margin: 1em auto;  width: 95%; font: 18px/1.5 sans-serif; }
     .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
@@ -11,12 +11,10 @@
 
 <div class="example-wrapper">
     <a href="/account">&lt; Back</a>
-
     {% for error in errors %}
         <p>{{error}}</p>
     {% endfor %}
-
-    <h1>Change {{ action }}</h1>
+    <h1>Create Character</h1>
 
         {{ form_start(form) }}
         {{ form_widget(form) }}

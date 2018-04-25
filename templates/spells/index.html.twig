@@ -4,7 +4,7 @@
 
 {% block content %}
 <style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper { margin: 1em auto;  width: 95%; font: 18px/1.5 sans-serif; }
     .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
 
     td, th {
@@ -18,28 +18,53 @@
     tr:nth-child(even) {
         background: #dddddd;
     }
+
+    th.header.headerSortUp:after {
+        content: "⯅";
+    }
+
+    th.header {
+        cursor: pointer;
+    }
+
+    th.header.headerSortDown:after {
+        content: "⯆";
+    }
 </style>
 
 <div class="example-wrapper">
     <h1>Spells</h1>
 
-        <table>
-        <tr>
-            <th>Spell Name</th>
-            <th>Words</th>
-            <th>Vocations</th>
-            <th>Level</th>
-            <th>Mana</th>
-        </tr>
-        {% for spell in instantSpells %}
-        <tr>
-            <td>{{ spell.name }}</td>
-            <td>{{ spell.words }}</td>
-            <td>{{ spell.vocations }}</td>
-            <td>{{ spell.level }}</td>
-            <td>{{ spell.mana }}</td>
-        </tr>
-        {% endfor %}
+        <table id="spells-table" class="tablesorter">
+        <thead>
+                <tr>
+                    <th>Spell Name</th>
+                    <th>Words</th>
+                    <th>Vocations</th>
+                    <th>Level</th>
+                    <th>Mana</th>
+                </tr>
+        </thead>
+        <tbody>
+                {% for spell in instantSpells %}
+                <tr>
+                    <td>{{ spell.name }}</td>
+                    <td>{{ spell.words }}</td>
+                    <td>{{ spell.vocations }}</td>
+                    <td>{{ spell.level }}</td>
+                    <td>{{ spell.mana }}</td>
+                </tr>
+                {% endfor %}
+        </tbody>
+
     </table>
 </div>
+<script>
+        $(document).ready(function() 
+        { 
+            $("#spells-table").tablesorter(); 
+        } 
+    ); 
+       
+</script>
 {% endblock %}

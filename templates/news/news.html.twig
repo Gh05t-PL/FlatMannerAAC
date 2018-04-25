@@ -1,0 +1,168 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}News{% endblock %}
+
+{% block content %}
+<style>
+    .example-wrapper { margin: 1em auto;  width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+
+
+    a.page {
+        background: white;
+        border: solid 1px black;
+        border-radius: 20px;
+        /* padding: 0px 5%; */
+        text-align: center;
+        margin: 0 5px;
+        display: block;
+    }
+    div.pages {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+    }
+    .page.active {
+        background:#dadada;
+    }
+</style>
+
+<div class="example-wrapper">
+    <h1>News</h1>
+
+    <div class="news">
+        {% for article in news %}
+            {% if loop.last %}
+            <div class="article">
+                    <h2 class="title"><a href="/article/{{ article.id }}">{{ article.title }}</a></h2>
+                    <p class="info">By <a href="/player/{{ article.author.name }}">{{ article.author.name }}</a> on {{ article.date|date("d.m.Y H:i:s") }}</p>
+                    <div><div class="ql-editor ns text">{{ article.text|raw }}</div></div>
+                </div>
+            {% else %}
+            <div class="article">
+                    <h2 class="title"><a href="/article/{{ article.id }}">{{ article.title }}</a></h2>
+                    <p class="info">By <a href="/player/{{ article.author.name }}">{{ article.author.name }}</a> on {{ article.date|date("d.m.Y H:i:s") }}</p>
+                    <div><div class="ql-editor ns text">{{ article.text|raw }}</div>
+                    </div></div><hr>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <div style="margin-top: 40px;">
+        <div class="pages">
+
+            {% for i in 1..(pagesCount > 7 ? 7 : pagesCount) %}
+                {% if i == page %}
+                    <a class="page active" href="/news/{{ i }}">{{ i }}</a>
+                {% else %}
+                    <a class="page" href="/news/{{ i }}">{{ i }}</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <input style="display: {{ (pagesCount > 7) ? "block" : "none" }}; width: 100%;" id="range"type="range" min="1" max="1" value="1" name="">
+    </div>
+</div>
+<script>
+
+        var percent = document.getElementById("range");
+        var pages = document.getElementsByClassName("page");
+        {# var newsCount = {{ pagesCount }}; #}
+        var newsPageCount =  {{ pagesCount }};
+        var currentPage =  {{ page }};
+        var pageCount = Math.ceil(newsPageCount/7);
+    
+        percent.oninput= function(){
+            if (pageCount == 1)
+                percent.max = 1;
+            else{
+    
+                percent.max = newsPageCount - 6;
+                for (let i = 0; i < pages.length; i++) {
+    
+                    pages[i].innerHTML = Number(percent.value)+i;
+                    pages[i].href = "/news"+`/${(Number(percent.value)+i).toString()}`;
+                    pages[i].style.display = "block";
+    
+    
+                }
+                for (let i = 0; i < pages.length; i++) {
+                    pages[i].className = "page"
+                    if (Number(pages[i].innerHTML) == currentPage)
+                        pages[i].className = "page active"
+                }
+    
+            }
+        }
+        document.addEventListener("DOMContentLoaded", function() {
+            if (pageCount == 1)
+                percent.max = 1;
+    
+            else{
+                percent.max = newsPageCount - 6;
+                var value = currentPage - 3;
+                percent.value = value;
+                for (let i = 0; i < pages.length; i++) {
+                    pages[i].innerHTML = Number(percent.value)+i
+                    pages[i].href = "/news"+`/${(Number(percent.value)+i).toString()}`;
+                    pages[i].className = "page"
+                    if (Number(pages[i].innerHTML) == currentPage)
+                        pages[i].className = "page active"
+                }
+            }
+    
+        })
+    
+
+        hljs.configure({   // optionally configure hljs
+          languages: ['javascript', 'php', 'html', 'twig']
+        });
+
+        var toolbarOptions = [
+          ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+          ['blockquote', 'code-block', 'image'],
+
+          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+          [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+          [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+          [{ 'direction': 'rtl' }],                         // text direction
+
+          [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+
+
+          [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+          [{ 'font': [] }],
+          [{ 'align': [] }],
+
+          ['clean']                                         // remove formatting button
+        ];
+
+            var options = {
+          debug: 'info',
+          modules: {
+            toolbar: toolbarOptions,
+            syntax: true
+          },
+          placeholder: 'Compose an epic...',
+          readOnly: false,
+          theme: 'snow'
+        };
+
+        var reader = {
+          modules: {
+            syntax: true,
+            toolbar: false
+          },
+          readOnly: true,
+          theme: 'bubble'
+        };
+
+
+            if (document.getElementById("editor"))
+                var editor = new Quill('#editor',options);
+
+            if (document.getElementsByClassName("ql-editor ns text")){
+                for (let index = 0; index < document.getElementsByClassName("ql-editor ns").length; index++) {
+                    new Quill(document.getElementsByClassName("ql-editor ns")[index],reader);
+
+                }
+            }
+        </script>
+{% endblock %}
