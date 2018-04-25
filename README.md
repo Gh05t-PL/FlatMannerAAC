@@ -8,7 +8,7 @@ Automated Account Maker created for Open Tibia Servers with Symfony 4 MVC framew
 <br>
 <br>
 <h1>Installation</h1>
-
+</div>
 <pre>
  
 
@@ -134,4 +134,4 @@ AND THEN ENABLE PHP7.2
 </pre>
 
 Tested with TFS 0.3.6 && TFS 0.4
-</div>
+
