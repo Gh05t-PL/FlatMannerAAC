@@ -4,6 +4,7 @@ set -e
 echo
 echo
 
+
 echo "============================="
 echo "= Installing fmAAC by Ghost ="
 echo "============================="
@@ -16,6 +17,9 @@ read env
 echo
 echo 'Secret key? ("recommended length is around 32 characters.")'
 read secret
+
+#  \/(\w+\/)+powergamers.php
+# if file is in cron folder then install else give path \/(\w+\/)+powergamers.php
 
 while [ $(echo -n $secret | wc -m) -lt 10 ]
 do
@@ -63,8 +67,11 @@ echo "======================="
 echo
 echo
 
+
+
+
 echo "=============================================="
-echo "=       Install Extensions? 'y' or 'n'        "
+echo "=       Install Extensions? 'y' or 'n'       ="
 echo "= Remember do not install it 2 times for now ="
 echo "=============================================="
 read installExt
@@ -74,10 +81,19 @@ if [[ $installExt == "y" ]]; then
 
 
 echo
+(crontab -l > tempCron)
+
+if  ( grep -q "powergamers.php" tempCron ; ) then
+  echo "Power Gamers has previously been installed"
+  echo "Exiting...."
+  (rm tempCron)
+  exit 0
+fi
+
+echo
 echo "==================================="
 echo "= Installing CRON for PowerGamers ="
 echo "==================================="
-(crontab -l > tempCron)
 
 echo "FULL PATH TO powergamers.php:"
 read path
@@ -86,6 +102,10 @@ while [ ! -e $path ]
 do
   echo "FILE NOT FOUND! Please provide proper path"
 done
+
+
+
+
 
 (echo "00 00 * * * php $path" >> tempCron)
 (crontab tempCron)
