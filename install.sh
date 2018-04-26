@@ -95,19 +95,26 @@ echo "==================================="
 echo "= Installing CRON for PowerGamers ="
 echo "==================================="
 
-echo "FULL PATH TO powergamers.php:"
-read path
-
-while [ ! -e $path ]
-do
-  echo "FILE NOT FOUND! Please provide proper path"
-done
 
 
+if [[ ! -e CRON/powergamers.php ]] ; then
+
+  echo "FILE NOT FOUND! Provide FULL PATH TO powergamers.php:"
+  read path
+
+  while [ ! -e $path ]
+  do
+    echo "FILE NOT FOUND! Please provide proper path"
+    read path
+  done
+
+else
+  path="${PWD}/CRON/powergamers.php"
+fi
 
 
 
-(echo "00 00 * * * php $path" >> tempCron)
+(echo -e "\n00 00 * * * php $path" >> tempCron)
 (crontab tempCron)
 echo "CRON ADDED!"
 (rm tempCron)
