@@ -32,7 +32,7 @@
     <div class="news">
         <div class="article">
             <h2 class="title">{{ article.title }}</h2>
-            <p class="info">By <a href="/player/{{ article.author.name }}">{{ article.author.name }}</a> on {{ article.date|date("d.m.Y H:i:s") }}</p>
+            <p class="info">By <a href="/player/{{ article.author.name }}">{{ article.author.name }}</a> on {{ article.datetime|date("d.m.Y H:i:s") }}</p>
             <div class="ql-editor ns text">{{ article.text|raw }}</div>
         </div>
     </div>

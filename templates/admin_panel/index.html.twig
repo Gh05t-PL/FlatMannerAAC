@@ -1,0 +1,286 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin Panel{% endblock %}
+
+{% block content %}
+<style>
+    .example-wrapper { margin: 1em auto; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+    .charts-container {
+        display:grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 10px;
+    }
+    .actions {
+        display: inline-block;
+        width: 40%;
+        margin-left: 20px;
+    }
+    .actions > div > a {
+        display: block;
+        font-size: 14px;
+    }
+</style>
+
+<div class="example-wrapper">
+    <h1>Admin Panel</h1>
+    <div class="charts-container">
+        <div class="chart-container" style="height:auto; width:100%;">
+                <canvas id="playersOnline"></canvas>
+        </div>
+        <div class="chart-container" style="height:auto; width:100%;">
+                <canvas id="accountsDelta"></canvas>
+        </div>
+        <div class="chart-container" style="height:auto; width:100%;">
+                <canvas id="playersOnline3"></canvas>
+        </div>
+        <div class="chart-container" style="height:auto; width:100%;">
+                <canvas id="playersOnline4"></canvas>
+        </div>
+    </div>
+    <div class="actions">
+            <p>Actions List</p>
+            <div>
+                <a href="/admin/create/article">Create Article</a>
+                <a href="/account/create/character">Edit Item Shop</a>
+                <a href="/account/change/password">Edit Player</a>
+                <a href="/account/change/email">Edit Account</a>
+                <a href="/account/change/email">Ban/unBAN</a>
+                <a href="/account/change/email">Something Special</a>
+            </div>
+    
+        </div>
+    
+
+</div>
+<script>
+/*
+    function labelGetter(table,tableLabel,size){
+        var arr = [];
+        table.forEach(function(item,index){
+            itemm = new Date(item[tableLabel])
+            itemm = `${itemm.getFullYear()}-${itemm.getMonth() + 1}-${itemm.getDate()}`
+            arr.push(itemm)
+        })
+        if (arr.length < size){
+            var diff = size - arr.length
+            for (let index = 0; index < diff; index++) {
+                arr.push("NULL")
+            }
+        }
+        return arr
+    }
+*/
+    function labelGetter(table,tableLabel,size,format = 0){
+        var arr = [];
+        
+        table.forEach(function(item,index){
+            itemm = new Date(item[tableLabel])
+            var formats = [
+        `${itemm.getFullYear()}-${(itemm.getMonth() + 1) >= 10 ? (itemm.getMonth() + 1) : '0'+(itemm.getMonth() + 1)}-${itemm.getDate()}`,
+        `${itemm.getHours() >= 10 ? itemm.getHours() : '0'+itemm.getHours()}:${itemm.getMinutes() >= 10 ? itemm.getMinutes() : '0'+itemm.getMinutes()}`
+        ]
+            itemm = formats[format]
+            arr.push(itemm)
+        })
+        if (arr.length < size){
+            var diff = size - arr.length
+            for (let index = 0; index < diff; index++) {
+                arr.push("NULL")
+            }
+        }
+        return arr
+    }
+
+    function infoGetter(table,tableLabel){
+        var arr = [];
+        table.forEach(function(item,index){
+            arr.push(item[tableLabel])
+        })
+        return arr
+    }
+
+    var jsonOnline = {{ onlineStatsJson|raw }}
+    var jsonAccounts = {{ accountsStatsJson|raw }}
+    var jsonChars = {{ charactersStatsJson|raw }}
+    var jsonPoint = {{ pointsStatsJson|raw }}
+
+    console.log(infoGetter(jsonOnline, "date"))
+    console.log(infoGetter(jsonOnline, "online"))
+
+    console.log(labelGetter(jsonAccounts, "date", 14))
+    console.log(infoGetter(jsonAccounts, "deltaAcc"))
+
+    console.log(labelGetter(jsonChars, "date", 14))
+    console.log(infoGetter(jsonChars, "deltaChar"))
+
+    var ctx = document.getElementById('playersOnline').getContext('2d');
+    var chart = new Chart(ctx, {
+        // The type of chart we want to create
+        type: 'line',
+    
+        // The data for our dataset
+        data: {
+            labels: labelGetter(jsonOnline, "date", 24, 1),
+            datasets: [{
+                label: "Players online [24 HOURS]",
+                backgroundColor: "rgba(255,99,132,0.2)",
+                borderColor: "rgba(255,99,132,1)",
+                borderWidth: 1,
+                hoverBackgroundColor: "rgba(255,99,132,0.4)",
+                hoverBorderColor: "rgba(255,99,132,1)",
+                data: infoGetter(jsonOnline, "online"),
+                "lineTension": 0.0,
+                
+            }]
+        },
+    
+        // Configuration options go here
+        options: {
+            responsive:true,
+            scales: {
+                xAxes: [{
+                    ticks: {
+                        display: true,
+                        fontSize: 10
+                    }
+                }],
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true,
+                        callback: function(value, index, values) {
+                            if (Math.floor(value) === value) {
+                                return value;
+                            }
+                        }
+                    }
+                }]
+            }
+        }
+    })
+
+    var ctx = document.getElementById('accountsDelta').getContext('2d');
+    var chart = new Chart(ctx, {
+        // The type of chart we want to create
+        type: 'line',
+    
+        // The data for our dataset
+        data: {
+            labels: labelGetter(jsonAccounts, "date", 14, 0),
+            datasets: [{
+                label: "Accounts Created [14 DAYS]",
+                backgroundColor: "rgba(25,99,132,0.2)",
+                borderColor: "rgba(25,99,132,1)",
+                borderWidth: 1,
+                hoverBackgroundColor: "rgba(25,99,132,0.4)",
+                hoverBorderColor: "rgba(25,99,132,1)",
+                data: infoGetter(jsonAccounts, "deltaAcc"),
+                "lineTension": 0.0,
+                
+            }]
+        },
+    
+        // Configuration options go here
+        options: {
+            responsive:true,
+            scales: {
+                xAxes: [{
+                    ticks: {
+                        display: true,
+                        fontSize: 9
+                    }
+                }],
+                yAxes: [{
+                    ticks: {
+                        callback: function(value, index, values) {
+                            if (Math.floor(value) === value) {
+                                return value;
+                            }
+                        }
+                    }
+                }]
+            }
+        }
+    })
+
+    var ctx = document.getElementById('playersOnline3').getContext('2d');
+    var chart = new Chart(ctx, {
+        // The type of chart we want to create
+        type: 'line',
+    
+        // The data for our dataset
+        data: {
+            labels: labelGetter(jsonChars, "date", 14),
+            datasets: [{
+                label: "Characters Created [14 DAYS]",
+                backgroundColor: "rgba(25,19,132,0.2)",
+                borderColor: "rgba(25,19,132,1)",
+                borderWidth: 1,
+                hoverBackgroundColor: "rgba(25,19,132,0.4)",
+                hoverBorderColor: "rgba(25,19,132,1)",
+                data: infoGetter(jsonChars, "deltaChar"),
+                "lineTension": 0.0,
+                
+            }]
+        },
+    
+        // Configuration options go here
+        options: {
+            responsive:true,
+            scales: {
+                xAxes: [{
+                    ticks: {
+                        display: true,
+                        fontSize: 9
+                    }
+                }],
+                yAxes: [{
+                    ticks: {
+                        callback: function(value, index, values) {
+                            if (Math.floor(value) === value) {
+                                return value;
+                            }
+                        }
+                    }
+                }]
+            }
+        }
+    })
+
+
+    var ctx = document.getElementById('playersOnline4').getContext('2d');
+    var chart = new Chart(ctx, {
+        // The type of chart we want to create
+        type: 'line',
+    
+        // The data for our dataset
+        data: {
+            labels: labelGetter(jsonPoint, "date", 14),
+            datasets: [{
+                label: "Points Bought [14 DAYS]",
+                backgroundColor: "rgba(0,99,0,0.2)",
+                borderColor: "rgba(0,99,0,1)",
+                borderWidth: 1,
+                hoverBackgroundColor: "rgba(0,99,0,0.4)",
+                hoverBorderColor: "rgba(0,99,0,1)",
+                data: infoGetter(jsonPoint, "points"),
+                "lineTension": 0.0,
+                
+            }]
+        },
+    
+        // Configuration options go here
+        options: {
+            responsive:true,
+            scales: {
+                xAxes: [{
+                    ticks: {
+                        display: true,
+                        fontSize: 9
+                    }
+                }]
+            }
+        }
+    })
+</script>
+{% endblock %}

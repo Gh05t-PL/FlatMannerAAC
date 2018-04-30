@@ -78,6 +78,13 @@ class Accounts
     /**
      * @var int
      *
+     * @ORM\Column(name="points", type="integer", length=10, nullable=false, options={"default"="0"})
+     */
+    private $points = '0';
+
+    /**
+     * @var int
+     *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -226,6 +233,22 @@ class Accounts
     public function setGroupId($groupId)
     {
         $this->groupId = $groupId;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPoints()
+    {
+        return $this->points;
+    }
+
+    /**
+     * @param int $points
+     */
+    public function setPoints($points)
+    {
+        $this->points = $points;
     }
 
     /**

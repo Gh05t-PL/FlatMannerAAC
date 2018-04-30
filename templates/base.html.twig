@@ -1,10 +1,15 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
 
         <!-- highlight.js library -->
         <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/vs2015.min.css">
         <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">
+
 
         <!-- Main Quill library -->
         <script src="//cdn.quilljs.com/1.3.6/quill.js"></script>
@@ -58,13 +63,20 @@
             background: #dddddd99;
             color: white;
             text-decoration: none;
-            /* margin: 0 17px; */
+             margin: 0 auto; 
             width: 90%;
             padding: 4px 0 4px 0px;
-            border-bottom: solid 1px black;
         }
         .menu-item > center > a:hover {
             background: #fff8dccc;
+        }
+        center {
+            display: grid;
+            grid-gap: 1px;
+        }
+        .server.status-menu > div {
+            display: grid;
+            grid-gap: 1px;
         }
         .menu-item > a, .status > .status-menu {
             display: block;
@@ -73,7 +85,6 @@
             text-decoration: none;
             margin: 0 0px;
             padding: 4px 0 4px 12px;
-            border-bottom: solid 1px black;
         }
         .status > .status-menu {
             padding-left: 0;
@@ -139,7 +150,6 @@
             width: 90%;
             margin: 0 auto;
             font-family: sans-serif;
-            border-bottom: solid 1px black;
             font-size: small;
         }
         .top_player > p:nth-child(1) {
@@ -229,9 +239,15 @@
             </center>
         </div>
 
+        <h2 class="server-label">SMS Shop</h2>
+        <div class="server menu-item">
+            <center>
+            <a href="/shop/items">Items</a>
+            <a href="/points">Buy Points</a>
+            </center>
+        </div>
 
         <h2 class="server-label">Library</h2>
-
         <div class="library menu-item">
             <center>
             <a href="/spells">Spells</a>
@@ -274,7 +290,7 @@
                         </div>
                     {% else %}
                         <p class="online offline">OFFLINE</p>
-                        <p class="ip">firefun.dyn.pl</p>
+                        <!-- <p class="ip">firefun.dyn.pl</p> -->
                     {% endif %}
                     </center>
                 </div>

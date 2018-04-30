@@ -13,6 +13,8 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use App\Entity\Accounts;
 use App\Entity\Players;
 use App\Entity\PlayerSkill;
+use App\Entity\FmaacLogs;
+use App\Entity\FmaacLogsActions;
 
 class AccountController extends Controller
 {
@@ -165,8 +167,22 @@ class AccountController extends Controller
                 $em = $this->getDoctrine()->getManager();
 
                 $em->persist($account);
+                
+
+                //LOG ACTION
+                $action = $this->getDoctrine()->getRepository(FmaacLogsActions::class)->find(1); // action 1 = create account
+                $log = new FmaacLogs();
+                $log->setAction($action)
+                    ->setDatetime(new \DateTime())
+                ->setIp($_SERVER['REMOTE_ADDR']);
+
+                $em->persist($log);
                 $em->flush();
+
+
+
                 return $this->redirectToRoute('account_login');
+                
             }
 
             
@@ -333,6 +349,14 @@ class AccountController extends Controller
                         $em->persist($value);
                     }
 
+                    //LOG ACTION
+                    $action = $this->getDoctrine()->getRepository(FmaacLogsActions::class)->find(3); // action 3 = create char
+                    $log = new FmaacLogs();
+                    $log->setAction($action)
+                        ->setDatetime(new \DateTime())
+                    ->setIp($_SERVER['REMOTE_ADDR']);
+
+                    $em->persist($log);
                     $em->flush();
                     return $this->redirectToRoute('account');
                 }
@@ -390,6 +414,17 @@ class AccountController extends Controller
                     $em = $this->getDoctrine()->getManager();
                     $em->persist($account);
                     $em->flush();
+
+                    //LOG ACTION
+                    $action = $this->getDoctrine()->getRepository(FmaacLogsActions::class)->find(6); // action 6 = account changes
+                    $log = new FmaacLogs();
+                    $log->setAction($action)
+                        ->setDatetime(new \DateTime())
+                    ->setIp($_SERVER['REMOTE_ADDR']);
+
+                    $em->persist($log);
+                    $em->flush();
+
                     return $this->redirectToRoute('account');
                 }
             }
@@ -440,6 +475,17 @@ class AccountController extends Controller
                     $em = $this->getDoctrine()->getManager();
                     $em->persist($account);
                     $em->flush();
+
+                    //LOG ACTION
+                    $action = $this->getDoctrine()->getRepository(FmaacLogsActions::class)->find(6); // action 6 = account changes
+                    $log = new FmaacLogs();
+                    $log->setAction($action)
+                        ->setDatetime(new \DateTime())
+                    ->setIp($_SERVER['REMOTE_ADDR']);
+
+                    $em->persist($log);
+                    $em->flush();
+
                     return $this->redirectToRoute('account');
                 }
             }

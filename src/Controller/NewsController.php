@@ -7,7 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Entity\Players;
-use App\Entity\News;
+use App\Entity\FmaacNews;
 
 class NewsController extends Controller
 {
@@ -29,7 +29,7 @@ class NewsController extends Controller
     public function news($page = 1)
     {
         $newsCount = count($this->getDoctrine()
-            ->getRepository(News::class)
+            ->getRepository(FmaacNews::class)
         ->findAll());
         //var_dump($newsCount);
 
@@ -39,7 +39,7 @@ class NewsController extends Controller
 
         $query = $this->getDoctrine()
             ->getManager()
-        ->createQuery("SELECT u FROM App\Entity\News u")->setMaxResults($resultsLimit)->setFirstResult($resultsLimit*($page-1));
+        ->createQuery("SELECT u FROM App\Entity\FmaacNews u ORDER BY u.datetime DESC")->setMaxResults($resultsLimit)->setFirstResult($resultsLimit*($page-1));
         $news = $query->getResult();
         //var_dump($news);
 
@@ -64,7 +64,7 @@ class NewsController extends Controller
     {
 
         $article = $this->getDoctrine()
-            ->getRepository(News::class)
+            ->getRepository(FmaacNews::class)
         ->find($id);
 
 

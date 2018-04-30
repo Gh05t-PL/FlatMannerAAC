@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello {{ controller_name }}!{% endblock %}
+{% block title %}Spells{% endblock %}
 
 {% block content %}
 <style>
@@ -62,7 +62,7 @@
 <script>
         $(document).ready(function() 
         { 
-            $("#spells-table").tablesorter(); 
+            $("#spells-table").tablesorter( {sortList: [[3,0]]} ); 
         } 
     ); 
        

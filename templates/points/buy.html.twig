@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Buy Points{% endblock %}
+
+{% block content %}
+<style>
+    .example-wrapper { margin: 1em auto; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+</style>
+
+<div class="example-wrapper">
+    <h1>Buy Points</h1>
+    {% if provider == 'paygol' %}
+        
+
+        <!-- PayGol Form -->
+        <form name="pg_frm" method="post" action="https://www.paygol.com/pay" >
+            <input type="hidden" name="pg_serviceid" value="{{ config.paygol.serviceId }}">
+            <input type="hidden" name="pg_currency" value="EUR">
+            <input type="hidden" name="pg_name" value="FireFun Premium Points">
+            <p>Account Name</p><input type="text" name="pg_custom" value="{{ account.name }}">
+            <br>
+            <br>
+            <input type="radio" name="pg_price" value="1.30"checked>10 Premium Points 5.58 PLN PLN||1.30 EUR||1.56 USD<p>
+            <input type="radio" name="pg_price" value="2.45">22 Premium Points 10.51 PLN||2.45 EUR||2.93 USD<p>
+            <input type="radio" name="pg_price" value="5">60 Premium Points 21.45 PLN||5.00 EUR||5.99 USD<p>
+            <input type="hidden" name="pg_return_url" value="{{ config.paygol.returnUrl }}">
+            <input type="hidden" name="pg_cancel_url" value="{{ config.paygol.cancelUrl }}">
+            <input type="image" name="pg_button" src="https://www.paygol.com/webapps/img/buttons/150/black_en_pbm.png" border="0" alt="Make payments with Paygol: the easiest way!" title="Make payments with Paygol: the easiest way!" >     
+        </form>
+    {% elseif provider == 'paypal' %}
+
+    {% elseif provider == 'microsms' %}
+        {% for error in errors %}
+            <p>{{ error }}</p>
+        {% endfor %}
+
+        <p>Terms Of Use - <a href="http://microsms.pl/files/regulations/">http://microsms.pl/files/regulations/</a></p>
+        <p>Return code not received? - <a href="http://microsms.pl/customer/complaint/">http://microsms.pl/customer/complaint/</a></p>
+
+        {{ form_start(form) }}
+        {{ form_widget(form) }}
+        {{ form_end(form) }}
+    {% endif %}
+    
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+{% if provider == 'paygol' %}
+    <!-- PayGol JavaScript -->
+    <script src="http://www.paygol.com/micropayment/js/paygol.js" type="text/javascript"></script> 
+{% endif %} 
+{% endblock %}

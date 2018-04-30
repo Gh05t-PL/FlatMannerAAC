@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Buy Points{% endblock %}
+
+{% block content %}
+<style>
+    .example-wrapper { margin: 1em auto; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+</style>
+
+<div class="example-wrapper">
+    <h1>Buy Points</h1>
+    {% for key,system in availableSystems %}
+        {% if system == true %}
+            <a style="display: block; font-size: 40px;" href="/points/{{ key }}">{{ key|capitalize }}</a>
+        {% endif %}
+    {% endfor %}
+    
+</div>
+{% endblock %}
