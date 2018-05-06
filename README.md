@@ -14,8 +14,6 @@ Automated Account Maker created for Open Tibia Servers with Symfony 4 MVC framew
 
 0 EXECUTE THIS QUERIES 
 {
-    ALTER TABLE player_skills ADD id INT (11) NOT NULL AUTO_INCREMENT PRIMARY KEY;
-    ALTER TABLE player_killers ADD id INT (11) NOT NULL AUTO_INCREMENT PRIMARY KEY;
     ALTER TABLE accounts ADD points INT (10) NOT NULL DEFAULT 0;
 
     CREATE TABLE today_exp (
