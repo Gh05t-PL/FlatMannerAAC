@@ -115,7 +115,7 @@ class AdminPanelController extends Controller
 
 
         $accountsStats = $this->getDoctrine()->getManager()
-            ->createNativeQuery("SELECT calendar.datefield AS date, IFNULL(COUNT(CASE WHEN action_id = 1 THEN 1 END) - COUNT(CASE WHEN action_id = 2 THEN 1 END),0) AS deltaAcc FROM fmAAC_logs RIGHT JOIN calendar ON (DATE(fmAAC_logs.datetime) = calendar.datefield) WHERE ( calendar.datefield BETWEEN (NOW() - INTERVAL 14 DAY) AND NOW() ) GROUP BY date ASC", $rsm)
+            ->createNativeQuery("SELECT fmAAC_calendar.datefield AS date, IFNULL(COUNT(CASE WHEN action_id = 1 THEN 1 END) - COUNT(CASE WHEN action_id = 2 THEN 1 END),0) AS deltaAcc FROM fmAAC_logs RIGHT JOIN fmAAC_calendar ON (DATE(fmAAC_logs.datetime) = fmAAC_calendar.datefield) WHERE ( fmAAC_calendar.datefield BETWEEN (NOW() - INTERVAL 14 DAY) AND NOW() ) GROUP BY date ASC", $rsm)
         ->getArrayResult();
 
         // DELTA CHARS
@@ -123,10 +123,10 @@ class AdminPanelController extends Controller
         $rsm->addScalarResult('date', 'date');
         $rsm->addScalarResult('deltaChar', 'deltaChar');
 
-//SELECT calendar.datefield AS DATE, IFNULL(COUNT(fmAAC_logs.id),0) AS total FROM fmAAC_logs RIGHT JOIN calendar ON (DATE(fmAAC_logs.datetime) = calendar.datefield) WHERE ( calendar.datefield BETWEEN (NOW() - INTERVAL 14 DAY) AND NOW() ) GROUP BY DATE DESC
+//SELECT fmAAC_calendar.datefield AS DATE, IFNULL(COUNT(fmAAC_logs.id),0) AS total FROM fmAAC_logs RIGHT JOIN fmAAC_calendar ON (DATE(fmAAC_logs.datetime) = fmAAC_calendar.datefield) WHERE ( fmAAC_calendar.datefield BETWEEN (NOW() - INTERVAL 14 DAY) AND NOW() ) GROUP BY DATE DESC
 
         $charactersStats = $this->getDoctrine()->getManager()
-            ->createNativeQuery("SELECT calendar.datefield AS date, IFNULL(COUNT(CASE WHEN action_id = 3 THEN 1 END) - COUNT(CASE WHEN action_id = 4 THEN 1 END),0) AS deltaChar FROM fmAAC_logs RIGHT JOIN calendar ON (DATE(fmAAC_logs.datetime) = calendar.datefield) WHERE ( calendar.datefield BETWEEN (NOW() - INTERVAL 14 DAY) AND NOW() ) GROUP BY date ASC", $rsm)
+            ->createNativeQuery("SELECT fmAAC_calendar.datefield AS date, IFNULL(COUNT(CASE WHEN action_id = 3 THEN 1 END) - COUNT(CASE WHEN action_id = 4 THEN 1 END),0) AS deltaChar FROM fmAAC_logs RIGHT JOIN fmAAC_calendar ON (DATE(fmAAC_logs.datetime) = fmAAC_calendar.datefield) WHERE ( fmAAC_calendar.datefield BETWEEN (NOW() - INTERVAL 14 DAY) AND NOW() ) GROUP BY date ASC", $rsm)
         ->getArrayResult();
 
         // POINTS BOUGHT
@@ -135,7 +135,7 @@ class AdminPanelController extends Controller
         $rsm->addScalarResult('points', 'points');
 
         $pointsStats = $this->getDoctrine()->getManager()
-            ->createNativeQuery("SELECT calendar.datefield AS date, IFNULL(SUM(points),0) AS points FROM fmAAC_shop_logs RIGHT JOIN calendar ON (DATE(fmAAC_shop_logs.datetime) = calendar.datefield) WHERE ( calendar.datefield BETWEEN (NOW() - INTERVAL 14 DAY) AND NOW() ) GROUP BY date ASC", $rsm)
+            ->createNativeQuery("SELECT fmAAC_calendar.datefield AS date, IFNULL(SUM(points),0) AS points FROM fmAAC_shop_logs RIGHT JOIN fmAAC_calendar ON (DATE(fmAAC_shop_logs.datetime) = fmAAC_calendar.datefield) WHERE ( fmAAC_calendar.datefield BETWEEN (NOW() - INTERVAL 14 DAY) AND NOW() ) GROUP BY date ASC", $rsm)
         ->getArrayResult();
 
         // TO JSON
