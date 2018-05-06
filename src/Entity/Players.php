@@ -2,29 +2,33 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Players
  *
- * @ORM\Table(name="players", uniqueConstraints={@ORM\UniqueConstraint(name="name", columns={"name", "deleted"})}, indexes={@ORM\Index(name="account_id", columns={"account_id"}), @ORM\Index(name="group_id", columns={"group_id"}), @ORM\Index(name="online", columns={"online"}), @ORM\Index(name="deleted", columns={"deleted"})})
+ * @ORM\Table(name="players", uniqueConstraints={@ORM\UniqueConstraint(name="name", columns={"name"})}, indexes={@ORM\Index(name="account_id", columns={"account_id"}), @ORM\Index(name="vocation", columns={"vocation"})})
  * @ORM\Entity
  */
 class Players
 {
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="id", type="integer", nullable=false)
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    private $id;
+
     /**
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255, nullable=false)
      */
     private $name;
-
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="world_id", type="boolean", nullable=false)
-     */
-    private $worldId = '0';
 
     /**
      * @var int
@@ -134,7 +138,7 @@ class Players
     /**
      * @var int
      *
-     * @ORM\Column(name="manaspent", type="integer", nullable=false)
+     * @ORM\Column(name="manaspent", type="integer", nullable=false, options={"unsigned"=true})
      */
     private $manaspent = '0';
 
@@ -178,7 +182,7 @@ class Players
      *
      * @ORM\Column(name="conditions", type="blob", length=65535, nullable=false)
      */
-    private $conditions = '';
+    private $conditions;
 
     /**
      * @var int
@@ -232,20 +236,6 @@ class Players
     /**
      * @var int
      *
-     * @ORM\Column(name="rank_id", type="integer", nullable=false)
-     */
-    private $rankId = '0';
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="guildnick", type="string", length=255, nullable=false)
-     */
-    private $guildnick = '';
-
-    /**
-     * @var int
-     *
      * @ORM\Column(name="lastlogout", type="bigint", nullable=false, options={"unsigned"=true})
      */
     private $lastlogout = '0';
@@ -260,114 +250,147 @@ class Players
     /**
      * @var int
      *
-     * @ORM\Column(name="balance", type="bigint", nullable=false)
+     * @ORM\Column(name="onlinetime", type="integer", nullable=false)
+     */
+    private $onlinetime = '0';
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="deletion", type="bigint", nullable=false)
+     */
+    private $deletion = '0';
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="balance", type="bigint", nullable=false, options={"unsigned"=true})
      */
     private $balance = '0';
 
     /**
      * @var int
      *
-     * @ORM\Column(name="stamina", type="bigint", nullable=false, options={"default"="151200000","comment"="stored in miliseconds"})
+     * @ORM\Column(name="offlinetraining_time", type="smallint", nullable=false, options={"default"="43200","unsigned"=true})
      */
-    private $stamina = '151200000';
+    private $offlinetrainingTime = '43200';
 
     /**
      * @var int
      *
-     * @ORM\Column(name="direction", type="integer", nullable=false, options={"default"="2"})
+     * @ORM\Column(name="offlinetraining_skill", type="integer", nullable=false, options={"default"="-1"})
      */
-    private $direction = '2';
+    private $offlinetrainingSkill = '-1';
 
     /**
      * @var int
      *
-     * @ORM\Column(name="loss_experience", type="integer", nullable=false, options={"default"="100"})
+     * @ORM\Column(name="stamina", type="smallint", nullable=false, options={"default"="2520","unsigned"=true})
      */
-    private $lossExperience = '100';
+    private $stamina = '2520';
 
     /**
      * @var int
      *
-     * @ORM\Column(name="loss_mana", type="integer", nullable=false, options={"default"="100"})
+     * @ORM\Column(name="skill_fist", type="integer", nullable=false, options={"default"="10","unsigned"=true})
      */
-    private $lossMana = '100';
+    private $skillFist = '10';
 
     /**
      * @var int
      *
-     * @ORM\Column(name="loss_skills", type="integer", nullable=false, options={"default"="100"})
+     * @ORM\Column(name="skill_fist_tries", type="bigint", nullable=false, options={"unsigned"=true})
      */
-    private $lossSkills = '100';
+    private $skillFistTries = '0';
 
     /**
      * @var int
      *
-     * @ORM\Column(name="loss_containers", type="integer", nullable=false, options={"default"="100"})
+     * @ORM\Column(name="skill_club", type="integer", nullable=false, options={"default"="10","unsigned"=true})
      */
-    private $lossContainers = '100';
+    private $skillClub = '10';
 
     /**
      * @var int
      *
-     * @ORM\Column(name="loss_items", type="integer", nullable=false, options={"default"="100"})
+     * @ORM\Column(name="skill_club_tries", type="bigint", nullable=false, options={"unsigned"=true})
      */
-    private $lossItems = '100';
+    private $skillClubTries = '0';
 
     /**
      * @var int
      *
-     * @ORM\Column(name="premend", type="integer", nullable=false, options={"comment"="NOT IN USE BY THE SERVER"})
+     * @ORM\Column(name="skill_sword", type="integer", nullable=false, options={"default"="10","unsigned"=true})
      */
-    private $premend = '0';
-
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="online", type="boolean", nullable=false)
-     */
-    private $online = '0';
+    private $skillSword = '10';
 
     /**
      * @var int
      *
-     * @ORM\Column(name="marriage", type="integer", nullable=false, options={"unsigned"=true})
+     * @ORM\Column(name="skill_sword_tries", type="bigint", nullable=false, options={"unsigned"=true})
      */
-    private $marriage = '0';
+    private $skillSwordTries = '0';
 
     /**
      * @var int
      *
-     * @ORM\Column(name="promotion", type="integer", nullable=false)
+     * @ORM\Column(name="skill_axe", type="integer", nullable=false, options={"default"="10","unsigned"=true})
      */
-    private $promotion = '0';
-
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="deleted", type="boolean", nullable=false)
-     */
-    private $deleted = '0';
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="description", type="string", length=255, nullable=false)
-     */
-    private $description = '';
+    private $skillAxe = '10';
 
     /**
      * @var int
      *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @ORM\Column(name="skill_axe_tries", type="bigint", nullable=false, options={"unsigned"=true})
      */
-    private $id;
+    private $skillAxeTries = '0';
 
     /**
-     * @var \App\Entity\Accounts
+     * @var int
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Accounts")
+     * @ORM\Column(name="skill_dist", type="integer", nullable=false, options={"default"="10","unsigned"=true})
+     */
+    private $skillDist = '10';
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="skill_dist_tries", type="bigint", nullable=false, options={"unsigned"=true})
+     */
+    private $skillDistTries = '0';
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="skill_shielding", type="integer", nullable=false, options={"default"="10","unsigned"=true})
+     */
+    private $skillShielding = '10';
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="skill_shielding_tries", type="bigint", nullable=false, options={"unsigned"=true})
+     */
+    private $skillShieldingTries = '0';
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="skill_fishing", type="integer", nullable=false, options={"default"="10","unsigned"=true})
+     */
+    private $skillFishing = '10';
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="skill_fishing_tries", type="bigint", nullable=false, options={"unsigned"=true})
+     */
+    private $skillFishingTries = '0';
+
+    /**
+     * @var \Accounts
+     *
+     * @ORM\ManyToOne(targetEntity="Accounts")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="account_id", referencedColumnName="id")
      * })
@@ -375,832 +398,693 @@ class Players
     private $account;
 
     /**
-     * @return string
+     * @var \Doctrine\Common\Collections\Collection
+     *
+     * @ORM\ManyToMany(targetEntity="Guilds", inversedBy="player")
+     * @ORM\JoinTable(name="guild_invites",
+     *   joinColumns={
+     *     @ORM\JoinColumn(name="player_id", referencedColumnName="id")
+     *   },
+     *   inverseJoinColumns={
+     *     @ORM\JoinColumn(name="guild_id", referencedColumnName="id")
+     *   }
+     * )
      */
-    public function getName()
+    private $guild;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->guild = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     */
-    public function setName($name)
+    public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isWorldId()
-    {
-        return $this->worldId;
-    }
-
-    /**
-     * @param bool $worldId
-     */
-    public function setWorldId($worldId)
-    {
-        $this->worldId = $worldId;
-    }
-
-    /**
-     * @return int
-     */
-    public function getGroupId()
+    public function getGroupId(): ?int
     {
         return $this->groupId;
     }
 
-    public function getKills()
-    {
-        return $this->kills;
-    }
-
-    /**
-     * @param int $groupId
-     */
-    public function setGroupId($groupId)
+    public function setGroupId(int $groupId): self
     {
         $this->groupId = $groupId;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getLevel()
+    public function getLevel(): ?int
     {
         return $this->level;
     }
 
-    /**
-     * @param int $level
-     */
-    public function setLevel($level)
+    public function setLevel(int $level): self
     {
         $this->level = $level;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getVocation()
+    public function getVocation(): ?int
     {
         return $this->vocation;
     }
 
-    /**
-     * @param int $vocation
-     */
-    public function setVocation($vocation)
+    public function setVocation(int $vocation): self
     {
         $this->vocation = $vocation;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getHealth()
+    public function getHealth(): ?int
     {
         return $this->health;
     }
 
-    /**
-     * @param int $health
-     */
-    public function setHealth($health)
+    public function setHealth(int $health): self
     {
         $this->health = $health;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getHealthmax()
+    public function getHealthmax(): ?int
     {
         return $this->healthmax;
     }
 
-    /**
-     * @param int $healthmax
-     */
-    public function setHealthmax($healthmax)
+    public function setHealthmax(int $healthmax): self
     {
         $this->healthmax = $healthmax;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getExperience()
+    public function getExperience(): ?int
     {
         return $this->experience;
     }
 
-    /**
-     * @param int $experience
-     */
-    public function setExperience($experience)
+    public function setExperience(int $experience): self
     {
         $this->experience = $experience;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getLookbody()
+    public function getLookbody(): ?int
     {
         return $this->lookbody;
     }
 
-    /**
-     * @param int $lookbody
-     */
-    public function setLookbody($lookbody)
+    public function setLookbody(int $lookbody): self
     {
         $this->lookbody = $lookbody;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getLookfeet()
+    public function getLookfeet(): ?int
     {
         return $this->lookfeet;
     }
 
-    /**
-     * @param int $lookfeet
-     */
-    public function setLookfeet($lookfeet)
+    public function setLookfeet(int $lookfeet): self
     {
         $this->lookfeet = $lookfeet;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getLookhead()
+    public function getLookhead(): ?int
     {
         return $this->lookhead;
     }
 
-    /**
-     * @param int $lookhead
-     */
-    public function setLookhead($lookhead)
+    public function setLookhead(int $lookhead): self
     {
         $this->lookhead = $lookhead;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getLooklegs()
+    public function getLooklegs(): ?int
     {
         return $this->looklegs;
     }
 
-    /**
-     * @param int $looklegs
-     */
-    public function setLooklegs($looklegs)
+    public function setLooklegs(int $looklegs): self
     {
         $this->looklegs = $looklegs;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getLooktype()
+    public function getLooktype(): ?int
     {
         return $this->looktype;
     }
 
-    /**
-     * @param int $looktype
-     */
-    public function setLooktype($looktype)
+    public function setLooktype(int $looktype): self
     {
         $this->looktype = $looktype;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getLookaddons()
+    public function getLookaddons(): ?int
     {
         return $this->lookaddons;
     }
 
-    /**
-     * @param int $lookaddons
-     */
-    public function setLookaddons($lookaddons)
+    public function setLookaddons(int $lookaddons): self
     {
         $this->lookaddons = $lookaddons;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getMaglevel()
+    public function getMaglevel(): ?int
     {
         return $this->maglevel;
     }
 
-    /**
-     * @param int $maglevel
-     */
-    public function setMaglevel($maglevel)
+    public function setMaglevel(int $maglevel): self
     {
         $this->maglevel = $maglevel;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getMana()
+    public function getMana(): ?int
     {
         return $this->mana;
     }
 
-    /**
-     * @param int $mana
-     */
-    public function setMana($mana)
+    public function setMana(int $mana): self
     {
         $this->mana = $mana;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getManamax()
+    public function getManamax(): ?int
     {
         return $this->manamax;
     }
 
-    /**
-     * @param int $manamax
-     */
-    public function setManamax($manamax)
+    public function setManamax(int $manamax): self
     {
         $this->manamax = $manamax;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getManaspent()
+    public function getManaspent(): ?int
     {
         return $this->manaspent;
     }
 
-    /**
-     * @param int $manaspent
-     */
-    public function setManaspent($manaspent)
+    public function setManaspent(int $manaspent): self
     {
         $this->manaspent = $manaspent;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getSoul()
+    public function getSoul(): ?int
     {
         return $this->soul;
     }
 
-    /**
-     * @param int $soul
-     */
-    public function setSoul($soul)
+    public function setSoul(int $soul): self
     {
         $this->soul = $soul;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getTownId()
+    public function getTownId(): ?int
     {
         return $this->townId;
     }
 
-    /**
-     * @param int $townId
-     */
-    public function setTownId($townId)
+    public function setTownId(int $townId): self
     {
         $this->townId = $townId;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getPosx()
+    public function getPosx(): ?int
     {
         return $this->posx;
     }
 
-    /**
-     * @param int $posx
-     */
-    public function setPosx($posx)
+    public function setPosx(int $posx): self
     {
         $this->posx = $posx;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getPosy()
+    public function getPosy(): ?int
     {
         return $this->posy;
     }
 
-    /**
-     * @param int $posy
-     */
-    public function setPosy($posy)
+    public function setPosy(int $posy): self
     {
         $this->posy = $posy;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getPosz()
+    public function getPosz(): ?int
     {
         return $this->posz;
     }
 
-    /**
-     * @param int $posz
-     */
-    public function setPosz($posz)
+    public function setPosz(int $posz): self
     {
         $this->posz = $posz;
+
+        return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getConditions()
     {
         return $this->conditions;
     }
 
-    /**
-     * @param string $conditions
-     */
-    public function setConditions($conditions)
+    public function setConditions($conditions): self
     {
         $this->conditions = $conditions;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getCap()
+    public function getCap(): ?int
     {
         return $this->cap;
     }
 
-    /**
-     * @param int $cap
-     */
-    public function setCap($cap)
+    public function setCap(int $cap): self
     {
         $this->cap = $cap;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getSex()
+    public function getSex(): ?int
     {
         return $this->sex;
     }
 
-    /**
-     * @param int $sex
-     */
-    public function setSex($sex)
+    public function setSex(int $sex): self
     {
         $this->sex = $sex;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getLastlogin()
+    public function getLastlogin(): ?int
     {
         return $this->lastlogin;
     }
 
-    /**
-     * @param int $lastlogin
-     */
-    public function setLastlogin($lastlogin)
+    public function setLastlogin(int $lastlogin): self
     {
         $this->lastlogin = $lastlogin;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getLastip()
+    public function getLastip(): ?int
     {
         return $this->lastip;
     }
 
-    /**
-     * @param int $lastip
-     */
-    public function setLastip($lastip)
+    public function setLastip(int $lastip): self
     {
         $this->lastip = $lastip;
+
+        return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isSave()
+    public function getSave(): ?bool
     {
         return $this->save;
     }
 
-    /**
-     * @param bool $save
-     */
-    public function setSave($save)
+    public function setSave(bool $save): self
     {
         $this->save = $save;
+
+        return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isSkull()
+    public function getSkull(): ?bool
     {
         return $this->skull;
     }
 
-    /**
-     * @param bool $skull
-     */
-    public function setSkull($skull)
+    public function setSkull(bool $skull): self
     {
         $this->skull = $skull;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getSkulltime()
+    public function getSkulltime(): ?int
     {
         return $this->skulltime;
     }
 
-    /**
-     * @param int $skulltime
-     */
-    public function setSkulltime($skulltime)
+    public function setSkulltime(int $skulltime): self
     {
         $this->skulltime = $skulltime;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getRankId()
-    {
-        return $this->rankId;
-    }
-
-    /**
-     * @param int $rankId
-     */
-    public function setRankId($rankId)
-    {
-        $this->rankId = $rankId;
-    }
-
-    /**
-     * @return string
-     */
-    public function getGuildnick()
-    {
-        return $this->guildnick;
-    }
-
-    /**
-     * @param string $guildnick
-     */
-    public function setGuildnick($guildnick)
-    {
-        $this->guildnick = $guildnick;
-    }
-
-    /**
-     * @return int
-     */
-    public function getLastlogout()
+    public function getLastlogout(): ?int
     {
         return $this->lastlogout;
     }
 
-    /**
-     * @param int $lastlogout
-     */
-    public function setLastlogout($lastlogout)
+    public function setLastlogout(int $lastlogout): self
     {
         $this->lastlogout = $lastlogout;
+
+        return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isBlessings()
+    public function getBlessings(): ?bool
     {
         return $this->blessings;
     }
 
-    /**
-     * @param bool $blessings
-     */
-    public function setBlessings($blessings)
+    public function setBlessings(bool $blessings): self
     {
         $this->blessings = $blessings;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getBalance()
+    public function getOnlinetime(): ?int
+    {
+        return $this->onlinetime;
+    }
+
+    public function setOnlinetime(int $onlinetime): self
+    {
+        $this->onlinetime = $onlinetime;
+
+        return $this;
+    }
+
+    public function getDeletion(): ?int
+    {
+        return $this->deletion;
+    }
+
+    public function setDeletion(int $deletion): self
+    {
+        $this->deletion = $deletion;
+
+        return $this;
+    }
+
+    public function getBalance(): ?int
     {
         return $this->balance;
     }
 
-    /**
-     * @param int $balance
-     */
-    public function setBalance($balance)
+    public function setBalance(int $balance): self
     {
         $this->balance = $balance;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getStamina()
+    public function getOfflinetrainingTime(): ?int
+    {
+        return $this->offlinetrainingTime;
+    }
+
+    public function setOfflinetrainingTime(int $offlinetrainingTime): self
+    {
+        $this->offlinetrainingTime = $offlinetrainingTime;
+
+        return $this;
+    }
+
+    public function getOfflinetrainingSkill(): ?int
+    {
+        return $this->offlinetrainingSkill;
+    }
+
+    public function setOfflinetrainingSkill(int $offlinetrainingSkill): self
+    {
+        $this->offlinetrainingSkill = $offlinetrainingSkill;
+
+        return $this;
+    }
+
+    public function getStamina(): ?int
     {
         return $this->stamina;
     }
 
-    /**
-     * @param int $stamina
-     */
-    public function setStamina($stamina)
+    public function setStamina(int $stamina): self
     {
         $this->stamina = $stamina;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getDirection()
+    public function getSkillFist(): ?int
     {
-        return $this->direction;
+        return $this->skillFist;
     }
 
-    /**
-     * @param int $direction
-     */
-    public function setDirection($direction)
+    public function setSkillFist(int $skillFist): self
     {
-        $this->direction = $direction;
+        $this->skillFist = $skillFist;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getLossExperience()
+    public function getSkillFistTries(): ?int
     {
-        return $this->lossExperience;
+        return $this->skillFistTries;
     }
 
-    /**
-     * @param int $lossExperience
-     */
-    public function setLossExperience($lossExperience)
+    public function setSkillFistTries(int $skillFistTries): self
     {
-        $this->lossExperience = $lossExperience;
+        $this->skillFistTries = $skillFistTries;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getLossMana()
+    public function getSkillClub(): ?int
     {
-        return $this->lossMana;
+        return $this->skillClub;
     }
 
-    /**
-     * @param int $lossMana
-     */
-    public function setLossMana($lossMana)
+    public function setSkillClub(int $skillClub): self
     {
-        $this->lossMana = $lossMana;
+        $this->skillClub = $skillClub;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getLossSkills()
+    public function getSkillClubTries(): ?int
     {
-        return $this->lossSkills;
+        return $this->skillClubTries;
     }
 
-    /**
-     * @param int $lossSkills
-     */
-    public function setLossSkills($lossSkills)
+    public function setSkillClubTries(int $skillClubTries): self
     {
-        $this->lossSkills = $lossSkills;
+        $this->skillClubTries = $skillClubTries;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getLossContainers()
+    public function getSkillSword(): ?int
     {
-        return $this->lossContainers;
+        return $this->skillSword;
     }
 
-    /**
-     * @param int $lossContainers
-     */
-    public function setLossContainers($lossContainers)
+    public function setSkillSword(int $skillSword): self
     {
-        $this->lossContainers = $lossContainers;
+        $this->skillSword = $skillSword;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getLossItems()
+    public function getSkillSwordTries(): ?int
     {
-        return $this->lossItems;
+        return $this->skillSwordTries;
     }
 
-    /**
-     * @param int $lossItems
-     */
-    public function setLossItems($lossItems)
+    public function setSkillSwordTries(int $skillSwordTries): self
     {
-        $this->lossItems = $lossItems;
+        $this->skillSwordTries = $skillSwordTries;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getPremend()
+    public function getSkillAxe(): ?int
     {
-        return $this->premend;
+        return $this->skillAxe;
     }
 
-    /**
-     * @param int $premend
-     */
-    public function setPremend($premend)
+    public function setSkillAxe(int $skillAxe): self
     {
-        $this->premend = $premend;
+        $this->skillAxe = $skillAxe;
+
+        return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isOnline()
+    public function getSkillAxeTries(): ?int
     {
-        return $this->online;
+        return $this->skillAxeTries;
     }
 
-    /**
-     * @param bool $online
-     */
-    public function setOnline($online)
+    public function setSkillAxeTries(int $skillAxeTries): self
     {
-        $this->online = $online;
+        $this->skillAxeTries = $skillAxeTries;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getMarriage()
+    public function getSkillDist(): ?int
     {
-        return $this->marriage;
+        return $this->skillDist;
     }
 
-    /**
-     * @param int $marriage
-     */
-    public function setMarriage($marriage)
+    public function setSkillDist(int $skillDist): self
     {
-        $this->marriage = $marriage;
+        $this->skillDist = $skillDist;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getPromotion()
+    public function getSkillDistTries(): ?int
     {
-        return $this->promotion;
+        return $this->skillDistTries;
     }
 
-    /**
-     * @param int $promotion
-     */
-    public function setPromotion($promotion)
+    public function setSkillDistTries(int $skillDistTries): self
     {
-        $this->promotion = $promotion;
+        $this->skillDistTries = $skillDistTries;
+
+        return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isDeleted()
+    public function getSkillShielding(): ?int
     {
-        return $this->deleted;
+        return $this->skillShielding;
     }
 
-    /**
-     * @param bool $deleted
-     */
-    public function setDeleted($deleted)
+    public function setSkillShielding(int $skillShielding): self
     {
-        $this->deleted = $deleted;
+        $this->skillShielding = $skillShielding;
+
+        return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getDescription()
+    public function getSkillShieldingTries(): ?int
     {
-        return $this->description;
+        return $this->skillShieldingTries;
     }
 
-    /**
-     * @param string $description
-     */
-    public function setDescription($description)
+    public function setSkillShieldingTries(int $skillShieldingTries): self
     {
-        $this->description = $description;
+        $this->skillShieldingTries = $skillShieldingTries;
+
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getSkillFishing(): ?int
     {
-        return $this->id;
+        return $this->skillFishing;
     }
 
-    /**
-     * @param int $id
-     */
-    public function setId($id)
+    public function setSkillFishing(int $skillFishing): self
     {
-        $this->id = $id;
+        $this->skillFishing = $skillFishing;
+
+        return $this;
     }
 
-    /**
-     * @return Accounts
-     */
-    public function getAccount()
+    public function getSkillFishingTries(): ?int
+    {
+        return $this->skillFishingTries;
+    }
+
+    public function setSkillFishingTries(int $skillFishingTries): self
+    {
+        $this->skillFishingTries = $skillFishingTries;
+
+        return $this;
+    }
+
+    public function getAccount(): ?Accounts
     {
         return $this->account;
     }
 
-    /**
-     * @param Accounts $account
-     */
-    public function setAccount($account)
+    public function setAccount(?Accounts $account): self
     {
         $this->account = $account;
+
+        return $this;
     }
 
+    /**
+     * @return Collection|Guilds[]
+     */
+    public function getGuild(): Collection
+    {
+        return $this->guild;
+    }
 
+    public function addGuild(Guilds $guild): self
+    {
+        if (!$this->guild->contains($guild)) {
+            $this->guild[] = $guild;
+        }
 
+        return $this;
+    }
 
+    public function removeGuild(Guilds $guild): self
+    {
+        if ($this->guild->contains($guild)) {
+            $this->guild->removeElement($guild);
+        }
 
-
-
-
+        return $this;
+    }
 
 }
