@@ -1,23 +1,27 @@
 <?php
 
-namespace App\Acme\TestBundle\Entity;
+namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Guilds
  *
- * @ORM\Table(name="guilds", uniqueConstraints={@ORM\UniqueConstraint(name="name", columns={"name", "world_id"})})
+ * @ORM\Table(name="guilds", uniqueConstraints={@ORM\UniqueConstraint(name="name", columns={"name"}), @ORM\UniqueConstraint(name="ownerid", columns={"ownerid"})})
  * @ORM\Entity
  */
 class Guilds
 {
     /**
-     * @var bool
+     * @var int
      *
-     * @ORM\Column(name="world_id", type="boolean", nullable=false)
+     * @ORM\Column(name="id", type="integer", nullable=false)
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    private $worldId = '0';
+    private $id;
 
     /**
      * @var string
@@ -25,13 +29,6 @@ class Guilds
      * @ORM\Column(name="name", type="string", length=255, nullable=false)
      */
     private $name;
-
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="ownerid", type="integer", nullable=false)
-     */
-    private $ownerid;
 
     /**
      * @var int
@@ -45,117 +42,112 @@ class Guilds
      *
      * @ORM\Column(name="motd", type="string", length=255, nullable=false)
      */
-    private $motd;
+    private $motd = '';
 
     /**
-     * @var int
+     * @var \Players
      *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @ORM\ManyToOne(targetEntity="Players")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="ownerid", referencedColumnName="id")
+     * })
      */
-    private $id;
+    private $ownerid;
 
     /**
-     * @return bool
+     * @var \Doctrine\Common\Collections\Collection
+     *
+     * @ORM\ManyToMany(targetEntity="Players", mappedBy="guild")
      */
-    public function isWorldId()
+    private $player;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
     {
-        return $this->worldId;
+        $this->player = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
-    /**
-     * @param bool $worldId
-     */
-    public function setWorldId($worldId)
-    {
-        $this->worldId = $worldId;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * @param string $name
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
-
-    /**
-     * @return int
-     */
-    public function getOwnerid()
-    {
-        return $this->ownerid;
-    }
-
-    /**
-     * @param int $ownerid
-     */
-    public function setOwnerid($ownerid)
-    {
-        $this->ownerid = $ownerid;
-    }
-
-    /**
-     * @return int
-     */
-    public function getCreationdata()
-    {
-        return $this->creationdata;
-    }
-
-    /**
-     * @param int $creationdata
-     */
-    public function setCreationdata($creationdata)
-    {
-        $this->creationdata = $creationdata;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMotd()
-    {
-        return $this->motd;
-    }
-
-    /**
-     * @param string $motd
-     */
-    public function setMotd($motd)
-    {
-        $this->motd = $motd;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @param int $id
-     */
-    public function setId($id)
+    public function getName(): ?string
     {
-        $this->id = $id;
+        return $this->name;
     }
 
+    public function setName(string $name): self
+    {
+        $this->name = $name;
 
+        return $this;
+    }
 
+    public function getCreationdata(): ?int
+    {
+        return $this->creationdata;
+    }
 
+    public function setCreationdata(int $creationdata): self
+    {
+        $this->creationdata = $creationdata;
 
+        return $this;
+    }
 
+    public function getMotd(): ?string
+    {
+        return $this->motd;
+    }
+
+    public function setMotd(string $motd): self
+    {
+        $this->motd = $motd;
+
+        return $this;
+    }
+
+    public function getOwnerid(): ?Players
+    {
+        return $this->ownerid;
+    }
+
+    public function setOwnerid(?Players $ownerid): self
+    {
+        $this->ownerid = $ownerid;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Players[]
+     */
+    public function getPlayer(): Collection
+    {
+        return $this->player;
+    }
+
+    public function addPlayer(Players $player): self
+    {
+        if (!$this->player->contains($player)) {
+            $this->player[] = $player;
+            $player->addGuild($this);
+        }
+
+        return $this;
+    }
+
+    public function removePlayer(Players $player): self
+    {
+        if ($this->player->contains($player)) {
+            $this->player->removeElement($player);
+            $player->removeGuild($this);
+        }
+
+        return $this;
+    }
 
 }

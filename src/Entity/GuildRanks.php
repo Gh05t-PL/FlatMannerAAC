@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Acme\TestBundle\Entity;
+namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
@@ -13,103 +13,78 @@ use Doctrine\ORM\Mapping as ORM;
 class GuildRanks
 {
     /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255, nullable=false)
-     */
-    private $name;
-
-    /**
      * @var int
      *
-     * @ORM\Column(name="level", type="integer", nullable=false, options={"comment"="1 - leader, 2 - vice leader, 3 - member"})
-     */
-    private $level;
-
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
+     * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     private $id;
 
     /**
-     * @var \App\Acme\TestBundle\Entity\Guilds
+     * @var string
      *
-     * @ORM\ManyToOne(targetEntity="App\Acme\TestBundle\Entity\Guilds")
+     * @ORM\Column(name="name", type="string", length=255, nullable=false, options={"comment"="rank name"})
+     */
+    private $name;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="level", type="integer", nullable=false, options={"comment"="rank level - leader, vice, member, maybe something else"})
+     */
+    private $level;
+
+    /**
+     * @var \Guilds
+     *
+     * @ORM\ManyToOne(targetEntity="Guilds")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="guild_id", referencedColumnName="id")
      * })
      */
     private $guild;
 
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * @param string $name
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
-
-    /**
-     * @return int
-     */
-    public function getLevel()
-    {
-        return $this->level;
-    }
-
-    /**
-     * @param int $level
-     */
-    public function setLevel($level)
-    {
-        $this->level = $level;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @param int $id
-     */
-    public function setId($id)
+    public function getName(): ?string
     {
-        $this->id = $id;
+        return $this->name;
     }
 
-    /**
-     * @return Guilds
-     */
-    public function getGuild()
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getLevel(): ?int
+    {
+        return $this->level;
+    }
+
+    public function setLevel(int $level): self
+    {
+        $this->level = $level;
+
+        return $this;
+    }
+
+    public function getGuild(): ?Guilds
     {
         return $this->guild;
     }
 
-    /**
-     * @param Guilds $guild
-     */
-    public function setGuild($guild)
+    public function setGuild(?Guilds $guild): self
     {
         $this->guild = $guild;
+
+        return $this;
     }
-
-
 
 
 }
