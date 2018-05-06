@@ -23,7 +23,7 @@ class PointsController extends Controller
             'microsms' => true,
         ],
         'paygol' => [
-            'serviceId' => xxxxx,
+            'serviceId' => 'xxxxx',
             'returnUrl' => "http://217.182.78.52/points/paygol",
             'cancelUrl' => "http://217.182.78.52/points/paygol",
         ],
