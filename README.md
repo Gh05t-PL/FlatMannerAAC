@@ -70,7 +70,11 @@ Automated Account Maker created for Open Tibia Servers with Symfony 4 MVC framew
         FOREIGN KEY (account_id) REFERENCES accounts(id)
     );
 
-
+    CREATE TABLE fmAAC_statistics_online ( 
+        id int AUTO_INCREMENT, 
+        online_players int NOT NULL, 
+        date DATETIME, PRIMARY KEY (id) 
+    );
 
 
     CREATE TABLE fmAAC_calendar (datefield DATE);
