@@ -182,7 +182,7 @@ class Players
      *
      * @ORM\Column(name="conditions", type="blob", length=65535, nullable=false)
      */
-    private $conditions;
+    private $conditions = '';
 
     /**
      * @var int

@@ -224,7 +224,7 @@ color: #b5b5b5;
             <table>
                 <tr>
                     <td>Name:</td>
-                    <td><strong>{{ (player.isOnline() ? ("<span style='color: green;'>#{player.name}</span>"): player.name)|raw }}</strong></td>
+                    <td><strong>{{ (player.online ? ("<span style='color: green;'>#{player.name}</span>"): player.name)|raw }}</strong></td>
                 </tr>
                 <tr>
                     <td>Sex:</td>
@@ -248,6 +248,10 @@ color: #b5b5b5;
                     <td>Kills:</td>
                     <td>{{ player.kills }}</td>
                 </tr>
+                <tr>
+                    <td>Today Exp Gain:</td>
+                    <td>{{ player.expDiff >= 0 ? "+" ~ player.expDiff : player.expDiff }} ExP</td>
+                </tr>
             </table>
 
         
@@ -261,31 +265,31 @@ color: #b5b5b5;
                 <div class="cap">{{ player.cap }}</div>
                 <div class="stamina"><font style="text-shadow: -1px -1px 0 rgba(0,0,0,0.50),1px -1px 0 rgba(0,0,0,0.50),-1px 1px 0 rgba(0,0,0,0.50),1px 1px 0 rgba(0,0,0,0.50);">{{ (player.stamina / 3600000)|round(0, 'floor') ~ ':' ~ ((((player.stamina / (60 * 1000)) % 60)|round(0, 'ceil') < 10) ? ('0' ~ ((player.stamina / (60 * 1000)) % 60)|round(0, 'ceil')) : ((player.stamina / (60 * 1000)) % 60)|round(0, 'ceil')) }}</font></div>
                 <div class="magicLevel">{{ player.maglevel }}</div>
-                <div class="fist">{{ playerSkills[0].value }}</div>
-                <div class="club">{{ playerSkills[1].value }}</div>
-                <div class="sword">{{ playerSkills[2].value }}</div>
-                <div class="axe">{{ playerSkills[3].value }}</div>
-                <div class="distance">{{ playerSkills[4].value }}</div>
-                <div class="shield">{{ playerSkills[5].value }}</div>
-                <div class="fishing">{{ playerSkills[6].value }}</div>		
+                <div class="fist">{{ player.skillFist }}</div>
+                <div class="club">{{ player.skillClub }}</div>
+                <div class="sword">{{ player.skillSword }}</div>
+                <div class="axe">{{ player.skillAxe }}</div>
+                <div class="distance">{{ player.skillDist }}</div>
+                <div class="shield">{{ player.skillShielding }}</div>
+                <div class="fishing">{{ player.skillFishing }}</div>		
             </div>
 
             <p class="label">Frags</p>
             <div class="frags">
-                {% if playerPK %}
+              {% if playerPK %}
                 <table>
 
                     {% for frags in playerPK %}
                     <tr>
-                        <td>Killed <a href="/player/{{ frags.kill.death.player.name }}">{{ frags.kill.death.player.name }}</a>({{ frags.kill.death.level }}) on {{ frags.kill.death.date|date("d.m.Y H:i:s") }}</td>
-                        <td>{{ frags.kill.unjustified ? "UnJustified" : "Justified" }}</td>
+                        <td>Killed <a href="/player/{{ frags.name }}">{{ frags.name }}</a>({{ frags.level }}) on {{ frags.time|date("d.m.Y H:i:s") }}</td>
+                        <td>{{ frags.unjustified ? "UnJustified" : "Justified" }}</td>
                     </tr>
                     {% endfor %}
                 </table>
-                {% else %}
+            {% else %}
                 <p style="font-size: small; margin-left: 10px;">No frags</p>
-                {% endif %}
-
+            {% endif %}
+  
                 <p class="label">Deaths</p>
                 <p style="font-size: small;">By Players</p>
                 {% if playerKillers %}
@@ -293,16 +297,7 @@ color: #b5b5b5;
 
                     {% for death in playerKillers %}
                     <tr>
-                        {% set namess = death.names|split(',') %}
-                        <td>Killed by 
-                            {% for name in namess %}
-                                {% if loop.last %}
-                                    <a href="/player/{{ name }}">{{ name }}</a>
-                                {% else %}
-                                    <a href="/player/{{ name }}">{{ name }}</a>,
-                                {% endif %}
-                            {% endfor %}
-                        at Level {{ death.level }} on {{ death.date|date("d.m.Y H:i:s") }}</td>
+                        <td>Killed by <a href="/player/{{ death.name }}">{{ death.name }}</a> at Level {{ death.level }} on {{ death.date|date("d.m.Y H:i:s") }}</td>
                     </tr>
                     {% endfor %}
                 </table>
@@ -316,7 +311,7 @@ color: #b5b5b5;
 
                     {% for death in monsterKillers %}
                     <tr>
-                        <td>Killed by {{ death.killers }} at Level {{ death.level }} on {{ death.date|date("d.m.Y H:i:s") }}</td>
+                        <td>Killed by {{ death.name }} at Level {{ death.level }} on {{ death.date|date("d.m.Y H:i:s") }}</td>
                     </tr>
                     {% endfor %}
                 </table>
@@ -333,7 +328,7 @@ color: #b5b5b5;
         <p style="display: inline-block">Find Player: </p>
         <input type="search" name="search" id="search" onkeypress="enterSearch(event)">
         <input type="button" value="Search" onclick="search()">
-    {% endif %}
+    {% endif %} 
 
 </div>
 <script>

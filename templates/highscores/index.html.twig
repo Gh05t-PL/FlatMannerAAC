@@ -80,8 +80,17 @@
                 <td><a href="/player/{{ player.name }}">{{ player.name }}</a></td>
                 <td>{{ filter == "mlvl" ? attribute(player, "maglevel") : attribute(player, filter) }}</td>
             {% else %}
-                <td><a href="/player/{{ player.player.name }}">{{ player.player.name }}</a></td>
-                <td>{{ player.value }}</td>
+            {% set foo = {
+                fist: 'skillFist',
+                club: 'skillClub',
+                sword: 'skillSword',
+                axe: 'skillAxe',
+                distance: 'skillDist',
+                shielding: 'skillShielding',
+                fishing: 'skillFishing',
+                } %}
+                <td><a href="/player/{{ player.name }}">{{ player.name }}</a></td>
+                <td>{{ attribute(player, attribute(foo, filter)) }}</td>
             {% endif %}
         </tr>
         {% endfor %}

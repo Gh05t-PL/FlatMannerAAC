@@ -34,7 +34,7 @@ class AdminPanelController extends Controller
 
 
             // CHECK IF ACCOUNT HAVE ADMIN PRIVILEGES
-            if ($account->getGroupId() < 7)
+            if ($account->getType() < 7)
                 return new Response("No admin privileges");
 
 
@@ -70,7 +70,7 @@ class AdminPanelController extends Controller
         ->find($session->get('account_id'));
 
         // CHECK IF ACCOUNT HAVE ADMIN PRIVILEGES
-        if ($account->getGroupId() < 7)
+        if ($account->getType() < 7)
             return $this->redirectToRoute('account', [], 301);
 
         return $this->render('admin_panel/create_article.html.twig', [
@@ -94,7 +94,7 @@ class AdminPanelController extends Controller
         ->find($session->get('account_id'));
 
         // CHECK IF ACCOUNT HAVE ADMIN PRIVILEGES
-        if ($account->getGroupId() < 7)
+        if ($account->getType() < 7)
             return $this->redirectToRoute('account', [], 301);
 
         // PLAYERS ONLINE

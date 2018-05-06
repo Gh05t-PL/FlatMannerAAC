@@ -6,9 +6,6 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use App\Entity\Players;
-use App\Entity\PlayerSkill;
-use App\Entity\PlayerKiller;
-use App\Entity\PlayerDeaths;
 use Doctrine\ORM\Query\ResultSetMapping;
 
 class HighscoresController extends Controller
@@ -67,11 +64,11 @@ class HighscoresController extends Controller
         //----SKILLS
         elseif ($filter === "fist"){
             $result = $this->getDoctrine()
-                ->getRepository(PlayerSkill::class)
+                ->getRepository(Players::class)
             ->findBy([
-                'skillid' => 0,
+                'groupId' => 1,
             ],[
-                'value' => "DESC"
+                'skillFist' => "DESC"
             ], $resultsLimit ,$resultsLimit*($page-1));
 
             $filterName = "Fist Fighting";
@@ -79,11 +76,11 @@ class HighscoresController extends Controller
 
         elseif ($filter === "club"){
             $result = $this->getDoctrine()
-                ->getRepository(PlayerSkill::class)
+                ->getRepository(Players::class)
             ->findBy([
-                'skillid' => 1,
+                'groupId' => 1,
             ],[
-                'value' => "DESC"
+                'skillClub' => "DESC"
             ], $resultsLimit ,$resultsLimit*($page-1));
 
             $filterName = "Club Fighting";
@@ -91,11 +88,11 @@ class HighscoresController extends Controller
 
         elseif ($filter === "sword"){
             $result = $this->getDoctrine()
-                ->getRepository(PlayerSkill::class)
+                ->getRepository(Players::class)
             ->findBy([
-                'skillid' => 2,
+                'groupId' => 1,
             ],[
-                'value' => "DESC"
+                'skillSword' => "DESC"
             ], $resultsLimit ,$resultsLimit*($page-1));
 
             $filterName = "Sword Fighting";
@@ -103,11 +100,11 @@ class HighscoresController extends Controller
 
         elseif ($filter === "axe"){
             $result = $this->getDoctrine()
-                ->getRepository(PlayerSkill::class)
+                ->getRepository(Players::class)
             ->findBy([
-                'skillid' => 3,
+                'groupId' => 1,
             ],[
-                'value' => "DESC"
+                'skillAxe' => "DESC"
             ], $resultsLimit ,$resultsLimit*($page-1));
 
             $filterName = "Axe Fighting";
@@ -115,11 +112,11 @@ class HighscoresController extends Controller
 
         elseif ($filter === "distance"){
             $result = $this->getDoctrine()
-                ->getRepository(PlayerSkill::class)
+                ->getRepository(Players::class)
             ->findBy([
-                'skillid' => 4,
+                'groupId' => 1,
             ],[
-                'value' => "DESC"
+                'skillDist' => "DESC"
             ], $resultsLimit ,$resultsLimit*($page-1));
 
             $filterName = "Distance Fighting";
@@ -127,11 +124,11 @@ class HighscoresController extends Controller
 
         elseif ($filter === "shielding"){
             $result = $this->getDoctrine()
-                ->getRepository(PlayerSkill::class)
+                ->getRepository(Players::class)
             ->findBy([
-                'skillid' => 5,
+                'groupId' => 1,
             ],[
-                'value' => "DESC"
+                'skillShielding' => "DESC"
             ], $resultsLimit ,$resultsLimit*($page-1));
 
             $filterName = "Shielding";
@@ -139,11 +136,11 @@ class HighscoresController extends Controller
 
         elseif ($filter === "fishing"){
             $result = $this->getDoctrine()
-                ->getRepository(PlayerSkill::class)
+                ->getRepository(Players::class)
             ->findBy([
-                'skillid' => 6,
+                'groupId' => 1,
             ],[
-                'value' => "DESC"
+                'skillFishing' => "DESC"
             ], $resultsLimit ,$resultsLimit*($page-1));
 
             $filterName = "Fishing";

@@ -36,7 +36,7 @@ class NewsController extends Controller
         $resultsLimit = 5;
         $pagesCount = ceil(($newsCount / $resultsLimit));
 
-
+        
         $query = $this->getDoctrine()
             ->getManager()
         ->createQuery("SELECT u FROM App\Entity\FmaacNews u ORDER BY u.datetime DESC")->setMaxResults($resultsLimit)->setFirstResult($resultsLimit*($page-1));

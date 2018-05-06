@@ -70,6 +70,13 @@ class Accounts
      */
     private $creation = '0';
 
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="points", type="integer", length=10, nullable=false, options={"default"="0"})
+     */
+    private $points = '0';
+
     public function getId(): ?int
     {
         return $this->id;
@@ -143,6 +150,24 @@ class Accounts
     public function setEmail(string $email): self
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPoints()
+    {
+        return $this->points;
+    }
+
+    /**
+     * @param int $points
+     */
+    public function setPoints($points)
+    {
+        $this->points = $points;
 
         return $this;
     }

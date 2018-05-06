@@ -316,9 +316,9 @@
                         <div class="top_player">
                             <p class="name">{{ loop.index }}. <a href="/player/{{ player.name }}">{{ player.name }}</a></p>
                         {% if player.expDiff > 99999999 %}
-                            <p class="level" style="font-size: 11px; padding-bottom: 0; border-radius: 5px; padding-top: 3px; background: green;">+{{ player.expDiff }} ExP</p>
+                            <p class="level" style="font-size: 10px; padding-bottom: 0; border-radius: 5px; padding-top: 3px; background: green;">+{{ player.expDiff }} ExP</p>
                         {% else %}
-                            <p class="level" style="background: green; border-radius: 5px;">+{{ player.expDiff }} ExP</p>
+                            <p class="level" style="background: green; border-radius: 5px;">{{ player.expDiff >= 0 ? "+" ~ player.expDiff : player.expDiff }} ExP</p>
                         {% endif %}
                         </div>
                     {% endfor %}

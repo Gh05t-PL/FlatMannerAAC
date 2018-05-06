@@ -12,7 +12,6 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use App\Entity\Accounts;
 use App\Entity\Players;
-use App\Entity\PlayerSkill;
 use App\Entity\FmaacLogs;
 use App\Entity\FmaacLogsActions;
 
@@ -99,7 +98,7 @@ class AccountController extends Controller
 
 
             // Checking for errors
-            if ( $account = $this->getDoctrine()->getRepository(Accounts::class)->findOneBy(['name' => $form->getData()['Account'],'password' => $form->getData()['Password']]) === NULL )
+            if ( $account = $this->getDoctrine()->getRepository(Accounts::class)->findOneBy(['name' => $form->getData()['Account'],'password' => sha1($form->getData()['Password'])]) === NULL )
                 $errors[] = "Wrong Account Name or/and Password";
 
             // No errors found
@@ -108,7 +107,7 @@ class AccountController extends Controller
                     ->getRepository(Accounts::class)
                 ->findOneBy([
                     'name' => $form->getData()['Account'],
-                    'password' => $form->getData()['Password']
+                    'password' => sha1($form->getData()['Password'])
                 ]);
 
 
@@ -236,6 +235,11 @@ class AccountController extends Controller
                 "y" => 497,
                 "z" => 7,
             ],
+            3 => [
+                "x" => 201,
+                "y" => 497,
+                "z" => 7,
+            ],
         ];
 
 
@@ -305,49 +309,18 @@ class AccountController extends Controller
 
                     $player->setExperience(expToLevel($startStats['level']));
 
+                    //SKILLS
+                    $player->setSkillFist($startStats['skill'])
+                        ->setSkillClub($startStats['skill'])
+                        ->setSkillSword($startStats['skill'])
+                        ->setSkillAxe($startStats['skill'])
+                        ->setSkillDist($startStats['skill'])
+                        ->setSkillShielding($startStats['skill'])
+                    ->setSkillFishing($startStats['skill']);
+
                     $em = $this->getDoctrine()->getManager();
                     $em->persist($player);
-                    //$em->flush();
-                    // $skills = [
-                    //     new PlayerSkill(),
-                    //     new PlayerSkill(),
-                    //     new PlayerSkill(),
-                    //     new PlayerSkill(),
-                    //     new PlayerSkill(),
-                    //     new PlayerSkill(),
-                    //     new PlayerSkill()
-                    // ];
-                    // for ($i=1; $i < 7; $i++) { 
-                    //     $skills[$i]->setPlayer($player);
-                    //     $skills[$i]->setSkillid($i);
-                    //     $skills[$i]->setValue($startStats['skill']);
-                    //     $skills[$i]->setCount(0);
-                    //     $em->persist($skills[$i]);
-                    // }
-                    // // foreach ($skills as $key => $value) {
-                    // //     $value->setPlayer($player);
-                    // //     echo $key.'<br>';
-                    // //     $value->setSkillid($key);
-                    // //     echo $key.'<br>';
-                    // //     $value->setValue($startStats['skill']);
-                    // //     $value->setCount(0);
-                    // //     $em->persist($value);
-                    // // }
-                    // var_dump($skills);
                     $em->flush();
-
-                    // GET SKILLS
-                    $skills = $this->getDoctrine()
-                    ->getRepository(PlayerSkill::class)
-                    ->findBy([
-                        'player' => $player,
-                    ]);
-                        
-                    // SET STARTING SKILLS
-                    foreach ($skills as $key => $value) {
-                        $value->setValue($startStats['skill']);
-                        $em->persist($value);
-                    }
 
                     //LOG ACTION
                     $action = $this->getDoctrine()->getRepository(FmaacLogsActions::class)->find(3); // action 3 = create char
@@ -358,6 +331,16 @@ class AccountController extends Controller
 
                     $em->persist($log);
                     $em->flush();
+
+                    //today exp
+                    $conn = $em->getConnection();
+                    $conn->insert('today_exp', [
+                        'id' => null,
+                        'exp' => expToLevel($startStats['level']),
+                        'player_id' => $player->getId()
+                    ]);
+
+                    
                     return $this->redirectToRoute('account');
                 }
 
