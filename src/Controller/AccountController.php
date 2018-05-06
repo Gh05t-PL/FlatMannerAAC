@@ -161,7 +161,7 @@ class AccountController extends Controller
             if ( empty($errors) ){
                 $account = new Accounts();
                 $account->setName($formData['account']);
-                $account->setPassword($formData['password']);
+                $account->setPassword(sha1($formData['password']));
                 $account->setEmail($formData['email']);
                 $em = $this->getDoctrine()->getManager();
 
