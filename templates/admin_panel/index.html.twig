@@ -77,7 +77,7 @@
         table.forEach(function(item,index){
             itemm = new Date(item[tableLabel])
             var formats = [
-        `${itemm.getFullYear()}-${(itemm.getMonth() + 1) >= 10 ? (itemm.getMonth() + 1) : '0'+(itemm.getMonth() + 1)}-${itemm.getDate()}`,
+        `${itemm.getFullYear()}-${(itemm.getMonth() + 1) >= 10 ? (itemm.getMonth() + 1) : '0'+(itemm.getMonth() + 1)}-${itemm.getDate() >= 10 ? itemm.getDate() : '0'+itemm.getDate()}`,
         `${itemm.getHours() >= 10 ? itemm.getHours() : '0'+itemm.getHours()}:${itemm.getMinutes() >= 10 ? itemm.getMinutes() : '0'+itemm.getMinutes()}`
         ]
             itemm = formats[format]
