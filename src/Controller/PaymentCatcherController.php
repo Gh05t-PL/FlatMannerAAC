@@ -14,7 +14,7 @@ class PaymentCatcherController extends Controller
 
     private $config = [
         'paygol' => [
-            'secretKey' => "xxxxxxxxxxxxxx",
+            'secretKey' => "37f87ebd-8e18-11e7-b7cb-128b57940774",
             'points' => [
                 '1.30' => 10, # key=from price value=points
                 '2.45' => 22,
@@ -22,7 +22,7 @@ class PaymentCatcherController extends Controller
             ]
         ],
         'microsms' => [
-            'userid' => 'xxxxxxxxxxx',
+            'userid' => '4359',
             'points' => [       # this system is for SMS PREMIUM PROFESJONALNY
                 '71480' => 1, # key=sms number value=points
                 '72480' => 2,

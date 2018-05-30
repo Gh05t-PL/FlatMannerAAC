@@ -21,16 +21,26 @@ class HighscoresController extends Controller
      */
     public function highscores($filter = "level", $page = 1, SessionInterface $session)
     {
+        /*
+        * Config
+        */
         $resultsLimit = 15;
+        $accessLimit = 3;
+
 
         // GET COUNT OF POSSIBLE RESULTS
-        $possibleCount = count($this->getDoctrine()
+        $possibleCount = $this->getDoctrine()
         ->getRepository(Players::class)
-        ->findBy([
-            'groupId' => 1,
-        ],[
-            'maglevel' => "DESC"
-        ]));
+        ->findBy([],[
+            'maglevel' => "DESC",
+        ]);
+
+        // unset element with group higher then 3
+        foreach ($possibleCount as $key => $value) {
+            if ( $value->getGroupId() > 3 )
+                unset($possibleCount[$key]);
+        }
+        $possibleCount = count($possibleCount);
 
         // GET POSSIBLE COUNT OF PAGES
         $pagesCount = ceil(($possibleCount / $resultsLimit));
@@ -39,122 +49,113 @@ class HighscoresController extends Controller
         //----LEVEL AND MLVL
         if ($filter === "level"){
 
-            $result = $this->getDoctrine()
-                ->getRepository(Players::class)
-            ->findBy([
-                'groupId' => 1,
-            ],[
-                'level' => "DESC"
-            ], $resultsLimit ,$resultsLimit*($page-1));
+            // fetch players with tutors and senior tutors
+            $query = $this->getDoctrine()->getEntityManager()->createQuery("SELECT p FROM App\Entity\Players p WHERE p.groupId <= {$accessLimit} AND p.id > 1 ORDER BY p.level DESC, p.experience DESC, p.name ASC");
+            $query->setMaxResults($resultsLimit)->setFirstResult($resultsLimit*($page-1));
 
+            $result = $query->getResult();
+            //var_dump($users);
 
             $filterName = "Level";
         }
 
         elseif ($filter === "mlvl"){
 
-            $result = $this->getDoctrine()
-                ->getRepository(Players::class)
-            ->findBy([
-                'groupId' => 1,
-            ],[
-                'maglevel' => "DESC"
-            ], $resultsLimit ,$resultsLimit*($page-1));
+            // fetch players with tutors and senior tutors
+            $query = $this->getDoctrine()->getEntityManager()->createQuery("SELECT p FROM App\Entity\Players p WHERE p.groupId <= {$accessLimit} AND p.id > 1 ORDER BY p.maglevel DESC, p.manaspent DESC, p.name ASC");
+            $query->setMaxResults($resultsLimit)->setFirstResult($resultsLimit*($page-1));
+
+            $result = $query->getResult();
 
 
             $filterName = "Magic Level";
         }
         //----SKILLS
         elseif ($filter === "fist"){
-            $result = $this->getDoctrine()
-                ->getRepository(PlayerSkill::class)
-            ->findBy([
-                'skillid' => 0,
-            ],[
-                'value' => "DESC"
-            ], $resultsLimit ,$resultsLimit*($page-1));
+
+            // fetch players with tutors and senior tutors
+            $query = $this->getDoctrine()->getEntityManager()->createQuery("SELECT s, p FROM App\Entity\PlayerSkill s JOIN s.player p WHERE s.skillid = 0 AND p.groupId <= {$accessLimit} ORDER BY s.value DESC, s.count DESC, p.name ASC");
+            $query->setMaxResults($resultsLimit)->setFirstResult($resultsLimit*($page-1));
+
+            $result = $query->getResult();
 
             $filterName = "Fist Fighting";
         }
 
         elseif ($filter === "club"){
-            $result = $this->getDoctrine()
-                ->getRepository(PlayerSkill::class)
-            ->findBy([
-                'skillid' => 1,
-            ],[
-                'value' => "DESC"
-            ], $resultsLimit ,$resultsLimit*($page-1));
+
+            // fetch players with tutors and senior tutors
+            $query = $this->getDoctrine()->getEntityManager()->createQuery("SELECT s, p FROM App\Entity\PlayerSkill s JOIN s.player p WHERE s.skillid = 1 AND p.groupId <= {$accessLimit} ORDER BY s.value DESC, s.count DESC, p.name ASC");
+            $query->setMaxResults($resultsLimit)->setFirstResult($resultsLimit*($page-1));
+
+            $result = $query->getResult();
 
             $filterName = "Club Fighting";
         }
 
         elseif ($filter === "sword"){
-            $result = $this->getDoctrine()
-                ->getRepository(PlayerSkill::class)
-            ->findBy([
-                'skillid' => 2,
-            ],[
-                'value' => "DESC"
-            ], $resultsLimit ,$resultsLimit*($page-1));
+
+            // fetch players with tutors and senior tutors
+            $query = $this->getDoctrine()->getEntityManager()->createQuery("SELECT s, p FROM App\Entity\PlayerSkill s JOIN s.player p WHERE s.skillid = 2 AND p.groupId <= {$accessLimit} ORDER BY s.value DESC, s.count DESC, p.name ASC");
+            $query->setMaxResults($resultsLimit)->setFirstResult($resultsLimit*($page-1));
+
+            $result = $query->getResult();
 
             $filterName = "Sword Fighting";
         }
 
         elseif ($filter === "axe"){
-            $result = $this->getDoctrine()
-                ->getRepository(PlayerSkill::class)
-            ->findBy([
-                'skillid' => 3,
-            ],[
-                'value' => "DESC"
-            ], $resultsLimit ,$resultsLimit*($page-1));
+            
+            // fetch players with tutors and senior tutors
+            $query = $this->getDoctrine()->getEntityManager()->createQuery("SELECT s, p FROM App\Entity\PlayerSkill s JOIN s.player p WHERE s.skillid = 3 AND p.groupId <= {$accessLimit} ORDER BY s.value DESC, s.count DESC, p.name ASC");
+            $query->setMaxResults($resultsLimit)->setFirstResult($resultsLimit*($page-1));
+
+            $result = $query->getResult();
 
             $filterName = "Axe Fighting";
         }
 
         elseif ($filter === "distance"){
-            $result = $this->getDoctrine()
-                ->getRepository(PlayerSkill::class)
-            ->findBy([
-                'skillid' => 4,
-            ],[
-                'value' => "DESC"
-            ], $resultsLimit ,$resultsLimit*($page-1));
+            
+            // fetch players with tutors and senior tutors
+            $query = $this->getDoctrine()->getEntityManager()->createQuery("SELECT s, p FROM App\Entity\PlayerSkill s JOIN s.player p WHERE s.skillid = 4 AND p.groupId <= {$accessLimit} ORDER BY s.value DESC, s.count DESC, p.name ASC");
+            $query->setMaxResults($resultsLimit)->setFirstResult($resultsLimit*($page-1));
+
+            $result = $query->getResult();
 
             $filterName = "Distance Fighting";
         }
 
         elseif ($filter === "shielding"){
-            $result = $this->getDoctrine()
-                ->getRepository(PlayerSkill::class)
-            ->findBy([
-                'skillid' => 5,
-            ],[
-                'value' => "DESC"
-            ], $resultsLimit ,$resultsLimit*($page-1));
+            
+            // fetch players with tutors and senior tutors
+            $query = $this->getDoctrine()->getEntityManager()->createQuery("SELECT s, p FROM App\Entity\PlayerSkill s JOIN s.player p WHERE s.skillid = 5 AND p.groupId <= {$accessLimit} ORDER BY s.value DESC, s.count DESC, p.name ASC");
+            $query->setMaxResults($resultsLimit)->setFirstResult($resultsLimit*($page-1));
+
+            $result = $query->getResult();
 
             $filterName = "Shielding";
         }
 
         elseif ($filter === "fishing"){
-            $result = $this->getDoctrine()
-                ->getRepository(PlayerSkill::class)
-            ->findBy([
-                'skillid' => 6,
-            ],[
-                'value' => "DESC"
-            ], $resultsLimit ,$resultsLimit*($page-1));
+            
+            // fetch players with tutors and senior tutors
+            $query = $this->getDoctrine()->getEntityManager()->createQuery("SELECT s, p FROM App\Entity\PlayerSkill s JOIN s.player p WHERE s.skillid = 6 AND p.groupId <= {$accessLimit} ORDER BY s.value DESC, s.count DESC, p.name ASC");
+            $query->setMaxResults($resultsLimit)->setFirstResult($resultsLimit*($page-1));
+
+            $result = $query->getResult();
 
             $filterName = "Fishing";
         }
+
         // if page has no results redirect to last page
         if (count($result) == 0){
             $qb = $this->getDoctrine()->getEntityManager()->createQueryBuilder();
             $qb->select('count(player.id)');
             $qb->from('App:Players','player');
+            $qb->where('player.groupId <= 3');
             $count = $qb->getQuery()->getSingleScalarResult();
-            //var_dump($count);
+            var_dump($count);
             $redirPage = ceil((int)$count/(float)$resultsLimit);
             return $this->redirectToRoute('highscores_level', ['page' => $redirPage, 'filter' => $filter]);
         }

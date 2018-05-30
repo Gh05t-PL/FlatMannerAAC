@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Acme\TestBundle\Entity;
+namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
@@ -39,6 +39,13 @@ class Guilds
      * @ORM\Column(name="creationdata", type="integer", nullable=false)
      */
     private $creationdata;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="checkdata", type="integer", nullable=false)
+     */
+    private $checkdata;
 
     /**
      * @var string
@@ -120,6 +127,21 @@ class Guilds
         $this->creationdata = $creationdata;
     }
 
+    /**
+     * @return int
+     */
+    public function getCheckdata()
+    {
+        return $this->checkdata;
+    }
+
+    /**
+     * @param int $checkdata
+     */
+    public function setCheckdata($checkdata)
+    {
+        $this->checkdata = $checkdata;
+    }
     /**
      * @return string
      */

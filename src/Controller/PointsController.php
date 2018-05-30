@@ -23,13 +23,13 @@ class PointsController extends Controller
             'microsms' => true,
         ],
         'paygol' => [
-            'serviceId' => 'xxxxx',
+            'serviceId' => 465273,
             'returnUrl' => "http://217.182.78.52/points/paygol",
             'cancelUrl' => "http://217.182.78.52/points/paygol",
         ],
         'microsms' => [
-            'userid' => 'xxxxx',
-            'serviceid' => 'xxxxxx',
+            'userid' => '4359',
+            'serviceid' => '4986',
             'points' => [       # this system is for SMS PREMIUM STANDARD go check PaymentCatcherController for SMS PREMIUM PROFESJONALNY
                 '71480' => 200, # key=sms number value=points
                 '72480' => 200,

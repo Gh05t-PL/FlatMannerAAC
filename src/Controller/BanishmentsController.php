@@ -26,7 +26,7 @@ class BanishmentsController extends Controller
 
         $query = $this->getDoctrine()
             ->getEntityManager()
-        ->createNativeQuery("SELECT p.id, p.name, expires FROM players p INNER JOIN (SELECT value, expires FROM bans b WHERE b.expires > 0 AND b.type = 3) t2 on p.account_id = t2.value", $rsm);
+        ->createNativeQuery("SELECT p.id, p.name, expires FROM players p INNER JOIN (SELECT value, expires FROM bans b WHERE b.expires > UNIX_TIMESTAMP() AND b.type = 3) t2 on p.account_id = t2.value", $rsm);
         $query->setParameter(1, time());
 //SELECT p, expires FROM App\Entity\Players p INNER JOIN (SELECT value, expires FROM App\Entity\Bans b WHERE b.expires > 0 AND b.type = 3) t2 on p.account_id = t2.value
         $result = $query->getResult();

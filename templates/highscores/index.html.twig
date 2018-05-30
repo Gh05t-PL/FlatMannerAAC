@@ -43,6 +43,51 @@
         background:#dadada;
     }
 
+    /* Tooltip container */
+    .tooltip {
+        position: relative;
+        display: inline-block;
+    }
+
+    /* Tooltip text */
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 120px;
+        background-color: #555;
+        color: #fff;
+        text-align: center;
+        padding: 5px 0;
+        border-radius: 6px;
+
+        /* Position the tooltip text */
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 51%;
+        margin-left: -60px;
+
+        /* Fade in tooltip */
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    /* Tooltip arrow */
+    .tooltip .tooltiptext::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 52%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: #555 transparent transparent transparent;
+    }
+
+    /* Show the tooltip text when you mouse over the tooltip container */
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+    }
 </style>
 {#
 0:Fist
@@ -53,6 +98,7 @@
 5:Shield
 6:Fishing
 #}
+
 <div class="highscores-wrapper">
 <h1>Highscores</h1>
     <p style="display: inline-block">Filter: </p><select style="display: inline-block" name="filter" id="filter" onchange="highscoreFilter(this)">
@@ -73,14 +119,24 @@
             <th>Name</th>
             <th>{{ filterName }}</th>
         </tr>
+        {% set groupIds = ["none","player","tutor","senior tutor","gm","cm","god"] %}
         {% for player in players %}
         <tr>
             <td>{{ loop.index + (page - 1) * resultsLimit }}</td>
             {% if filter == "level" or filter == "mlvl" %}
-                <td><a href="/player/{{ player.name }}">{{ player.name }}</a></td>
+                {% if player.groupId > 1 %}
+                    <td><a href="/player/{{ player.name }}">{{ player.name }}</a><div class="tooltip"><img src="/img/emblem/{{ groupIds[player.groupid] }}.svg" style="height: 20px;width: 20px;margin-left:5px;position:relative;top:3px;"><span class="tooltiptext">{{ groupIds[player.groupid]|ucwords }}</span></div></td>
+                {% else %}
+                    <td><a href="/player/{{ player.name }}">{{ player.name }}</a></td>
+                {% endif %}
+                
                 <td>{{ filter == "mlvl" ? attribute(player, "maglevel") : attribute(player, filter) }}</td>
             {% else %}
-                <td><a href="/player/{{ player.player.name }}">{{ player.player.name }}</a></td>
+                {% if player.player.groupId > 1 %}
+                    <td><a href="/player/{{ player.player.name }}">{{ player.player.name }}</a><div class="tooltip"><img src="/img/emblem/{{ groupIds[player.player.groupid] }}.svg" style="height: 20px;width: 20px;margin-left:5px;position:relative;top:3px;"><span class="tooltiptext">{{ groupIds[player.player.groupid]|ucwords }}</span></div></td>
+                {% else %}
+                    <td><a href="/player/{{ player.player.name }}">{{ player.player.name }}</a></td>
+                {% endif %}
                 <td>{{ player.value }}</td>
             {% endif %}
         </tr>

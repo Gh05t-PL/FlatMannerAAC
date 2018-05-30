@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Guilds{% endblock %}
+
+{% block content %}
+<style>
+    .example-wrapper { margin: 1em auto; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+
+    
+    .highscores-wrapper { margin: 1em auto;  width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+    tr:nth-child(even) {
+        background: #dddddd;
+    }
+    th:nth-child(1) {
+        width: 20%;
+    }
+    th:nth-child(2) {
+        width: 70%;
+    }
+    th:nth-child(3) {
+        width: 10%;
+    }
+    td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+    table {
+        width: 100%;
+    }
+</style>
+
+<div class="example-wrapper">
+    <h1>Guilds</h1>
+    {% if guilds %}
+        <table>
+            <tr>
+                <th>Avatar</th>
+                <th>Motd</th>
+                <th style="text-align: center;">Members</th>
+            </tr>
+        {% for guild in guilds %}
+            <tr>
+                <td>{{ guild.name }}</td>
+                <td>
+                    <a style="margin: 0 0 2px 0; font-weight:700; text-decoration:none; color:black;" href="/guilds/{{ guild.id }}">{{ guild.name }}</a>
+                    <p style="margin: 0;">{{ guild.motd }}</p>
+                </td>
+                <td style="text-align: center;">{{ guild.members }}</td>
+            </tr>   
+        {% endfor %}
+        </table>
+    {% else %}
+        <p>There is no guilds for now</p>
+    {% endif %}
+    
+</div>
+{% endblock %}
