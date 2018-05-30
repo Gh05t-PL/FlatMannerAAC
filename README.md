@@ -14,6 +14,7 @@ Automated Account Maker created for Open Tibia Servers with Symfony 4 MVC framew
 
 0 EXECUTE THIS QUERIES 
 {
+
     ALTER TABLE player_skills ADD id INT (11) NOT NULL AUTO_INCREMENT PRIMARY KEY;
     ALTER TABLE player_killers ADD id INT (11) NOT NULL AUTO_INCREMENT PRIMARY KEY;
     ALTER TABLE accounts ADD points INT (10) NOT NULL DEFAULT 0;
@@ -93,12 +94,14 @@ Automated Account Maker created for Open Tibia Servers with Symfony 4 MVC framew
 
 
     CALL fill_calendar('2018-01-01', '2025-12-31');
+    
 }
 
 
 
 1 IN CONSOLE
 {
+
     sudo apt-get install p7zip-full
  
  
@@ -123,6 +126,7 @@ Automated Account Maker created for Open Tibia Servers with Symfony 4 MVC framew
  
 2 EDIT FILE /etc/apache2/sites-enabled/000-default.conf
 {
+
 CHANGE
     DocumentRoot /var/www/html
 TO
@@ -132,12 +136,14 @@ TO
         Order Allow,Deny
         Allow from All
     </Directory>
+    
 }
  
  
  
 3 IN CONSOLE
 {
+
     cd /var/www/html
  
  
@@ -148,13 +154,15 @@ TO
  
     7z x master.zip
  
-    mv FlatMannerAAC-master/* aac
+    mv FlatMannerAAC-master/{.,}* aac
+    
 }
  
  
 
 4 IN CONSOLE
 {
+
     composer install
  
     chmod 777 -R /var/www/html/aac
@@ -172,6 +180,7 @@ AND THEN ENABLE PHP7.2
 
 5 IN CONSOLE
 {
+
     bash install.sh
 
     PROCEED WITH CAUTION!
@@ -181,6 +190,7 @@ AND THEN ENABLE PHP7.2
 
 
     CRON TASKS LOGGING INTO aac/CRON/crons.log
+    
 }
  
 </pre>
