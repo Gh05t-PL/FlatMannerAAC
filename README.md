@@ -148,7 +148,7 @@ TO
  
     7z x master.zip
  
-    mv FlatMannerAAC-master/ aac
+    mv FlatMannerAAC-master/* aac
 }
  
  
@@ -157,7 +157,7 @@ TO
 {
     composer install
  
-    chmod 775 -R /var/www/html/aac
+    chmod 777 -R /var/www/html/aac
     sudo a2enmod rewrite
  
 IF YOU HAVE OTHER PHP INSTALLATION YOU MUST DISABLE IT WITH
