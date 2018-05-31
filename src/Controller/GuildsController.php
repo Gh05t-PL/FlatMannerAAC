@@ -299,6 +299,11 @@ class GuildsController extends Controller
             return $this->redirectToRoute('guild_management', ['id' => $id]);
         }
 
+        if ( $this->getDoctrine()->getRepository(Guilds::class)->find($id) == null ){
+            $error[] = "Guild don't exists";
+            return $this->redirectToRoute('guilds');
+        }
+
         // fetch guild rank level max
         $rsm = new ResultSetMapping;
         $rsm->addScalarResult('access', 'access');
