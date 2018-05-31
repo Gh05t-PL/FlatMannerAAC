@@ -287,6 +287,46 @@ class GuildsController extends Controller
     }
 
 
+    /**
+     * @Route("/guilds/{id}/delete", name="guild_delete", requirements={"id"="\d+"})
+     */
+    public function guildDelete($id, SessionInterface $session, Request $request)
+    {
+
+        $error = [];
+        if ( $session->get('account_id') == NULL ){
+            $error[] = "You are not logged in";
+            return $this->redirectToRoute('guild_management', ['id' => $id]);
+        }
+
+        // fetch guild rank level max
+        $rsm = new ResultSetMapping;
+        $rsm->addScalarResult('access', 'access');
+
+        $access = $this->getDoctrine()->getManager()
+            ->createNativeQuery("SELECT IFNULL(MAX(level),1) as access FROM guild_ranks WHERE id IN (SELECT rank_id FROM players WHERE account_id = {$session->get('account_id')}) AND guild_id = {$id}", $rsm)
+        ->getSingleScalarResult();
+
+        if ( $access != 3 ){
+            $error[] = "You are not leader";
+            return $this->redirectToRoute('guild_management', ['id' => $id]);
+        }
+
+        if (empty($errors)) {
+
+            $guild = $this->getDoctrine()
+                ->getRepository(Guilds::class)
+            ->find($id);
+
+            $em = $this->getDoctrine()->getManager();
+            $em->remove($guild);
+            $em->flush();
+            return $this->redirectToRoute('guilds');
+        }
+
+    }
+
+
 
 
 
