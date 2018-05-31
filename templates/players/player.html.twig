@@ -21,7 +21,12 @@
         padding: 8px;
     }
     table {
+        all: unset;
         width: 100%;
+        display: table;
+        border-collapse: separate;
+        border-spacing: 2px;
+        border-color: grey;
     }
 
 
@@ -223,7 +228,7 @@ color: #b5b5b5;
             <p class="label">Character Info</p>
             <table>
                 <tr>
-                    <td>Name:</td>
+                    <td style="width: 53%;">Name:</td>
                     <td><strong>{{ (player.isOnline() ? ("<span style='color: green;'>#{player.name}</span>"): player.name)|raw }}</strong></td>
                 </tr>
                 <tr>
@@ -244,6 +249,12 @@ color: #b5b5b5;
                     <td>Magic Level:</td>
                     <td>{{ player.maglevel }}</td>
                 </tr>
+                {% if player.guild is iterable %}
+                <tr>
+                    <td>Guild:</td>
+                    <td>He is {{ player.guild[0].rankName }} of <a href="/guilds/{{ player.guild[0].guildId }}">{{ player.guild[0].guildName }}</a></td>
+                </tr>
+                {% endif %}
                 <tr>
                     <td>Kills:</td>
                     <td>{{ player.kills }}</td>

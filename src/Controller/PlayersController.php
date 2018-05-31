@@ -52,6 +52,21 @@ class PlayersController extends Controller
             ]);
             $result->kills = count($playerPK);
 
+            //Player Guild in playeer.guild
+            if ( $player->getRankId() > 0 ){
+                $rsm = new ResultSetMapping;
+                $rsm->addScalarResult('guild_name', 'guildName');
+                $rsm->addScalarResult('guildId', 'guildId');
+                $rsm->addScalarResult('rank_name', 'rankName');
+
+                $player->guild = $this->getDoctrine()->getManager()
+                    ->createNativeQuery("SELECT guild_name,rank_name,guildId FROM players t3 INNER JOIN ( SELECT t2.name as guild_name, t2.id as guildId, t1.name as rank_name, t1.id as rankID FROM guild_ranks t1 INNER JOIN (SELECT * FROM guilds) t2 ON t1.guild_id = t2.id) t4 ON t3.rank_id = t4.rankID WHERE id = {$player->getId()}", $rsm)
+                ->getScalarResult();
+                \var_dump($player->guild);
+            }else{
+                $player->guild = "No Membership";
+            }
+
             //Deaths by Player
             $rsm = new ResultSetMapping;
             $rsm->addScalarResult('names', 'names');

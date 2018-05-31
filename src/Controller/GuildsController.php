@@ -277,13 +277,32 @@ class GuildsController extends Controller
         }  
 
         if (empty($errors)) {
-            $player->setRankId(0);
-
             $em = $this->getDoctrine()->getManager();
-            $em->persist($player);
-            $em->flush();
-            return $this->redirectToRoute('guild_management', ['id' => $id]);
+
+            // fetch guild rank level max
+            $rsm = new ResultSetMapping;
+            $rsm->addScalarResult('access', 'access');
+
+            $access = $this->getDoctrine()->getManager()
+                ->createNativeQuery("SELECT level as access FROM guild_ranks WHERE id IN (SELECT rank_id FROM players WHERE id = {$playerId}) AND guild_id = {$id}", $rsm)
+            ->getSingleScalarResult();
+            if ( $access == 3 ){
+                $guild = $this->getDoctrine()
+                    ->getRepository(Guilds::class)
+                ->find($id);
+
+                $em->remove($guild);
+                $em->flush();
+                return $this->redirectToRoute('guilds');
+            }else{
+                $player->setRankId(0);
+
+                
+                $em->persist($player);
+                $em->flush();
+                return $this->redirectToRoute('guild_management', ['id' => $id]);
             }
+        }
     }
 
 

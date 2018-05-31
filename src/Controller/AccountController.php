@@ -404,6 +404,7 @@ class AccountController extends Controller
             $chars = [];
 
             foreach ($charsTemp as $key => $value) {
+                if ( $value->getRankId() == 0 )
                 $chars[$value->getName()] = $value->getId();
             }
             $charsTemp = null;
