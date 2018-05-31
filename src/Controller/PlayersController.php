@@ -31,26 +31,26 @@ class PlayersController extends Controller
     {
         //, requirements={"page"="\d+"}
 
-        $result = $this->getDoctrine()
+        $player = $this->getDoctrine()
             ->getRepository(Players::class)
         ->findOneBy([
             'name' => $name,
         ]);
         
-        if ($result !== NULL){
+        if ($player !== NULL){
             //Player Skills
             $playerSkills = $this->getDoctrine()
             ->getRepository(PlayerSkill::class)
             ->findBy([
-                'player' => $result->getId(),
+                'player' => $player->getId(),
             ]);
             //Player Kills
             $playerPK = $this->getDoctrine()
             ->getRepository(PlayerKiller::class)
             ->findBy([
-                'killer' => $result->getId(),
+                'killer' => $player->getId(),
             ]);
-            $result->kills = count($playerPK);
+            $player->kills = count($playerPK);
 
             //Player Guild in playeer.guild
             if ( $player->getRankId() > 0 ){
@@ -74,9 +74,9 @@ class PlayersController extends Controller
             $rsm->addScalarResult('date', 'date');
 
             //WHY getResult returns 1 element?
-            //SELECT name,level,`date` from players WHERE id = t2.player_id (SELECT t2.player_id,level,`date` FROM (SELECT id,level,`date` FROM player_deaths WHERE player_id = {$result->getId()}) t1 INNER JOIN (SELECT kill_id, player_id FROM player_killers) t2 on t1.id = t2.kill_id
+            //SELECT name,level,`date` from players WHERE id = t2.player_id (SELECT t2.player_id,level,`date` FROM (SELECT id,level,`date` FROM player_deaths WHERE player_id = {$player->getId()}) t1 INNER JOIN (SELECT kill_id, player_id FROM player_killers) t2 on t1.id = t2.kill_id
             $playerKillers = $this->getDoctrine()->getManager()
-                ->createNativeQuery("SELECT GROUP_CONCAT(name SEPARATOR ',') as names,date, `death_id`,levels FROM players t5 RIGHT JOIN (SELECT t3.player_id, level as levels, date, `death_id` FROM player_killers t3 INNER JOIN (SELECT * FROM player_deaths t1 INNER JOIN (SELECT `id` as `killer_id`, `death_id` FROM `killers`) t2 on t1.id = t2.death_id WHERE `player_id`={$result->getId()}) t4 on t3.kill_id = t4.killer_id ) t6 on t5.id = t6.player_id GROUP BY death_id", $rsm)
+                ->createNativeQuery("SELECT GROUP_CONCAT(name SEPARATOR ',') as names,date, `death_id`,levels FROM players t5 RIGHT JOIN (SELECT t3.player_id, level as levels, date, `death_id` FROM player_killers t3 INNER JOIN (SELECT * FROM player_deaths t1 INNER JOIN (SELECT `id` as `killer_id`, `death_id` FROM `killers`) t2 on t1.id = t2.death_id WHERE `player_id`={$player->getId()}) t4 on t3.kill_id = t4.killer_id ) t6 on t5.id = t6.player_id GROUP BY death_id", $rsm)
             ->getArrayResult();
             
             //Deaths by Monsters
@@ -86,7 +86,7 @@ class PlayersController extends Controller
             $rsm->addScalarResult('date', 'date');
 
             $monsterKillers = $this->getDoctrine()->getManager()
-                ->createNativeQuery("SELECT GROUP_CONCAT(name SEPARATOR ', ') as killers_name, level, date FROM environment_killers t3 INNER JOIN (SELECT * FROM player_deaths t1 INNER JOIN (SELECT `id` as `killer_id`, `death_id` FROM `killers`) t2 on t1.id = t2.death_id WHERE `player_id`={$result->getId()}) t4 on t3.kill_id = t4.killer_id GROUP BY death_id", $rsm)
+                ->createNativeQuery("SELECT GROUP_CONCAT(name SEPARATOR ', ') as killers_name, level, date FROM environment_killers t3 INNER JOIN (SELECT * FROM player_deaths t1 INNER JOIN (SELECT `id` as `killer_id`, `death_id` FROM `killers`) t2 on t1.id = t2.death_id WHERE `player_id`={$player->getId()}) t4 on t3.kill_id = t4.killer_id GROUP BY death_id", $rsm)
             ->getResult();
 
         }
@@ -94,7 +94,7 @@ class PlayersController extends Controller
 
         return $this->render('players/player.html.twig', [
             'controller_name' => 'PlayersController',
-            'player' => @$result,
+            'player' => @$player,
             'playerSkills' => @$playerSkills,
             'playerPK' => @$playerPK,
             'playerKillers' => @$playerKillers,
