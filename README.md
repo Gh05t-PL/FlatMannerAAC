@@ -128,8 +128,10 @@ Automated Account Maker created for Open Tibia Servers with Symfony 4 MVC framew
 {
 
 CHANGE
+
     DocumentRoot /var/www/html
 TO
+
     DocumentRoot /var/www/html/aac/public
     <Directory /var/www/html/aac/public>
         AllowOverride All
