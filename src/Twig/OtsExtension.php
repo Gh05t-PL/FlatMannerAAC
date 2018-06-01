@@ -30,7 +30,7 @@ class OtsExtension extends \Twig_Extension
         //WHY getResult returns 1 element?
         //SELECT name,level,`date` from players WHERE id = t2.player_id (SELECT t2.player_id,level,`date` FROM (SELECT id,level,`date` FROM player_deaths WHERE player_id = {$result->getId()}) t1 INNER JOIN (SELECT kill_id, player_id FROM player_killers) t2 on t1.id = t2.kill_id
         $top5 = $this->doctrine->getManager()
-            ->createNativeQuery("SELECT name, level FROM players ORDER BY level DESC LIMIT 5", $rsm)
+            ->createNativeQuery("SELECT name, level FROM players WHERE group_id <= 3 ORDER BY level DESC LIMIT 5", $rsm)
         ->getResult();
 
 

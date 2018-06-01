@@ -244,6 +244,12 @@ color: #b5b5b5;
                     <td>Magic Level:</td>
                     <td>{{ player.maglevel }}</td>
                 </tr>
+                {% if player.member %}
+                <tr>
+                    <td>Guild:</td>
+                    <td>He is {{ player.member.rank.name }} of <a href="/guilds/{{ player.member.guild.id }}">{{ player.member.guild.name }}</a></td>
+                </tr>
+                {% endif %}
                 <tr>
                     <td>Kills:</td>
                     <td>{{ player.kills }}</td>

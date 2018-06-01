@@ -8,7 +8,7 @@
         <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 
         <!-- Font Awesome -->
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
 
 
         <!-- Main Quill library -->
@@ -146,7 +146,7 @@
         .top_player {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            background: #dddddd99;
+            background: rgba(221, 221, 221, 0.6);;
             width: 90%;
             margin: 0 auto;
             font-family: sans-serif;
@@ -205,9 +205,104 @@
         .server-status > div {
             margin: 6px 0;
         }
+
+        #modal-container {
+            min-height: 100%;
+            background: #aaaaaaaa;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: none;
+            z-index: 9999;
+        }
+        .modal-close {
+            cursor: pointer;
+            display: inline;
+        }
+        #modal-item {
+            display: grid;
+            grid-template-columns: 20px 1fr 20px;
+            grid-template-rows: 15% 1fr 15%;
+            border-radius: 10px;
+        }
+        #modal-desc {
+            grid-column: 2/2;
+            grid-row: 2/2;
+            text-align: center;
+            z-index: 9999;
+            font-family: sans-serif;
+            font-weight: 600;
+        }
+        #modal-buttons {
+            grid-column: 2/2;
+            grid-row: 3/3;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+        #modal-buttons > a {
+            justify-self: center;
+            align-self: center;
+        }
+        #modal-cross {
+            grid-column: 3/3;
+            grid-row: 1/1;
+            margin-right: 5px;
+            justify-self: center;
+            align-self: center;
+            z-index: 9999;
+        }
+        #modal-separator-1 {
+            grid-column: 1/-1;
+            grid-row: 1/1;
+            background: #cdcdcd;
+        }
+        #modal-separator-2 {
+            border-bottom: solid 1px #bababa;
+            grid-column: 1/-1;
+            grid-row: 2/2;
+        }
+        #modal-buttons > a {
+            background: #97a1a8;
+            background-image: -webkit-linear-gradient(top, #97a1a8, #52626b);
+            background-image: -moz-linear-gradient(top, #97a1a8, #52626b);
+            background-image: -ms-linear-gradient(top, #97a1a8, #52626b);
+            background-image: -o-linear-gradient(top, #97a1a8, #52626b);
+            background-image: linear-gradient(to bottom, #97a1a8, #52626b);
+            -webkit-border-radius: 28;
+            -moz-border-radius: 28;
+            border-radius: 28px;
+            font-family: Arial;
+            color: #fffcff;
+            font-size: small;
+            padding: 2px 3px;
+            min-width: 66px;
+            text-align: center;
+            text-decoration: none;
+            margin-left: 3px;
+        }
+        #modal-buttons > a:hover {
+            background: #3cb0fd;
+            background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
+            background-image: -moz-linear-gradient(top, #3cb0fd, #3498db);
+            background-image: -ms-linear-gradient(top, #3cb0fd, #3498db);
+            background-image: -o-linear-gradient(top, #3cb0fd, #3498db);
+            background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
+            text-decoration: none;
+        }
+        #modal-buttons > a:nth-child(2):hover {
+            background: #3cb0fd;
+            background-image: -webkit-linear-gradient(top, #fd3c3c, #db3434);
+            background-image: -moz-linear-gradient(top, #fd3c3c, #db3434);
+            background-image: -ms-linear-gradient(top, #fd3c3c, #db3434);
+            background-image: -o-linear-gradient(top, #fd3c3c, #db3434);
+            background-image: linear-gradient(to bottom, #fd3c3c, #db3434);
+            text-decoration: none;
+        }
         </style>
     </head>
     <body>
+        <div id="modal-container" onclick="closeModal(event)"><div id="modal-item" style="width: 470px;height: 230px;background: white;/*! align-self: center; */justify-self: center;position: sticky;margin-top: 20%;"></div></div>
         <div class="wrapper">
             <div class="header">
                 <img src="/img/header.gif" alt="">
@@ -235,6 +330,7 @@
             <a href="/player">Find Player</a>
             <a href="/players/online">Players Online</a>
             <a href="/highscores">Highscores</a>
+            <a href="/guilds">Guilds</a>
             <a href="/bans">Banishments</a>
             </center>
         </div>
@@ -315,7 +411,7 @@
                     {% for player in getPowerGamers() %}
                         <div class="top_player">
                             <p class="name">{{ loop.index }}. <a href="/player/{{ player.name }}">{{ player.name }}</a></p>
-                        {% if player.expDiff > 99999999 %}
+                        {% if player.expDiff > 9999999 %}
                             <p class="level" style="font-size: 10px; padding-bottom: 0; border-radius: 5px; padding-top: 3px; background: green;">+{{ player.expDiff }} ExP</p>
                         {% else %}
                             <p class="level" style="background: green; border-radius: 5px;">{{ player.expDiff >= 0 ? "+" ~ player.expDiff : player.expDiff }} ExP</p>
@@ -330,6 +426,28 @@
         </div>
 
 
-        {% block javascripts %}{% endblock %}
+        {% block javascripts %}
+        <script>
+            
+            function closeModal(e){
+
+                if ( (window.getComputedStyle(document.querySelector("#modal-container")).getPropertyValue('display') != "none" && e.target.id == "modal-container") || e.target.classList.contains("modal-close") == true){
+                    document.querySelector("#modal-container").style.display = "none"
+                    
+                }
+            }
+            // url:string(ex. /guilds/2 ),desc:string,options:array ([0]:cancel, [1]:execute)
+            function openModal(url,desc,options){
+                
+                console.log()
+                if ( window.getComputedStyle(document.querySelector("#modal-container")).getPropertyValue('display') == "none" ){
+                    document.querySelector("#modal-container").style.display = "grid"
+                    document.querySelector("#modal-item").innerHTML = `<p id="modal-cross" class="modal-close"><i class="fas fa-times modal-close"></i></p><div id="modal-separator-1"></div><p id="modal-desc">${desc}</p><div id="modal-separator-2"></div><div id="modal-buttons"><a class="modal-close">${options[0]}</a><a id="modal-exec" href="${url}">${options[1]}</a></div>`
+                }
+            }
+
+            
+        </script>
+        {% endblock %}
     </body>
 </html>

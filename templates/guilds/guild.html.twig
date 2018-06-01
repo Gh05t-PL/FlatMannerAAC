@@ -1,0 +1,151 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Guilds{% endblock %}
+
+{% block content %}
+<style>
+    .example-wrapper { margin: 1em auto; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+
+    
+    .highscores-wrapper { margin: 1em auto;  width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+    tr:nth-child(even) {
+        background: #dddddd;
+    }
+    #members > tbody > tr > th:nth-child(1) {
+        width: 15%;
+    }
+    #members > tbody > tr > th:nth-child(2) {
+        width: 55%;
+    }
+    #members > tbody > tr > th:nth-child(3) {
+        width: 30%;
+    }
+    #invitations > tbody > tr > th:nth-child(1) {
+        width: 55%;
+    }
+    #invitations > tbody > tr > th:nth-child(2) {
+        width: 45%;
+    }
+    td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+    table {
+        width: 100%;
+    }
+    .button {
+        background: #97a1a8;
+        background-image: -webkit-linear-gradient(top, #97a1a8, #52626b);
+        background-image: -moz-linear-gradient(top, #97a1a8, #52626b);
+        background-image: -ms-linear-gradient(top, #97a1a8, #52626b);
+        background-image: -o-linear-gradient(top, #97a1a8, #52626b);
+        background-image: linear-gradient(to bottom, #97a1a8, #52626b);
+        -webkit-border-radius: 28;
+        -moz-border-radius: 28;
+        border-radius: 28px;
+        font-family: Arial;
+        color: #fffcff;
+        font-size: 20px;
+        padding: 4px 8px;
+        text-decoration: none;
+        margin-left: 8px;
+        cursor: pointer;
+        font-size: x-small;
+    }
+    .button:hover {
+        background: #3cb0fd;
+        background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
+        background-image: -moz-linear-gradient(top, #3cb0fd, #3498db);
+        background-image: -ms-linear-gradient(top, #3cb0fd, #3498db);
+        background-image: -o-linear-gradient(top, #3cb0fd, #3498db);
+        background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
+        text-decoration: none;
+    }
+    .action-list > a {
+        margin-left: 10px;
+        display: block;
+        cursor: pointer;
+    }
+</style>
+
+<div class="example-wrapper">
+    <a href="/guilds">&lt; Back</a>
+    <h1>{{ guild.name }}</h1>
+    {% if loggedRankLevel > 0 %}
+        <p>Action List</p>
+        <div class="action-list">
+            {% if loggedRankLevel >= 2 %}
+                <a href="/guilds/{{ guild.id }}/invitation/add">Invite Player</a>
+            {% endif %}
+            {% if loggedRankLevel == 3 %}
+                <a href="#" onclick="openModal('/guilds/{{ guild.id }}/delete', 'Are you sure you want to delete this guild?', ['No', 'Yes'])">Delete Guild</a>
+            {% endif %}
+
+            <a href="/guilds/{{ guild.id }}/"></a>
+            <a href="/guilds/{{ guild.id }}/"></a>
+        </div>
+    {% endif %}
+
+    <p>Members</p>
+    {% if members %}
+        <table id="members">
+                <tr>
+                    <th>Rank</th>
+                    <th>Name and Title</th>
+                    <th>Level and Vocation</th>
+                </tr>
+            {% for member in members %}
+                <tr>
+                    <td>{{ member.rank.name }}</td>
+                    {% if member.nick|length > 0 %}
+                        {% if member.player.account.id == accountId %}
+                            <td><div style="display: grid;grid-template-columns: auto 1fr;"><p style="margin: 0;"><a href="/player/{{ member.player.name }}">{{ member.player.name }}</a> "{{ member.nick }}"</p><a style="margin: 0;justify-self: end;text-decoration:none;color:red;cursor:pointer;" onclick="openModal('/guilds/{{ guild.id }}/leave/{{ member.player.id }}', 'Are you sure you want to leave this guild?', ['No', 'Yes'])"><i class="fas fa-times"></i></a></div></td>
+                        {% else %}
+                            <td><p style="margin: 0;"><a href="/player/{{ member.player.name }}">{{ member.player.name }}</a> "{{ member.nick }}"</p></td>
+                        {% endif %}
+                    {% else %}
+                        {% if member.player.account.id == accountId %}
+                            <td><div style="display: grid;grid-template-columns: auto 1fr;"><a href="/player/{{ member.player.name }}">{{ member.player.name }}</a><a style="margin: 0;justify-self: end;text-decoration:none;color:red;cursor:pointer;" onclick="openModal('/guilds/{{ guild.id }}/leave/{{ member.player.id }}', 'Are you sure you want to leave this guild?', ['No', 'Yes'])"><i class="fas fa-times"></i></a></div></td>
+                        {% else %}
+                            <td><a href="/player/{{ member.player.name }}">{{ member.player.name }}</a></td> 
+                        {% endif %}
+                        
+                    {% endif %}
+                    <td>{{ member.player.level }} {{ vocations[member.player.vocation] }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p style="font-size: small;margin-left: 10px;">No members</p>
+    {% endif %}
+
+    <p>Invitations</p>
+    {% if invitations %}
+        <table id="invitations">
+                <tr>
+                    <th>Name</th>
+                    <th>Level and Vocation</th>
+                </tr>
+            {% for invitation in invitations %}
+                <tr>
+                    {% if invitation.account_id == accountId %}
+                        <td><a href="/player/{{ invitation.nick }}">{{ invitation.nick }}</a><a class="button" onclick="openModal('/guilds/{{ guild.id }}/invitation/{{ invitation.id }}', 'Are you sure you want to accept invite?', ['No', 'Yes'])">Accept Invite</a></td>
+                        <td>{{ invitation.level }} {{ vocations[invitation.vocation] }}</td>
+                    {% else %}
+                        <td><a href="/player/{{ invitation.nick }}">{{ invitation.nick }}</a></td>
+                        <td>{{ invitation.level }} {{ vocations[invitation.vocation] }}</td>
+                    {% endif %}
+                    
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p style="font-size: small;margin-left: 10px;">No invitations</p>
+    {% endif %}
+    
+    
+</div>
+{% endblock %}

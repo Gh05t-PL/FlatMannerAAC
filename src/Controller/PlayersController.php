@@ -7,6 +7,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use App\Entity\Players;
 use App\Entity\Accounts;
 
+use App\Entity\Guilds;
+use App\Entity\GuildMembership;
+use App\Entity\GuildRanks;
+
 use Doctrine\ORM\Query\ResultSetMapping;
 
 class PlayersController extends Controller
@@ -29,22 +33,29 @@ class PlayersController extends Controller
     {
         
 
-        $result = $this->getDoctrine()
+        $player = $this->getDoctrine()
             ->getRepository(Players::class)
         ->findOneBy([
             'name' => $name,
         ]);
         
-        if ($result !== NULL){
+        if ($player !== NULL){
+
+            $member = $this->getDoctrine()
+                ->getRepository(GuildMembership::class)
+            ->findOneBy([
+                'player' => $player
+            ]);
+            $player->member = $member;
             
             // Player Kills
             $rsm = new ResultSetMapping;
             $rsm->addScalarResult('count(*)', 'count');
 
             $playerKillsCount = $this->getDoctrine()->getManager()
-                ->createNativeQuery("SELECT count(*) FROM `player_deaths` WHERE `killed_by` in (select name from players where id = {$result->getId()}) AND is_player = 1", $rsm)
+                ->createNativeQuery("SELECT count(*) FROM `player_deaths` WHERE `killed_by` in (select name from players where id = {$player->getId()}) AND is_player = 1", $rsm)
             ->getSingleScalarResult();
-            $result->kills = $playerKillsCount;
+            $player->kills = $playerKillsCount;
 
             $rsm = new ResultSetMapping;
             $rsm->addScalarResult('id', 'id');
@@ -54,7 +65,7 @@ class PlayersController extends Controller
             $rsm->addScalarResult('unjustified', 'unjustified');
 
             $playerPK = $this->getDoctrine()->getManager()
-                ->createNativeQuery("SELECT id, t1.name as fragName, t2.time as date, t2.level as fragLevel, t2.unjustified FROM players t1 INNER JOIN (SELECT * FROM `player_deaths` WHERE `killed_by` in (select name from players where id = {$result->getId()}) AND is_player = 1) t2 ON t1.id = t2.player_id", $rsm)
+                ->createNativeQuery("SELECT id, t1.name as fragName, t2.time as date, t2.level as fragLevel, t2.unjustified FROM players t1 INNER JOIN (SELECT * FROM `player_deaths` WHERE `killed_by` in (select name from players where id = {$player->getId()}) AND is_player = 1) t2 ON t1.id = t2.player_id", $rsm)
             ->getResult();
             
 
@@ -63,12 +74,12 @@ class PlayersController extends Controller
             $rsm->addScalarResult('player_id', 'id');
 
             $playerOnline = $this->getDoctrine()->getManager()
-                ->createNativeQuery("SELECT * FROM players_online WHERE player_id = {$result->getId()}", $rsm)
+                ->createNativeQuery("SELECT * FROM players_online WHERE player_id = {$player->getId()}", $rsm)
             ->getResult();
             if ( empty($playerOnline) )
-                $result->online = false;
+                $player->online = false;
             else
-                $result->online = true;
+                $player->online = true;
 
             // Deaths by Player
             $rsm = new ResultSetMapping;
@@ -78,7 +89,7 @@ class PlayersController extends Controller
             $rsm->addScalarResult('unjustified', 'unjustified');  
 
             $playerKillers = $this->getDoctrine()->getManager()
-                ->createNativeQuery("SELECT time,level,killed_by,unjustified FROM `player_deaths` WHERE `player_id` = {$result->getId()} AND is_player = 1", $rsm)
+                ->createNativeQuery("SELECT time,level,killed_by,unjustified FROM `player_deaths` WHERE `player_id` = {$player->getId()} AND is_player = 1", $rsm)
             ->getArrayResult();
             
             // Deaths by Monsters
@@ -89,7 +100,7 @@ class PlayersController extends Controller
             $rsm->addScalarResult('unjustified', 'unjustified');  
 
             $monsterKillers = $this->getDoctrine()->getManager()
-                ->createNativeQuery("SELECT time,level,killed_by,unjustified FROM `player_deaths` WHERE `player_id` = {$result->getId()} AND is_player = 0", $rsm)
+                ->createNativeQuery("SELECT time,level,killed_by,unjustified FROM `player_deaths` WHERE `player_id` = {$player->getId()} AND is_player = 0", $rsm)
             ->getResult();
 
 
@@ -98,10 +109,10 @@ class PlayersController extends Controller
             $rsm->addScalarResult('expDiff', 'expDiff');
 
             $expDiff = $this->getDoctrine()->getManager()
-                ->createNativeQuery("SELECT (t1.experience - expBefore) as expDiff FROM players t1 INNER JOIN (SELECT player_id, exp as expBefore FROM today_exp) t2 ON t1.id = t2.player_id where id = {$result->getId()}", $rsm)
+                ->createNativeQuery("SELECT (t1.experience - expBefore) as expDiff FROM players t1 INNER JOIN (SELECT player_id, exp as expBefore FROM today_exp) t2 ON t1.id = t2.player_id where id = {$player->getId()}", $rsm)
             ->getSingleScalarResult();
             
-            $result->expDiff = $expDiff;
+            $player->expDiff = $expDiff;
             
 
         }
@@ -109,7 +120,7 @@ class PlayersController extends Controller
 
         return $this->render('players/player.html.twig', [
             'controller_name' => 'PlayersController',
-            'player' => @$result,
+            'player' => @$player,
             'playerPK' => @$playerPK,
             'playerKillers' => @$playerKillers,
             'monsterKillers' => @$monsterKillers,

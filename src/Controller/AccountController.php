@@ -11,9 +11,14 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use App\Entity\Accounts;
+use App\Entity\Guilds;
 use App\Entity\Players;
 use App\Entity\FmaacLogs;
 use App\Entity\FmaacLogsActions;
+use App\Entity\GuildMembership;
+use App\Entity\GuildRanks;
+
+use Doctrine\ORM\Query\ResultSetMapping;
 
 class AccountController extends Controller
 {
@@ -59,6 +64,8 @@ class AccountController extends Controller
 
             $session->remove('account_id');
             // no nie jestes zalogowany a to zle, przekierowuje 301 perm
+            return $this->redirectToRoute('account_login', [], 301);
+        }else{
             return $this->redirectToRoute('account_login', [], 301);
         }
     }
@@ -156,6 +163,10 @@ class AccountController extends Controller
                 $errors[] = "Passwords don't match";
             if ( $formData['email'] != $formData['repeatEmail'])
                 $errors[] = "E-mails don't match";
+            if ( strlen($formData['account']) > 20 || strlen($formData['account']) < 6 )
+                $errors[] = "Account Name must contain at least 6 characters and must be shorter than 20 characters";
+            if ( strlen($formData['password']) > 20 || strlen($formData['password']) < 6 )
+                $errors[] = "Password must contain at least 6 characters and must be shorter than 20 characters";
 
             // No errors found
             if ( empty($errors) ){
@@ -276,9 +287,13 @@ class AccountController extends Controller
                     $errors[] = "Name taken";
                 if ( strlen($formData['name']) > 20 )
                     $errors[] = "Name longer than 20 char";
-                if ( preg_match("/^([A-z ])+$/", $formData['name']) === 0 )
+                if ( preg_match("/^([A-Za-z] ?)*([A-Za-z])+$/", $formData['name']) === 0 )
                     $errors[] = "Name can only contain letters from [A-Z][a-z] and spaces";
                     //var_dump(preg_match("/^([A-z ])+$/", $formData['name']));
+                $patterns = ['^gm','^god','^tutor','admin','kurwa','^cm'];
+                $regex = '/(' .implode('|', $patterns) .')/i'; 
+                if ( preg_match($regex, $formData['name']) === 1 )
+                    $errors[] = "Name contains illegal string";
 
 
                 // No errors found
@@ -286,7 +301,7 @@ class AccountController extends Controller
 
                     $player = new Players();
 
-                    $player->setName(ucwords($formData['name']));
+                    $player->setName(ucwords(strtolower($formData['name'])));
                     $player->setSex($formData['sex']);
                     $player->setVocation($formData['vocation']);
                     $player->setAccount($this->getDoctrine()->getRepository(Accounts::class)->find($session->get('account_id')));
@@ -360,6 +375,108 @@ class AccountController extends Controller
         else{
             return $this->redirectToRoute('account_login');
         }
+    }
+
+
+    /**
+     * @Route("/account/create/guild", name="account_create_guild")
+     */
+    public function createGuild(Request $request, SessionInterface $session){
+        
+
+        if ($session->get('account_id') !== NULL){
+            // fetch all account chars
+            $charsTemp = $this->getDoctrine()->getRepository(Players::class)->findBy(['account' => $session->get('account_id')]);
+            var_dump(count($charsTemp));
+            $chars = [];
+
+            foreach ($charsTemp as $key => $value) {
+                if ( $this->getDoctrine()
+                ->getRepository(GuildMembership::class)
+            ->findBy(['player' => $value->getId()]) == NULL )
+                $chars[$value->getName()] = $value->getId();
+            }
+            $charsTemp = null;
+            var_dump($chars);
+
+
+            $form = $this->createFormBuilder()
+                ->add('name', TextType::class, ['label' => 'Guild Name', 'attr' => ['display' => 'block']])
+                ->add('leader', ChoiceType::class, [
+                    'label' => 'Leader',
+                    'choices' => $chars
+                ])
+                ->add('Create', SubmitType::class, ['label' => 'Create'])
+            ->getForm();
+
+            $form->handleRequest($request);
+
+            $errors = [];
+            if ( $form->isSubmitted() && $form->isValid() ) {
+                $formData = $form->getData();
+            
+                // Checking for errors
+                if ( $this->getDoctrine()->getRepository(Guilds::class)->findOneBy(['name' => $formData['name']]) !== NULL )
+                    $errors[] = "Guild name taken";
+                if ( $this->getDoctrine()->getRepository(Players::class)->findOneBy( ['id' => $formData['leader'],'account' => $session->get('account_id')] ) == NULL )
+                    $errors[] = "This character don't belong to you";
+                if ( strlen($formData['name']) > 20 )
+                    $errors[] = "Guild name longer than 20 char";
+                if ( preg_match("/^([A-Za-z] ?)*([A-Za-z])+$/", $formData['name']) === 0 )
+                    $errors[] = "Guild name can only contain letters from [A-Z][a-z] and spaces";
+                    
+                $patterns = ['^gm','^god','^tutor','admin','kurwa','^cm'];
+                $regex = '/(' .implode('|', $patterns) .')/i'; 
+                if ( preg_match($regex, $formData['name']) === 1 )
+                    $errors[] = "Guild name contains illegal string";
+                // No errors found
+                if ( empty($errors) ){
+                    $guild = new Guilds();
+
+                    $guild->setName($formData['name']);
+                    
+                    $guild->setOwnerid($this->getDoctrine()->getRepository(Players::class)->findOneBy( ['id' => $formData['leader']]));
+                    $guild->setCreationdata(time());
+                    $guild->setMotd("Please edit motd in leader action panel");
+                    //SELECT id FROM `guild_ranks` WHERE guild_id = 4 and level = 3
+
+                    $em = $this->getDoctrine()->getManager();
+                    $em->persist($guild);
+                    $em->flush();
+
+                    $rsm = new ResultSetMapping;
+                    $rsm->addScalarResult('id', 'id');
+            
+                    $leaderRank = $this->getDoctrine()->getManager()
+                        ->createNativeQuery("SELECT id FROM `guild_ranks` WHERE guild_id = {$guild->getId()} and level = 3", $rsm)
+                    ->getSingleScalarResult();
+
+                    $player = $this->getDoctrine()->getRepository(Players::class)->find($formData['leader']);
+                    
+
+                    $guildMember = new GuildMembership();
+                    $guildRank = $this->getDoctrine()->getRepository(GuildRanks::class)->findOneBy(['guild' => $guild, 'level' => 3]);
+                    $guildMember->setGuild($guild)
+                        ->setPlayer($player)
+                    ->setRank($guildRank);
+
+                    $em->persist($guildMember);
+                    $em->flush();
+
+                    return $this->redirectToRoute('guild_management', ['id' => $guild->getId()]);
+                }
+
+            }
+            return $this->render('account/account_create_guild.html.twig', [
+                'form' => $form->createView(),
+                'request' => $request,
+                'errors' => $errors,
+            ]);
+        }
+        else {
+            return $this->redirectToRoute('account_login');
+        }
+
     }
 
     /**
