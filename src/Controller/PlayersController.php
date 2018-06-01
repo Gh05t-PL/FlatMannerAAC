@@ -89,6 +89,16 @@ class PlayersController extends Controller
                 ->createNativeQuery("SELECT GROUP_CONCAT(name SEPARATOR ', ') as killers_name, level, date FROM environment_killers t3 INNER JOIN (SELECT * FROM player_deaths t1 INNER JOIN (SELECT `id` as `killer_id`, `death_id` FROM `killers`) t2 on t1.id = t2.death_id WHERE `player_id`={$player->getId()}) t4 on t3.kill_id = t4.killer_id GROUP BY death_id", $rsm)
             ->getResult();
 
+            // EXP DIFF
+            $rsm = new ResultSetMapping;
+            $rsm->addScalarResult('expDiff', 'expDiff');
+
+            $expDiff = $this->getDoctrine()->getManager()
+                ->createNativeQuery("SELECT (t1.experience - expBefore) as expDiff FROM players t1 INNER JOIN (SELECT player_id, exp as expBefore FROM today_exp) t2 ON t1.id = t2.player_id where id = {$player->getId()}", $rsm)
+            ->getSingleScalarResult();
+            
+            $player->expDiff = $expDiff;
+
         }
             
 

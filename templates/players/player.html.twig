@@ -259,6 +259,10 @@ color: #b5b5b5;
                     <td>Kills:</td>
                     <td>{{ player.kills }}</td>
                 </tr>
+                <tr>
+                    <td>Today Exp Gain:</td>
+                    <td>{{ player.expDiff >= 0 ? "+" ~ player.expDiff : player.expDiff }} ExP</td>
+                </tr>
             </table>
 
         

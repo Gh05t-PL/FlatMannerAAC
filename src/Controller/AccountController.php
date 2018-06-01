@@ -369,6 +369,15 @@ class AccountController extends Controller
 
                     $em->persist($log);
                     $em->flush();
+
+                    //today exp
+                    $conn = $em->getConnection();
+                    $conn->insert('today_exp', [
+                        'id' => null,
+                        'exp' => expToLevel($startStats['level']),
+                        'player_id' => $player->getId()
+                    ]);
+
                     return $this->redirectToRoute('account');
                 }
 
