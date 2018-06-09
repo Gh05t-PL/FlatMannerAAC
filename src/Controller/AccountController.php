@@ -318,33 +318,7 @@ class AccountController extends Controller
 
                     $em = $this->getDoctrine()->getManager();
                     $em->persist($player);
-                    //$em->flush();
-                    // $skills = [
-                    //     new PlayerSkill(),
-                    //     new PlayerSkill(),
-                    //     new PlayerSkill(),
-                    //     new PlayerSkill(),
-                    //     new PlayerSkill(),
-                    //     new PlayerSkill(),
-                    //     new PlayerSkill()
-                    // ];
-                    // for ($i=1; $i < 7; $i++) { 
-                    //     $skills[$i]->setPlayer($player);
-                    //     $skills[$i]->setSkillid($i);
-                    //     $skills[$i]->setValue($startStats['skill']);
-                    //     $skills[$i]->setCount(0);
-                    //     $em->persist($skills[$i]);
-                    // }
-                    // // foreach ($skills as $key => $value) {
-                    // //     $value->setPlayer($player);
-                    // //     echo $key.'<br>';
-                    // //     $value->setSkillid($key);
-                    // //     echo $key.'<br>';
-                    // //     $value->setValue($startStats['skill']);
-                    // //     $value->setCount(0);
-                    // //     $em->persist($value);
-                    // // }
-                    // var_dump($skills);
+                    
                     $em->flush();
 
                     // GET SKILLS
@@ -409,7 +383,7 @@ class AccountController extends Controller
         if ($session->get('account_id') !== NULL){
             // fetch all account chars
             $charsTemp = $this->getDoctrine()->getRepository(Players::class)->findBy(['account' => $session->get('account_id')]);
-            var_dump(count($charsTemp));
+            
             $chars = [];
 
             foreach ($charsTemp as $key => $value) {
@@ -417,7 +391,7 @@ class AccountController extends Controller
                 $chars[$value->getName()] = $value->getId();
             }
             $charsTemp = null;
-            var_dump($chars);
+            
 
 
             $form = $this->createFormBuilder()

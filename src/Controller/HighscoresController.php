@@ -155,7 +155,7 @@ class HighscoresController extends Controller
             $qb->from('App:Players','player');
             $qb->where('player.groupId <= 3');
             $count = $qb->getQuery()->getSingleScalarResult();
-            var_dump($count);
+            
             $redirPage = ceil((int)$count/(float)$resultsLimit);
             return $this->redirectToRoute('highscores_level', ['page' => $redirPage, 'filter' => $filter]);
         }
