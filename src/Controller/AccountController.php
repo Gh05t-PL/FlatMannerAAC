@@ -387,7 +387,6 @@ class AccountController extends Controller
         if ($session->get('account_id') !== NULL){
             // fetch all account chars
             $charsTemp = $this->getDoctrine()->getRepository(Players::class)->findBy(['account' => $session->get('account_id')]);
-            var_dump(count($charsTemp));
             $chars = [];
 
             foreach ($charsTemp as $key => $value) {
@@ -397,7 +396,7 @@ class AccountController extends Controller
                 $chars[$value->getName()] = $value->getId();
             }
             $charsTemp = null;
-            var_dump($chars);
+
 
 
             $form = $this->createFormBuilder()
