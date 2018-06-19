@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Article{% endblock %}
+{% block title %}Admin Panel - Edit Article{% endblock %}
 
 {% block content %}
 <style>
@@ -24,27 +24,27 @@
     .page.active {
         background:#dadada;
     }
-    .bot-margin {
-        margin-bottom: 0;
-    }
-    .top-margin {
-        margin-top: 0;
-    }
 </style>
 
 <div class="example-wrapper">
-    <h1>Article</h1>
+    <h1>Edit Article</h1>
 <a href="/news">< Back</a>
     <div class="news">
         <div class="article">
-            {% if isAdmin %}
-                <h2 class="title bot-margin"><a href="/article/{{ article.id }}">{{ article.title }}</a></h2>
-                <p class="top-margin"><i class="far fa-edit"></i> | <i class="fas fa-times"></i></p>
-            {% else %}
-                <h2 class="title"><a href="/article/{{ article.id }}">{{ article.title }}</a></h2>
-            {% endif %}
-            <p class="info">By <a href="/player/{{ article.author.name }}">{{ article.author.name }}</a> on {{ article.datetime|date("d.m.Y H:i:s") }}</p>
-            <div class="ql-editor ns text">{{ article.text|raw }}</div>
+
+            <form action="/admin/edit/article/{{ article.id }}" method="post" id="admin_form" onsubmit="return submitForm(this);">
+                <fieldset>
+                <legend>Article</legend>
+        
+                    <input type="text" name="title" placeholder="Title..." value="{{ article.title }}" required>
+                    <input type="text" name="author" placeholder="Author..." value="{{ article.author.name }}" required>
+                    <div id="editor" form="admin_form" name="text" >{{ article.text|raw }}</div>
+        
+                    <input type="submit">
+        
+                </fieldset>
+        
+        </form>
         </div>
     </div>
     <hr>
@@ -71,6 +71,18 @@
         xhr.send (formdata);
         return false;
 } #}
+
+        function submitForm(oFormElement)
+        {
+            var xhr = new XMLHttpRequest();
+            var formdata = new FormData (oFormElement)
+            formdata.set("text", document.querySelector(".ql-editor").innerHTML);
+            xhr.onload = function(){ if (xhr.status == 404){alert(xhr.responseText);}else{  alert(xhr.responseText); window.location.href = '/article{{id}}'} }
+            xhr.open (oFormElement.method, oFormElement.action, true);
+
+            xhr.send (formdata);
+            return false;
+        }
 
 
 
