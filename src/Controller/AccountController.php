@@ -4,18 +4,23 @@ namespace App\Controller;
 
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+
 use App\Entity\Accounts;
 use App\Entity\Guilds;
 use App\Entity\Players;
 use App\Entity\PlayerSkill;
 use App\Entity\FmaacLogs;
 use App\Entity\FmaacLogsActions;
+
 use Doctrine\ORM\Query\ResultSetMapping;
 class AccountController extends Controller
 {
@@ -91,7 +96,7 @@ class AccountController extends Controller
         
         $form = $this->createFormBuilder()
             ->add('Account', TextType::class)
-            ->add('Password', TextType::class)
+            ->add('Password', PasswordType::class)
             ->add('Login', SubmitType::class, array('label' => 'Login'))
         ->getForm();
 
@@ -140,8 +145,8 @@ class AccountController extends Controller
         
         $form = $this->createFormBuilder()
             ->add('account', TextType::class, ['label' => 'Account Name', 'attr' => ['display' => 'block']])
-            ->add('password', TextType::class, ['label' => 'Password'])
-            ->add('repeatPassword', TextType::class, ['label' => 'Repeat Password'])
+            ->add('password', PasswordType::class, ['label' => 'Password'])
+            ->add('repeatPassword', PasswordType::class, ['label' => 'Repeat Password'])
             ->add('email', TextType::class, ['label' => 'E-mail'])
             ->add('repeatEmail', TextType::class, ['label' => 'Repeat E-mail'])
             ->add('Create', SubmitType::class, ['label' => 'Create Account'])
@@ -476,9 +481,9 @@ class AccountController extends Controller
         if ( $session->get('account_id') !== NULL ){
 
             $form = $this->createFormBuilder()
-                ->add('currentPassword', TextType::class, ['label' => 'Current Password'])
-                ->add('password', TextType::class, ['label' => 'Password'])
-                ->add('repeatPassword', TextType::class, ['label' => 'Repeat Password'])
+                ->add('currentPassword', PasswordType::class, ['label' => 'Current Password'])
+                ->add('password', PasswordType::class, ['label' => 'Password'])
+                ->add('repeatPassword', PasswordType::class, ['label' => 'Repeat Password'])
                 ->add('Create', SubmitType::class, ['label' => 'Change'])
             ->getForm();
 
@@ -539,7 +544,7 @@ class AccountController extends Controller
             $form = $this->createFormBuilder()
                 ->add('email', TextType::class, ['label' => 'New Email'])
                 ->add('repeatEmail', TextType::class, ['label' => 'Repeat Email'])
-                ->add('password', TextType::class, ['label' => 'Password'])
+                ->add('password', PasswordType::class, ['label' => 'Password'])
                 ->add('Create', SubmitType::class, ['label' => 'Change'])
             ->getForm();
 

@@ -28,19 +28,10 @@ class HighscoresController extends Controller
         $accessLimit = 3;
 
 
-        // GET COUNT OF POSSIBLE RESULTS
-        $possibleCount = $this->getDoctrine()
-        ->getRepository(Players::class)
-        ->findBy([],[
-            'maglevel' => "DESC",
-        ]);
+        // GET COUNT OF POSSIBLE RESULTS exclude group <= accessLimit AND player.id = 1
+        $query = $this->getDoctrine()->getEntityManager()->createQuery("SELECT p FROM App\Entity\Players p WHERE p.groupId <= {$accessLimit} AND p.id > 1 ORDER BY p.level DESC, p.experience DESC, p.name ASC");
 
-        // unset element with group higher then 3
-        foreach ($possibleCount as $key => $value) {
-            if ( $value->getGroupId() > 3 )
-                unset($possibleCount[$key]);
-        }
-        $possibleCount = count($possibleCount);
+        $possibleCount = count($query->getResult());
 
         // GET POSSIBLE COUNT OF PAGES
         $pagesCount = ceil(($possibleCount / $resultsLimit));
@@ -150,11 +141,9 @@ class HighscoresController extends Controller
 
         // if page has no results redirect to last page
         if (count($result) == 0){
-            $qb = $this->getDoctrine()->getEntityManager()->createQueryBuilder();
-            $qb->select('count(player.id)');
-            $qb->from('App:Players','player');
-            $qb->where('player.groupId <= 3');
-            $count = $qb->getQuery()->getSingleScalarResult();
+            $query = $this->getDoctrine()->getEntityManager()->createQuery("SELECT p FROM App\Entity\Players p WHERE p.groupId <= {$accessLimit} AND p.id > 1 ORDER BY p.level DESC, p.experience DESC, p.name ASC");
+            $count = count($query->getResult());
+
             
             $redirPage = ceil((int)$count/(float)$resultsLimit);
             return $this->redirectToRoute('highscores_level', ['page' => $redirPage, 'filter' => $filter]);
