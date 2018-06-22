@@ -5,7 +5,7 @@ use App\Utils\Configs;
 
 class StrategyClient
 {
-    public $strategies;
+    private $strategies;
 
     public function __construct($doctrine)
     {
@@ -33,5 +33,11 @@ class StrategyClient
         {
             throw new UnsupportedServerVersionException;
         }
+    }
+
+
+    public function __get($property)
+    {
+        return $this->strategies[strtolower($property)];
     }
 }
