@@ -5,7 +5,7 @@ include "config.php";
 /*
 CREATE TABLE today_exp (
     id int AUTO_INCREMENT,
-    exp int NOT NULL,
+    exp bigint(20) NOT NULL,
     player_id int,
     PRIMARY KEY (id),
     FOREIGN KEY (player_id) REFERENCES players(id)
@@ -15,8 +15,10 @@ CREATE TABLE today_exp (
 
 
 try {
-
-$dbh = new PDO("mysql:host={$cfg['host']};dbname={$cfg['database']}", $cfg['user'], $cfg['password']);
+$options = [
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+];
+$dbh = new PDO("mysql:host={$cfg['host']};dbname={$cfg['database']}", $cfg['user'], $cfg['password'], $options);
 
 
 $stmt = $dbh->prepare('DELETE FROM today_exp');

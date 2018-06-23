@@ -14,7 +14,10 @@ CREATE TABLE fmAAC_statistics_online (
 include "config.php";
 
 try {
-    $dbh = new PDO("mysql:host={$cfg['host']};dbname={$cfg['database']}", $cfg['user'], $cfg['password']);
+    $options = [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+    ];
+    $dbh = new PDO("mysql:host={$cfg['host']};dbname={$cfg['database']}", $cfg['user'], $cfg['password'], $options);
 }catch (Exception $e){
     echo "[STATISTICS][" . date("d-m-Y H:i:s") . "]" . "[EXCEPTION]: \"" . $e->getMessage() . "\"\n";
 }
