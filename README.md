@@ -21,7 +21,7 @@ Automated Account Maker created for Open Tibia Servers with Symfony 4 MVC framew
 
     CREATE TABLE today_exp (
         id int AUTO_INCREMENT,
-        exp int NOT NULL,
+        exp bigint(20) NOT NULL,
         player_id int,
         PRIMARY KEY (id),
         FOREIGN KEY (player_id) REFERENCES players(id)
