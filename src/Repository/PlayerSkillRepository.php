@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Entity\PlayerSkill;
+use App\Entity\TFS04\PlayerSkill;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 

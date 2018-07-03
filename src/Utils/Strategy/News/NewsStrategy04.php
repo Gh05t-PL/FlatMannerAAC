@@ -5,7 +5,7 @@ namespace App\Utils\Strategy\News;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class NewsStrategy04
+class NewsStrategy04 implements INewsStrategy
 {
 
     private $doctrine;
@@ -15,9 +15,17 @@ class NewsStrategy04
         $this->doctrine = $doctrine;
     }
 
-    function isAdmin($id){
+
+
+
+    
+    /**
+     * CHECKERS
+     */
+    function isAdmin($id)
+    {
         $account = $this->doctrine
-                ->getRepository(\App\Entity\Accounts::class)
+                ->getRepository(\App\Entity\TFS04\Accounts::class)
         ->find($id);
 
         if ( $account->getGroupId() >= 7 )

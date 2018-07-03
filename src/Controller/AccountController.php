@@ -14,17 +14,18 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 
-use App\Entity\Accounts;
-use App\Entity\Guilds;
-use App\Entity\Players;
-use App\Entity\PlayerSkill;
 use App\Entity\FmaacLogs;
 use App\Entity\FmaacLogsActions;
 
 use Doctrine\ORM\Query\ResultSetMapping;
+
+use App\Utils\Strategy\StrategyClient;
+
+use App\Utils\Configs;
+
 class AccountController extends Controller
 {
-
+    
 
 
     /**
@@ -32,17 +33,14 @@ class AccountController extends Controller
      */
     public function account(SessionInterface $session){
 
+        $strategy = new StrategyClient($this->getDoctrine());
         // if session['account_id'] !== NULL AND loginIp == CurrentIp then
         // LOGGED IN
         if ( $session->get('account_id') !== NULL ){
 
-            $account = $this->getDoctrine()
-                ->getRepository(\App\Entity\Accounts::class)
-            ->find($session->get('account_id'));
+            $account = $strategy->accounts->getAccountById( $session->get('account_id') );
 
-            $accountChars = $this->getDoctrine()
-                ->getRepository(\App\Entity\Players::class)
-            ->findBy(['account' => $session->get('account_id')]);
+            $accountChars = $strategy->accounts->getAccountChars( $session->get('account_id') );
 
             return $this->render('account/account.html.twig', [
                 "account" => $account,
@@ -74,29 +72,13 @@ class AccountController extends Controller
 
 
     /**
-     * @Route("/account/{id}", name="account_index", requirements={"id"="\d+"})
-     */
-    public function get($id){
-
-        $account = $this->getDoctrine()
-            ->getRepository(\App\Entity\Accounts::class)
-        ->find($id);
-
-        return $this->render('account/index.html.twig', [
-            'account' => $account,
-        ]);
-    }
-
-
-
-    /**
      * @Route("/account/login", name="account_login")
      */
     public function login(Request $request, SessionInterface $session){
         
         $form = $this->createFormBuilder()
-            ->add('Account', TextType::class)
-            ->add('Password', PasswordType::class)
+            ->add('Account', TextType::class, ['attr' => ['display' => 'block']])
+            ->add('Password', PasswordType::class,['attr' => ['display' => 'block']])
             ->add('Login', SubmitType::class, array('label' => 'Login'))
         ->getForm();
 
@@ -104,17 +86,16 @@ class AccountController extends Controller
         $errors =[];
         if ( $form->isSubmitted() && $form->isValid() ) {
             //echo $request;
-
+            
+            $strategy = new StrategyClient($this->getDoctrine());
 
             // Checking for errors
-            if ( $account = $this->getDoctrine()->getRepository(Accounts::class)->findOneBy(['name' => $form->getData()['Account'],'password' => $form->getData()['Password']]) === NULL )
+            if ( $strategy->accounts->getAccountBy(['name' => $form->getData()['Account'],'password' => $form->getData()['Password']]) === NULL )
                 $errors[] = "Wrong Account Name or/and Password";
 
             // No errors found
             if ( empty($errors) ){
-                $account = $this->getDoctrine()
-                    ->getRepository(Accounts::class)
-                ->findOneBy([
+                $account = $strategy->accounts->getAccountBy([
                     'name' => $form->getData()['Account'],
                     'password' => $form->getData()['Password']
                 ]);
@@ -157,9 +138,11 @@ class AccountController extends Controller
         $errors = [];
         if ( $form->isSubmitted() && $form->isValid() ) {
             $formData = $form->getData();
+
+            $strategy = new StrategyClient($this->getDoctrine());
             
             // Checking for errors
-            if ( $this->getDoctrine()->getRepository(Accounts::class)->findOneBy(['name' => $formData['account']]) !== NULL )
+            if ( $strategy->accounts->getAccountBy(['name' => $formData['account']]) !== NULL )
                 $errors[] = "Account Name taken";
             if ( $formData['password'] != $formData['repeatPassword'])
                 $errors[] = "Passwords don't match";
@@ -173,13 +156,7 @@ class AccountController extends Controller
 
             // No errors found
             if ( empty($errors) ){
-                $account = new Accounts();
-                $account->setName($formData['account']);
-                $account->setPassword($formData['password']);
-                $account->setEmail($formData['email']);
-                $em = $this->getDoctrine()->getManager();
-
-                $em->persist($account);
+                $strategy->accounts->createAccount($formData);
                 
 
                 //LOG ACTION
@@ -189,6 +166,7 @@ class AccountController extends Controller
                     ->setDatetime(new \DateTime())
                 ->setIp($_SERVER['REMOTE_ADDR']);
 
+                $em = $this->getDoctrine()->getManager();
                 $em->persist($log);
                 $em->flush();
 
@@ -219,37 +197,7 @@ class AccountController extends Controller
         /**
          * [TODO] get vocations, gains of cap and health/mana from vocation.xml
          */
-        $startStats = [
-            'level' => 8,
-            'magiclevel' => 5,
-            'cap' => 200,
-            'health' => 250,
-            'mana' => 250,
-            'skill' => 10
-        ];
-        $vocations = [
-            'Sorcerer' => 1,
-            'Druid' => 2,
-            'Paladin' => 3,
-            'Knight' => 4
-        ];
-        $cities = [
-            "Thais" => 1,
-            "Kazordoon" => 2,
-            "Venore" => 3,
-        ];
-        $citiesPos = [
-            1 => [
-                "x" => 95,
-                "y" => 126,
-                "z" => 7,
-            ],
-            2 => [
-                "x" => 201,
-                "y" => 497,
-                "z" => 7,
-            ],
-        ];
+        
 
 
 
@@ -265,11 +213,11 @@ class AccountController extends Controller
                 ])
                 ->add('vocation', ChoiceType::class, [
                     'label' => 'Vocation',
-                    'choices' => $vocations
+                    'choices' => Configs::$config['player']['vocations']
                 ])
                 ->add('city', ChoiceType::class, [
                     'label' => 'City',
-                    'choices' => $cities,
+                    'choices' => Configs::$config['player']['cities'],
                 ])
                 ->add('Create', SubmitType::class, ['label' => 'Create'])
             ->getForm();
@@ -279,9 +227,11 @@ class AccountController extends Controller
             $errors = [];
             if ( $form->isSubmitted() && $form->isValid() ) {
                 $formData = $form->getData();
-            
+
+
+                $strategy = new StrategyClient($this->getDoctrine());
                 // Checking for errors
-                if ( $this->getDoctrine()->getRepository(Players::class)->findOneBy(['name' => $formData['name']]) !== NULL )
+                if ( $strategy->accounts->isPlayerName($formData['name']) )
                     $errors[] = "Name taken";
                 if ( strlen($formData['name']) > 20 )
                     $errors[] = "Name longer than 20 char";
@@ -296,66 +246,18 @@ class AccountController extends Controller
                 // No errors found
                 if ( empty($errors) ){
 
-                    $player = new Players();
-
-                    $player->setName(ucwords(strtolower($formData['name'])));
-                    $player->setSex($formData['sex']);
-                    $player->setVocation($formData['vocation']);
-                    $player->setAccount($this->getDoctrine()->getRepository(Accounts::class)->find($session->get('account_id')));
-                    $player->setLevel($startStats['level']);
-                    $player->setCap($startStats['cap']);
-                    $player->setMaglevel($startStats['magiclevel']);
-                    $player->setHealth($startStats['health']);
-                    $player->setHealthmax($startStats['health']);
-                    $player->setMana($startStats['mana']);
-                    $player->setManamax($startStats['mana']);
-
-                    $player->setTownId($formData['city']);
-                    $player->setPosx($citiesPos[$formData['city']]['x']);
-                    $player->setPosy($citiesPos[$formData['city']]['y']);
-                    $player->setPosz($citiesPos[$formData['city']]['z']);
-
-                    function expToLevel($level){
-                        return ((50 * ($level - 1)**3 - 150 * ($level - 1)**2 + 400 * ($level - 1)) / 3);
-                    }
-
-                    $player->setExperience(expToLevel($startStats['level']));
-
-                    $em = $this->getDoctrine()->getManager();
-                    $em->persist($player);
-                    
-                    $em->flush();
-
-                    // GET SKILLS
-                    $skills = $this->getDoctrine()
-                    ->getRepository(PlayerSkill::class)
-                    ->findBy([
-                        'player' => $player,
-                    ]);
-                        
-                    // SET STARTING SKILLS
-                    foreach ($skills as $key => $value) {
-                        $value->setValue($startStats['skill']);
-                        $em->persist($value);
-                    }
+                    $strategy->accounts->createCharacter($formData, $session->get('account_id'),  Configs::$config['player']);
 
                     //LOG ACTION
-                    $action = $this->getDoctrine()->getRepository(FmaacLogsActions::class)->find(3); // action 3 = create char
-                    $log = new FmaacLogs();
+                    $action = $this->getDoctrine()->getRepository(\App\Entity\FmaacLogsActions::class)->find(3); // action 3 = create char
+                    $log = new \App\Entity\FmaacLogs();
                     $log->setAction($action)
                         ->setDatetime(new \DateTime())
                     ->setIp($_SERVER['REMOTE_ADDR']);
 
+                    $em = $this->getDoctrine()->getManager();
                     $em->persist($log);
                     $em->flush();
-
-                    //today exp
-                    $conn = $em->getConnection();
-                    $conn->insert('today_exp', [
-                        'id' => null,
-                        'exp' => expToLevel($startStats['level']),
-                        'player_id' => $player->getId()
-                    ]);
 
                     return $this->redirectToRoute('account');
                 }
@@ -387,16 +289,8 @@ class AccountController extends Controller
 
         if ($session->get('account_id') !== NULL){
             // fetch all account chars
-            $charsTemp = $this->getDoctrine()->getRepository(Players::class)->findBy(['account' => $session->get('account_id')]);
-            
-            $chars = [];
-
-            foreach ($charsTemp as $key => $value) {
-                if ( $value->getRankId() == 0 )
-                $chars[$value->getName()] = $value->getId();
-            }
-            $charsTemp = null;
-            
+            $strategy = new StrategyClient($this->getDoctrine());
+            $chars = $strategy->accounts->getNoGuildPlayers($session->get('account_id'));
 
 
             $form = $this->createFormBuilder()
@@ -415,9 +309,9 @@ class AccountController extends Controller
                 $formData = $form->getData();
             
                 // Checking for errors
-                if ( $this->getDoctrine()->getRepository(Guilds::class)->findOneBy(['name' => $formData['name']]) !== NULL )
+                if ( $strategy->guilds->getGuildBy( ['name' => $formData['name']] ) !== NULL )
                     $errors[] = "Guild name taken";
-                if ( $this->getDoctrine()->getRepository(Players::class)->findOneBy( ['id' => $formData['leader'],'account' => $session->get('account_id')] ) == NULL )
+                if ( $strategy->players->getPlayerBy( ['id' => $formData['leader'],'account' => $session->get('account_id')] ) == NULL )
                     $errors[] = "This character don't belong to you";
                 if ( strlen($formData['name']) > 20 )
                     $errors[] = "Guild name longer than 20 char";
@@ -430,33 +324,9 @@ class AccountController extends Controller
                     $errors[] = "Guild name contains illegal string";
                 // No errors found
                 if ( empty($errors) ){
-                    $guild = new Guilds();
+                    $guild = $strategy->guilds->createGuild($formData);
 
-                    $guild->setName($formData['name']);
-                    $guild->setOwnerid($formData['leader']);
-                    $guild->setCreationdata(time());
-                    $guild->setMotd("Please edit motd in leader action panel");
-                    $guild->setCheckdata(time());
-                    //SELECT id FROM `guild_ranks` WHERE guild_id = 4 and level = 3
-
-                    $em = $this->getDoctrine()->getManager();
-                    $em->persist($guild);
-                    $em->flush();
-
-                    $rsm = new ResultSetMapping;
-                    $rsm->addScalarResult('id', 'id');
-            
-                    $leaderRank = $this->getDoctrine()->getManager()
-                        ->createNativeQuery("SELECT id FROM `guild_ranks` WHERE guild_id = {$guild->getId()} and level = 3", $rsm)
-                    ->getSingleScalarResult();
-
-                    $player = $this->getDoctrine()->getRepository(Players::class)->find($formData['leader']);
-                    $player->setRankId($leaderRank);
-
-                    $em->persist($player);
-                    $em->flush();
-
-                    return $this->redirectToRoute('guild_management', ['id' => $guild->getId()]);
+                    return $this->redirectToRoute('guild_management', ['id' => $guild]);
                 }
 
             }
@@ -478,12 +348,13 @@ class AccountController extends Controller
      */
     public function changePassword(Request $request, SessionInterface $session){
         $action = 'Password';
+        $strategy = new StrategyClient($this->getDoctrine());
         if ( $session->get('account_id') !== NULL ){
 
             $form = $this->createFormBuilder()
-                ->add('currentPassword', PasswordType::class, ['label' => 'Current Password'])
-                ->add('password', PasswordType::class, ['label' => 'Password'])
-                ->add('repeatPassword', PasswordType::class, ['label' => 'Repeat Password'])
+                ->add('currentPassword', TextType::class, ['label' => 'Current Password'])
+                ->add('password', TextType::class, ['label' => 'Password'])
+                ->add('repeatPassword', TextType::class, ['label' => 'Repeat Password'])
                 ->add('Create', SubmitType::class, ['label' => 'Change'])
             ->getForm();
 
@@ -494,20 +365,15 @@ class AccountController extends Controller
                 $formData = $form->getData();
                 
                 // Checking for errors
-                if ( $this->getDoctrine()->getRepository(Accounts::class)->findOneBy(['id' => $session->get('account_id'), 'password' => $formData['password']]) !== NULL )
+                if ( $strategy->accounts->getAccountBy(['id' => $session->get('account_id'), 'password' => $formData['password']]) !== NULL )
                     $errors[] = "Password incorrect";
                 if ( $formData['password'] != $formData['repeatPassword'])
                     $errors[] = "Passwords don't match";
 
                 // No errors found
                 if ( empty($errors) ){
-                    $account = $this->getDoctrine()->getRepository(Accounts::class)->find($session->get('account_id'));
-
-                    $account->setPassword($formData['password']);
-
-                    $em = $this->getDoctrine()->getManager();
-                    $em->persist($account);
-                    $em->flush();
+                    
+                    $strategy->accounts->changeAccountDetails($session->get('account_id'), ['password' => $formData['password']]);
 
                     //LOG ACTION
                     $action = $this->getDoctrine()->getRepository(FmaacLogsActions::class)->find(6); // action 6 = account changes
@@ -516,6 +382,7 @@ class AccountController extends Controller
                         ->setDatetime(new \DateTime())
                     ->setIp($_SERVER['REMOTE_ADDR']);
 
+                    $em = $this->getDoctrine()->getManager();
                     $em->persist($log);
                     $em->flush();
 
@@ -544,7 +411,7 @@ class AccountController extends Controller
             $form = $this->createFormBuilder()
                 ->add('email', TextType::class, ['label' => 'New Email'])
                 ->add('repeatEmail', TextType::class, ['label' => 'Repeat Email'])
-                ->add('password', PasswordType::class, ['label' => 'Password'])
+                ->add('password', TextType::class, ['label' => 'Password'])
                 ->add('Create', SubmitType::class, ['label' => 'Change'])
             ->getForm();
 
@@ -553,22 +420,18 @@ class AccountController extends Controller
             $errors = [];
             if ( $form->isSubmitted() && $form->isValid() ) {
                 $formData = $form->getData();
-                
+                $strategy = new StrategyClient($this->getDoctrine());
+
                 // Checking for errors
-                if ( $this->getDoctrine()->getRepository(Accounts::class)->findOneBy(['id' => $session->get('account_id'), 'password' => $formData['password']]) == NULL )
+                if ( $strategy->accounts->getAccountBy(['id' => $session->get('account_id'), 'password' => $formData['password']]) == NULL )
                     $errors[] = "Password incorrect";
                 if ( $formData['email'] != $formData['repeatEmail'])
                     $errors[] = "Emails don't match";
 
                 // No errors found
                 if ( empty($errors) ){
-                    $account = $this->getDoctrine()->getRepository(Accounts::class)->find($session->get('account_id'));
-
-                    $account->setEmail($formData['email']);
-
-                    $em = $this->getDoctrine()->getManager();
-                    $em->persist($account);
-                    $em->flush();
+                    
+                    $strategy->accounts->changeAccountDetails($session->get('account_id'), ['email' => $formData['email']]);
 
                     //LOG ACTION
                     $action = $this->getDoctrine()->getRepository(FmaacLogsActions::class)->find(6); // action 6 = account changes
@@ -577,6 +440,7 @@ class AccountController extends Controller
                         ->setDatetime(new \DateTime())
                     ->setIp($_SERVER['REMOTE_ADDR']);
 
+                    $em = $this->getDoctrine()->getManager();
                     $em->persist($log);
                     $em->flush();
 

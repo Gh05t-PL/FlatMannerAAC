@@ -15,6 +15,8 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use App\Entity\Guilds;
 use App\Entity\Players;
 
+use App\Utils\Strategy\StrategyClient;
+
 use Doctrine\ORM\Query\ResultSetMapping;
 class GuildsController extends Controller
 {
@@ -23,16 +25,16 @@ class GuildsController extends Controller
      */
     public function index()
     {
+        var_dump($_ENV);
+        // $rsm = new ResultSetMapping;
+        // $rsm->addScalarResult('id', 'id');
+        // $rsm->addScalarResult('name', 'name');
+        // $rsm->addScalarResult('motd', 'motd');
+        // $rsm->addScalarResult('members', 'members');
 
-        $rsm = new ResultSetMapping;
-        $rsm->addScalarResult('id', 'id');
-        $rsm->addScalarResult('name', 'name');
-        $rsm->addScalarResult('motd', 'motd');
-        $rsm->addScalarResult('members', 'members');
-
-        $guilds = $this->getDoctrine()->getManager()
-            ->createNativeQuery("SELECT id,name,motd,IFNULL(membersCount,0) as members FROM guilds t3 LEFT JOIN (SELECT count(*) as membersCount,guild_id FROM players t1 INNER JOIN (SELECT * FROM guild_ranks) t2 ON t1.rank_id = t2.id group by guild_id) t4 ON t3.id = t4.guild_id", $rsm)
-        ->getArrayResult();
+        // $guilds = $this->getDoctrine()->getManager()
+        //     ->createNativeQuery("SELECT id,name,motd,IFNULL(membersCount,0) as members FROM guilds t3 LEFT JOIN (SELECT count(*) as membersCount,guild_id FROM players t1 INNER JOIN (SELECT * FROM guild_ranks) t2 ON t1.rank_id = t2.id group by guild_id) t4 ON t3.id = t4.guild_id", $rsm)
+        // ->getArrayResult();
         
         // $guilds = $this->getDoctrine()
         //     ->getRepository(Guilds::class)
@@ -40,6 +42,9 @@ class GuildsController extends Controller
         //     [],
         //     ['name' => 'ASC']
         // );
+        $strategy = new StrategyClient($this->getDoctrine());
+        $guilds = $strategy->guilds->getGuildsList();
+
 
         return $this->render('guilds/index.html.twig', [
             'guilds' => $guilds,
@@ -52,50 +57,22 @@ class GuildsController extends Controller
      */
     public function guild($id, SessionInterface $session)
     {
-
-        // fetch guild entity
-        $guild = $this->getDoctrine()
-            ->getRepository(Guilds::class)
-        ->find($id);
-
-
-        // sql get members
-        $rsm = new ResultSetMapping;
-        $rsm->addScalarResult('id', 'id');
-        $rsm->addScalarResult('nick', 'nick');
-        $rsm->addScalarResult('level', 'level');
-        $rsm->addScalarResult('vocation', 'vocation');
-        $rsm->addScalarResult('rank_id', 'rankId');
-        $rsm->addScalarResult('guildnick', 'guildNick');
-        $rsm->addScalarResult('rankName', 'rankName');
-        $rsm->addScalarResult('rankLevel', 'rankLevel');
-        $rsm->addScalarResult('account_id', 'accountId');
-
-        $members = $this->getDoctrine()->getManager()
-            ->createNativeQuery("SELECT t1.id as id, t1.name as nick, t1.level as level, vocation, rank_id, guildnick, account_id, t2.name as rankName, t2.level as rankLevel FROM players t1 INNER JOIN (SELECT * FROM guild_ranks WHERE guild_id = $id) t2 ON t1.rank_id = t2.id ORDER BY rankLevel DESC, level DESC", $rsm)
-        ->getArrayResult();
+        $strategy = new StrategyClient($this->getDoctrine());
         
+        // fetch guild entity
+        $guild = $strategy->guilds->getGuildById($id);
+        if ( $guild === null )
+            return $this->redirectToRoute('guilds');
+        // get members
+        $members = $strategy->guilds->getGuildMembers($id);
+        //var_dump($members);
 
-        // sql get invitations
-        $rsm = new ResultSetMapping;
-        $rsm->addScalarResult('id', 'id');
-        $rsm->addScalarResult('nick', 'nick');
-        $rsm->addScalarResult('level', 'level');
-        $rsm->addScalarResult('vocation', 'vocation');
-        $rsm->addScalarResult('account_id', 'account_id');
-
-        $invitations = $this->getDoctrine()->getManager()
-            ->createNativeQuery("SELECT id, name as nick, level, vocation, account_id FROM players t1 INNER JOIN (SELECT * FROM guild_invites WHERE guild_id = $id ) t2 ON t1.id = t2.player_id ORDER BY level DESC", $rsm)
-        ->getArrayResult();
+        // get invitations
+        $invitations = $strategy->guilds->getGuildInvites($id);
 
 
         // check max rank of members tide to logged in account
-        $isLeaderLogged = false;
-        $loggedRankLevel = 0;
-        foreach ($members as $value) {
-            if ( $value['accountId'] == $session->get('account_id') && $value['rankLevel'] > $loggedRankLevel )
-                $loggedRankLevel = $value['rankLevel'];
-        }
+        $loggedRankLevel = $strategy->guilds->getAccountGuildRank($session->get('account_id'), $members);
         
         
 
@@ -115,27 +92,27 @@ class GuildsController extends Controller
      */
     public function guildAcceptInvite($id, $playerId, SessionInterface $session)
     {
+        $strategy = new StrategyClient($this->getDoctrine());
+
+
         $error = [];
+        // CHECK IF LOGGED IN
         if ( $session->get('account_id') == NULL ){
             $error[] = "You are not logged in";
             return $this->redirectToRoute('guild_management', ['id' => $id]);
         }
 
-
-        $player = $this->getDoctrine()
-            ->getRepository(\App\Entity\Players::class)
-        ->find($playerId);
-
+        // CHECK IF ACCOUNT CONTAIN THIS CHAR
+        $player = $strategy->players->getPlayerBy(['id' => $playerId]);
         if ( $player->getAccount()->getId() != $session->get('account_id') ){
             $error[] = "Account do not match to character";
             return $this->redirectToRoute('guild_management', ['id' => $id]);
         }  
 
-
+        // CHECK IF PLAYER IS INVITED
         $rsm = new ResultSetMapping;
         $rsm->addScalarResult('player_id', 'player_id');
         $rsm->addScalarResult('guild_id', 'guild_id');
-
         $invitation = $this->getDoctrine()->getManager()
             ->createNativeQuery("SELECT player_id, guild_id FROM guild_invites WHERE player_id = $playerId AND guild_id = $id", $rsm)
         ->getArrayResult();
@@ -145,8 +122,15 @@ class GuildsController extends Controller
             return $this->redirectToRoute('guild_management', ['id' => $id]);
         }
 
+        // CHECK IF PLAYER IS MEMBER IN ANY GUILD
+        $isMemberAny = $strategy->guilds->isMember($playerId);
+        if ( $isMemberAny )
+        {
+            $error[] = "You must leave your guild first";
+            return $this->redirectToRoute('guild_management', ['id' => $id]);
+        }
 
-            
+        // FIND MEMBER RANK_ID
         $rsm = new ResultSetMapping;
         $rsm->addScalarResult('id', 'id');
 
@@ -154,11 +138,19 @@ class GuildsController extends Controller
             ->createNativeQuery("SELECT MIN(id) as id FROM `guild_ranks` WHERE `guild_id` = $id AND level = 1", $rsm)
         ->getSingleScalarResult();
         
-        $player->setRankId($rankId);
-            
+        // $player->setRankId($rankId);
+
+        $data = [
+            'rankId' => $rankId,
+            'guildId' => $id,
+            'playerId' => $playerId
+        ];
+
+        $strategy->guilds->acceptInvite($data);
+
         $em = $this->getDoctrine()->getManager();
-        $em->persist($player);
-        $em->flush();
+        // $em->persist($player);
+        // $em->flush();
 
         $sql = "DELETE FROM guild_invites WHERE player_id = $playerId AND guild_id = $id";
         $stmt = $em->getConnection()->prepare($sql);
@@ -173,19 +165,16 @@ class GuildsController extends Controller
      */
     public function guildInvitationAdd($id, SessionInterface $session, Request $request)
     {
-        // fetch guild
-        $guild = $this->getDoctrine()
-            ->getRepository(Guilds::class)
-        ->find($id);
+        $strategy = new StrategyClient($this->getDoctrine());
+        
+        // fetch guild entity
+        $guild = $strategy->guilds->getGuildById($id);
 
 
-        // fetch guild rank level max
-        $rsm = new ResultSetMapping;
-        $rsm->addScalarResult('access', 'access');
+        // get rank level for logged in account
+        $members = $strategy->guilds->getGuildMembers($id);
 
-        $access = $this->getDoctrine()->getManager()
-            ->createNativeQuery("SELECT IFNULL(MAX(level),1) as access FROM guild_ranks WHERE id IN (SELECT rank_id FROM players WHERE account_id = {$session->get('account_id')}) AND guild_id = {$id}", $rsm)
-        ->getSingleScalarResult();
+        $access = $strategy->guilds->getAccountGuildRank($session->get('account_id'), $members);
         
         if ( $access < 2 )
             return $this->redirectToRoute('guild_management', ['id' => $id]);
@@ -203,7 +192,7 @@ class GuildsController extends Controller
             $formData = $form->getData();
 
             // Checking for errors
-            if ( $this->getDoctrine()->getRepository(Players::class)->findOneBy(['name' => $formData['nick']]) == NULL ){
+            if ( $strategy->players->getPlayerBy(['name' => $formData['nick']]) == NULL ){
                 $errors[] = "Player \"{$formData['nick']}\" do not exist";
                 return $this->render('guilds/guild_invitation_add.html.twig', [
                     'guild' => $guild,
@@ -213,11 +202,12 @@ class GuildsController extends Controller
             }
 
             
-            $player = $this->getDoctrine()->getRepository(Players::class)->findOneBy(['name' => $formData['nick']]);
+            $player = $strategy->players->getPlayerBy(['name' => $formData['nick']]);
             $rsm = new ResultSetMapping;
             $rsm->addScalarResult('player_id', 'player_id');
             $rsm->addScalarResult('guild_id', 'guild_id');
 
+            // check if invitation is not sent again
             $invitation = $this->getDoctrine()->getManager()
                 ->createNativeQuery("SELECT player_id, guild_id FROM guild_invites WHERE player_id = {$player->getId()} AND guild_id = $id", $rsm)
             ->getArrayResult();
@@ -225,19 +215,21 @@ class GuildsController extends Controller
                 $errors[] = "Player \"{$formData['nick']}\" is already invited";
 
 
-            $rsm = new ResultSetMapping;
-            $rsm->addScalarResult('name', 'name');
             
-            $isMember = empty($this->getDoctrine()->getManager()
-                ->createNativeQuery("SELECT name FROM players WHERE rank_id IN (SELECT id FROM guild_ranks WHERE guild_id = {$id}) AND name = '{$player->getName()}'", $rsm)
-            ->getArrayResult());
+            // check if invitation is not sent to member
+            $isMember = false;
+            foreach ($members as $key => $value) {
+                if ( strtolower($value['nick']) == strtolower($formData['nick']) )
+                    $isMember = true;
+                    break;
+            }
                 
-            if ( !$isMember )
+            if ( $isMember )
                 $errors[] = "Player \"{$formData['nick']}\" is member already";
 
 
             
-            if (empty($errors)) {
+            if ( empty($errors) ) {
                 $em = $this->getDoctrine()->getManager();
                 $sql = "INSERT INTO guild_invites VALUES ({$player->getId()}, {$guild->getId()})";
                 $stmt = $em->getConnection()->prepare($sql);
@@ -260,6 +252,8 @@ class GuildsController extends Controller
      */
     public function guildLeave($id, $playerId, SessionInterface $session, Request $request)
     {
+        $strategy = new StrategyClient($this->getDoctrine());
+
         $error = [];
         if ( $session->get('account_id') == NULL ){
             $error[] = "You are not logged in";
@@ -267,9 +261,7 @@ class GuildsController extends Controller
         }
 
 
-        $player = $this->getDoctrine()
-            ->getRepository(\App\Entity\Players::class)
-        ->find($playerId);
+        $player = $strategy->players->getPlayerBy(['id' => $playerId]);
 
         if ( $player->getAccount()->getId() != $session->get('account_id') ){
             $error[] = "Account do not match to character";
@@ -279,27 +271,24 @@ class GuildsController extends Controller
         if (empty($errors)) {
             $em = $this->getDoctrine()->getManager();
 
-            // fetch guild rank level max
-            $rsm = new ResultSetMapping;
-            $rsm->addScalarResult('access', 'access');
+            // get rank level for logged in account
+            $members = $strategy->guilds->getGuildMembers($id);
 
-            $access = $this->getDoctrine()->getManager()
-                ->createNativeQuery("SELECT level as access FROM guild_ranks WHERE id IN (SELECT rank_id FROM players WHERE id = {$playerId}) AND guild_id = {$id}", $rsm)
-            ->getSingleScalarResult();
+            foreach ($members as $key => $value) {
+                if ( $value['id'] == $playerId)
+                    $access = $value['rankLevel'];
+            }
+
             if ( $access == 3 ){
-                $guild = $this->getDoctrine()
-                    ->getRepository(Guilds::class)
-                ->find($id);
+                $guild = $strategy->guilds->getGuildById($id);
 
                 $em->remove($guild);
                 $em->flush();
                 return $this->redirectToRoute('guilds');
             }else{
-                $player->setRankId(0);
 
-                
-                $em->persist($player);
-                $em->flush();
+                $strategy->guilds->leaveGuild($playerId);
+
                 return $this->redirectToRoute('guild_management', ['id' => $id]);
             }
         }
@@ -311,25 +300,22 @@ class GuildsController extends Controller
      */
     public function guildDelete($id, SessionInterface $session, Request $request)
     {
-
+        $strategy = new StrategyClient($this->getDoctrine());
         $error = [];
         if ( $session->get('account_id') == NULL ){
             $error[] = "You are not logged in";
             return $this->redirectToRoute('guild_management', ['id' => $id]);
         }
 
-        if ( $this->getDoctrine()->getRepository(Guilds::class)->find($id) == null ){
+        if ( $strategy->guilds->getGuildById($id) == null ){
             $error[] = "Guild don't exists";
             return $this->redirectToRoute('guilds');
         }
 
-        // fetch guild rank level max
-        $rsm = new ResultSetMapping;
-        $rsm->addScalarResult('access', 'access');
+        // get rank level for logged in account
+        $members = $strategy->guilds->getGuildMembers($id);
 
-        $access = $this->getDoctrine()->getManager()
-            ->createNativeQuery("SELECT IFNULL(MAX(level),1) as access FROM guild_ranks WHERE id IN (SELECT rank_id FROM players WHERE account_id = {$session->get('account_id')}) AND guild_id = {$id}", $rsm)
-        ->getSingleScalarResult();
+        $access = $strategy->guilds->getAccountGuildRank($session->get('account_id'), $members);
 
         if ( $access != 3 ){
             $error[] = "You are not leader";
@@ -338,9 +324,7 @@ class GuildsController extends Controller
 
         if (empty($errors)) {
 
-            $guild = $this->getDoctrine()
-                ->getRepository(Guilds::class)
-            ->find($id);
+            $guild = $strategy->guilds->getGuildById($id);
 
             $em = $this->getDoctrine()->getManager();
             $em->remove($guild);

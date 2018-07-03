@@ -3,7 +3,8 @@ namespace App\Utils\Strategy\Highscores;
 
 
 use Doctrine\ORM\Query\ResultSetMapping;
-class HighscoreStrategy04
+
+class HighscoreStrategy04 implements IHighscoreStrategy
 {
 
     private $doctrine;
@@ -17,7 +18,7 @@ class HighscoreStrategy04
     function getPossibleCount()
     {
         $accessLimit = 3;
-        $query = $this->doctrine->getManager()->createQuery("SELECT p FROM App\Entity\Players04 p WHERE p.groupId <= {$accessLimit} AND p.id > 1 ORDER BY p.level DESC, p.experience DESC, p.name ASC");
+        $query = $this->doctrine->getManager()->createQuery("SELECT p FROM App\Entity\TFS04\Players p WHERE p.groupId <= {$accessLimit} AND p.id > 1 ORDER BY p.level DESC, p.experience DESC, p.name ASC");
     
         $possibleCount = count($query->getResult());
 
@@ -40,7 +41,7 @@ class HighscoreStrategy04
         $accessLimit = 3;
         $config['ver'] = "1.2";
             
-        $query = $this->doctrine->getManager()->createQuery("SELECT s, p FROM App\Entity\PlayerSkill s JOIN s.player p WHERE s.skillid = {$skillId} AND p.groupId <= {$accessLimit} ORDER BY s.value DESC, s.count DESC, p.name ASC");
+        $query = $this->doctrine->getManager()->createQuery("SELECT s, p FROM App\Entity\TFS04\PlayerSkill s JOIN s.player p WHERE s.skillid = {$skillId} AND p.groupId <= {$accessLimit} ORDER BY s.value DESC, s.count DESC, p.name ASC");
         $query->setMaxResults($resultsLimit)->setFirstResult($resultsLimit*($page-1));
 
         $result = $query->getResult();
@@ -76,14 +77,14 @@ class HighscoreStrategy04
         if ($filter === "level"){
 
             // fetch players with tutors and senior tutors
-            $query = $this->doctrine->getManager()->createQuery("SELECT p FROM App\Entity\Players04 p WHERE p.groupId <= {$accessLimit} AND p.id > 1 ORDER BY p.{$orders[$filter][0]} DESC, p.{$orders[$filter][1]} DESC, p.name ASC");
+            $query = $this->doctrine->getManager()->createQuery("SELECT p FROM App\Entity\TFS04\Players p WHERE p.groupId <= {$accessLimit} AND p.id > 1 ORDER BY p.{$orders[$filter][0]} DESC, p.{$orders[$filter][1]} DESC, p.name ASC");
             $query->setMaxResults($resultsLimit)->setFirstResult($resultsLimit*($page-1));
 
             $result = $query->getResult();
         }elseif ($filter === "mlvl"){
 
             // fetch players with tutors and senior tutors
-            $query = $this->doctrine->getManager()->createQuery("SELECT p FROM App\Entity\Players04 p WHERE p.groupId <= {$accessLimit} AND p.id > 1 ORDER BY p.{$orders[$filter][0]} DESC, p.{$orders[$filter][1]} DESC, p.name ASC");
+            $query = $this->doctrine->getManager()->createQuery("SELECT p FROM App\Entity\TFS04\Players p WHERE p.groupId <= {$accessLimit} AND p.id > 1 ORDER BY p.{$orders[$filter][0]} DESC, p.{$orders[$filter][1]} DESC, p.name ASC");
             $query->setMaxResults($resultsLimit)->setFirstResult($resultsLimit*($page-1));
 
             $result = $query->getResult();

@@ -5,13 +5,23 @@ namespace App\Controller;
 
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
 use App\Entity\Players;
 use App\Entity\Accounts;
 use App\Entity\FmaacNews;
+
 use Doctrine\ORM\Query\ResultSetMapping;
+
+use App\Utils\Strategy\Accounts\AccountsStrategy04;
+use App\Utils\Strategy\Accounts\AccountsStrategy12;
+
+use App\Utils\Strategy\StrategyClient;
+
+use App\Utils\Configs;
 
 class AdminPanelController extends Controller
 {
@@ -21,16 +31,16 @@ class AdminPanelController extends Controller
      */
     public function createArticle(SessionInterface $session, Request $request)
     {
-        
+
+        $strategy = new StrategyClient($this->getDoctrine());
+
         // check if XHR post request is pending
         if ( $request->request->get('text') !== NULL && $request->request->get('title') !== NULL && $request->request->get('author') !== NULL){
             // NOT LOGGED IN REDIR
             if ($session->get('account_id') === NULL)
                 return new Response("Login first");
 
-            $account = $this->getDoctrine()
-                ->getRepository(\App\Entity\Accounts::class)
-            ->find($session->get('account_id'));
+            $account = $strategy->accounts->getAccountById($session->get('account_id'));
 
 
             // CHECK IF ACCOUNT HAVE ADMIN PRIVILEGES
@@ -39,12 +49,9 @@ class AdminPanelController extends Controller
 
 
 
-
-            $player = $this->getDoctrine()
-                ->getRepository(\App\Entity\Players::class)
-            ->findOneBy(['name' => $request->request->get('author')]);
-
-            if ( $player === NULL )
+            // CHECK IF PLAYER NAME EXISTS IN DB
+            $player = $request->request->get('author');
+            if ( $strategy->accounts->isPlayerName($player) === false )
                 return new Response("Error author with name: '".$request->request->get('author')."' not found",Response::HTTP_NOT_FOUND);
 
             $article = new FmaacNews();
@@ -65,9 +72,7 @@ class AdminPanelController extends Controller
         if ($session->get('account_id') === NULL)
             return $this->redirectToRoute('account_login', [], 301);
 
-        $account = $this->getDoctrine()
-        ->getRepository(\App\Entity\Accounts::class)
-        ->find($session->get('account_id'));
+        $account = $strategy->accounts->getAccountById($session->get('account_id'));
 
         // CHECK IF ACCOUNT HAVE ADMIN PRIVILEGES
         if ($account->getGroupId() < 7)
@@ -83,15 +88,15 @@ class AdminPanelController extends Controller
      */
     public function editArticle($id, SessionInterface $session, Request $request)
     {
+        $strategy = new StrategyClient($this->getDoctrine());
         // check if XHR post request is pending
         if ( $request->request->get('text') !== NULL && $request->request->get('title') !== NULL && $request->request->get('author') !== NULL){
             // NOT LOGGED IN REDIR
             if ($session->get('account_id') === NULL)
                 return new Response("Login first");
 
-            $account = $this->getDoctrine()
-                ->getRepository(\App\Entity\Accounts::class)
-            ->find($session->get('account_id'));
+                
+            $account = $strategy->accounts->getAccountBy(['id' => $session->get('account_id')]);
 
 
             // CHECK IF ACCOUNT HAVE ADMIN PRIVILEGES
@@ -100,12 +105,9 @@ class AdminPanelController extends Controller
 
 
 
-
-            $player = $this->getDoctrine()
-                ->getRepository(\App\Entity\Players::class)
-            ->findOneBy(['name' => $request->request->get('author')]);
-
-            if ( $player === NULL )
+            // CHECK IF PLAYER NAME EXISTS IN DB
+            $player = $request->request->get('author');
+            if ( $strategy->accounts->isPlayerName($player) === false )
                 return new Response("Error author with name: '".$request->request->get('author')."' not found",Response::HTTP_NOT_FOUND);
 
             $article = $this->getDoctrine()
@@ -128,9 +130,7 @@ class AdminPanelController extends Controller
         if ($session->get('account_id') === NULL)
             return $this->redirectToRoute('account_login', [], 301);
 
-        $account = $this->getDoctrine()
-            ->getRepository(\App\Entity\Accounts::class)
-        ->find($session->get('account_id'));
+        $account = $strategy->accounts->getAccountBy(['id' => $session->get('account_id')]);
 
         // CHECK IF ACCOUNT HAVE ADMIN PRIVILEGES
         if ($account->getGroupId() < 7)
@@ -147,18 +147,17 @@ class AdminPanelController extends Controller
         ]);
     }
 
+
     /**
      * @Route("/admin/delete/article/{id}", name="adminPanel_delete_article", requirements={"id"="\d+"})
      */
-    public function deleteArticle($id, SessionInterface $session, Request $request)
+    public function deleteArticle($id, SessionInterface $session)
     {
         // NOT LOGGED IN REDIR
         if ($session->get('account_id') === NULL)
             return $this->redirectToRoute('account_login', [], 301);
 
-        $account = $this->getDoctrine()
-            ->getRepository(\App\Entity\Accounts::class)
-        ->find($session->get('account_id'));
+        $account = $strategy->getAccountById($session->get('account_id'));
 
         // CHECK IF ACCOUNT HAVE ADMIN PRIVILEGES
         if ($account->getGroupId() < 7)
@@ -182,15 +181,13 @@ class AdminPanelController extends Controller
      */
     public function index(SessionInterface $session)
     {
-
+        $strategy = new StrategyClient($this->getDoctrine());
 
         // NOT LOGGED IN REDIR
         if ($session->get('account_id') === NULL)
             return $this->redirectToRoute('account_login', [], 301);
 
-        $account = $this->getDoctrine()
-            ->getRepository(\App\Entity\Accounts::class)
-        ->find($session->get('account_id'));
+        $account = $strategy->accounts->getAccountById($session->get('account_id'));
 
         // CHECK IF ACCOUNT HAVE ADMIN PRIVILEGES
         if ($account->getGroupId() < 7)

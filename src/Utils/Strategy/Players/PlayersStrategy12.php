@@ -5,7 +5,7 @@ namespace App\Utils\Strategy\Players;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class PlayersStrategy12
+class PlayersStrategy12 implements IPlayersStrategy
 {
 
     private $doctrine;
@@ -23,7 +23,7 @@ class PlayersStrategy12
         
 
         $player = $this->doctrine
-            ->getRepository(\App\Entity\Players12::class)
+            ->getRepository(\App\Entity\TFS12\Players::class)
         ->findOneBy([
             'name' => $name,
         ]);
@@ -104,7 +104,7 @@ class PlayersStrategy12
 
         //player::$guild [["guildName"]=> string(), ["rankName"]=> string(), ["guildId"]=> string()]]
         $member = $this->doctrine
-            ->getRepository(\App\Entity\GuildMembership12::class)
+            ->getRepository(\App\Entity\TFS12\GuildMembership::class)
         ->findOneBy([
             'player' => $player
         ]);
@@ -112,9 +112,9 @@ class PlayersStrategy12
         
         if ($member !== NULL){
             $player->guilds = [
-                ["guildName"] => $member->getGuild()->getName(),
-                ["rankName"] => $member->getRank()->getName(),
-                ["guildId"] => $member->getGuild()->getId(),
+                "guildName" => $member->getGuild()->getName(),
+                "rankName" => $member->getRank()->getName(),
+                "guildId" => $member->getGuild()->getId(),
             ];
         }else{
             $player->guilds = "No Membership";
@@ -122,11 +122,11 @@ class PlayersStrategy12
         // EXP DIFF
         $rsm = new ResultSetMapping;
         $rsm->addScalarResult('expDiff', 'expDiff');
-
-        $expDiff = $this->doctrine->getManager()
-            ->createNativeQuery("SELECT (t1.experience - expBefore) as expDiff FROM players t1 INNER JOIN (SELECT player_id, exp as expBefore FROM today_exp) t2 ON t1.id = t2.player_id where id = {$player->getId()}", $rsm)
-        ->getSingleScalarResult();
-        
+        try {
+            $expDiff = $this->doctrine->getManager()
+                ->createNativeQuery("SELECT (t1.experience - expBefore) as expDiff FROM players t1 INNER JOIN (SELECT player_id, exp as expBefore FROM today_exp) t2 ON t1.id = t2.player_id where id = {$player->getId()}", $rsm)
+            ->getSingleScalarResult();
+        } catch (\Exception $e){$expDiff = 0;}
         $player->expDiff = $expDiff;
 
 
@@ -173,19 +173,26 @@ class PlayersStrategy12
     }
 
 
+    public function getPlayerBy($criteria)
+    {
+        return $this->doctrine
+            ->getRepository(\App\Entity\TFS12\Players::class)
+        ->findOneBy($criteria);
+    }
 
 
+    public function getOnlinePlayers()
+    {
+        $rsm = new ResultSetMapping;
+        $rsm->addScalarResult('name', 'name');
+        $rsm->addScalarResult('level', 'level');
+        $rsm->addScalarResult('vocation', 'vocation');
 
-
-
-
-
-
-
-
-
-
-
+        $onlines = $this->doctrine->getManager()
+            ->createNativeQuery("SELECT name, level, vocation FROM players t1 INNER JOIN (SELECT * FROM `players_online` WHERE 1) t2 ON t1.id = t2.`player_id`", $rsm)
+        ->getResult();
+        return $onlines;
+    }
 
 
 }

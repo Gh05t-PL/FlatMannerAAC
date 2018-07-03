@@ -5,6 +5,11 @@ namespace App\Controller;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
 class ShopController extends Controller
 {
     /**
@@ -62,5 +67,60 @@ class ShopController extends Controller
         return $this->render('shop/items.html.twig', [
             'items' => $items,
         ]);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /** CART
+     * 
+     */
+
+        /**
+     * @Route("/shop/cart", name="shop_cart")
+     */
+    public function shopCart(Request $request, SessionInterface $session){
+        var_dump($session->get('cart'));
+        if ( $request->query->get('json') !== null ){
+            $object = \json_decode($request->query->get('json'));
+            if ( $object->action == "refresh" ){
+
+            }
+            elseif ( $object->action == "add" ){
+                $cart = $session->get('cart');
+                if ( $cart === null ){
+                    $cart = $object->items;
+                    $session->set('cart', $cart);
+                    return new Response("OK");
+                }
+                elseif ( is_array($cart) && count($cart) <= 15 ){
+                    
+                    foreach ($object->items as $key => $value) {
+                        \array_push($cart, $value);
+                    }
+
+                    $session->set('cart',$cart);
+                    return new Response("OK");
+                }else{
+                    return new Response("ERROR ADD");
+                }
+            }
+            elseif ( $object->action == "remove" ){
+
+            }
+        }
+        else
+            return new Response("ERROR");
     }
 }

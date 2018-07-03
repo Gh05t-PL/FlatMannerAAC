@@ -5,7 +5,7 @@ namespace App\Utils\Strategy\Players;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class PlayersStrategy04
+class PlayersStrategy04 implements IPlayersStrategy
 {
 
     private $doctrine;
@@ -22,7 +22,7 @@ class PlayersStrategy04
         $config['ver'] = "0.4";
         
         $player = $this->doctrine
-            ->getRepository(\App\Entity\Players04::class)
+            ->getRepository(\App\Entity\TFS04\Players::class)
         ->findOneBy([
             'name' => $name,
         ]);
@@ -30,7 +30,7 @@ class PlayersStrategy04
             return NULL;
         //Player Kills count in player::$kills
         $playerPK = $this->doctrine
-            ->getRepository(\App\Entity\PlayerKiller::class)
+            ->getRepository(\App\Entity\TFS04\PlayerKiller::class)
         ->findBy([
             'killer' => $player->getId(),
         ],[
@@ -106,16 +106,18 @@ class PlayersStrategy04
         // EXP DIFF  player::$expDiff int()
         $rsm = new ResultSetMapping;
         $rsm->addScalarResult('expDiff', 'expDiff');
-
-        $expDiff = $this->doctrine->getManager()
-            ->createNativeQuery("SELECT (t1.experience - expBefore) as expDiff FROM players t1 INNER JOIN (SELECT player_id, exp as expBefore FROM today_exp) t2 ON t1.id = t2.player_id where id = {$player->getId()}", $rsm)
-        ->getSingleScalarResult();
+        try {
+            $expDiff = $this->doctrine->getManager()
+                ->createNativeQuery("SELECT (t1.experience - expBefore) as expDiff FROM players t1 INNER JOIN (SELECT player_id, exp as expBefore FROM today_exp) t2 ON t1.id = t2.player_id where id = {$player->getId()}", $rsm)
+            ->getSingleScalarResult();
+        } catch (\Exception $e){$expDiff = 0;}
+        
         
         $player->expDiff = $expDiff;
         //\var_dump($player);
 
         $playerSkills = $this->doctrine
-            ->getRepository(\App\Entity\PlayerSkill::class)
+            ->getRepository(\App\Entity\TFS04\PlayerSkill::class)
         ->findBy([
             'player' => $player->getId(),
         ]);
@@ -162,19 +164,24 @@ class PlayersStrategy04
     }
 
 
+    public function getPlayerBy($criteria)
+    {
+        return $this->doctrine
+            ->getRepository(\App\Entity\TFS04\Players::class)
+        ->findOneBy($criteria);
+    }
 
 
+    public function getOnlinePlayers()
+    {
+        $onlines = $this->doctrine
+            ->getRepository(\App\Entity\TFS04\Players::class)
+        ->findBy([
+            'online' => 1,
+        ]);
 
-
-
-
-
-
-
-
-
-
-
+        return $onlines;
+    }
 
 
 }

@@ -30,7 +30,7 @@ class PowerGamersExtension extends \Twig_Extension
         $rsm->addScalarResult('expDiff', 'expDiff');
 
         $powerGamers = $this->doctrine->getManager()
-            ->createNativeQuery("SELECT name,id,(t1.experience - expBefore) as expDiff FROM players t1 INNER JOIN (SELECT player_id, exp as expBefore FROM today_exp) t2 ON t1.id = t2.player_id WHERE group_id <= 3 ORDER BY expDiff DESC LIMIT 5", $rsm)
+            ->createNativeQuery("SELECT name,id,(t1.experience - expBefore) as expDiff FROM players t1 INNER JOIN (SELECT player_id, exp as expBefore FROM today_exp) t2 ON t1.id = t2.player_id WHERE group_id <= 3 AND id > 1 ORDER BY expDiff DESC LIMIT 5", $rsm)
         ->getResult();
 
         return $powerGamers;

@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+
+        <!-- highlight.js library -->
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/vs2015.min.css">
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+
+
+        <!-- Main Quill library -->
+        <script src="//cdn.quilljs.com/1.3.6/quill.js"></script>
+        <script src="//cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+        <!-- Theme included stylesheets -->
+        <link href="//cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+        <link href="//cdn.quilljs.com/1.3.6/quill.bubble.css" rel="stylesheet">
+        <!-- Main JQUERY library -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="/js/jquery.tablesorter.min.js"></script>
+        <!-- FONTS -->
+        <link href="https://fonts.googleapis.com/css?family=Cinzel+Decorative|Open+Sans" rel="stylesheet">
+        <meta charset="UTF-8">
+        <title>{{ otsName }} - {% block title %}{% endblock %}</title>
+        {% block stylesheets %}{% endblock %}
+        <style>
+        body {
+            background-color: #FFECDE;
+        }
+        .wrapper {
+            display: grid;
+            grid-template-columns: 240px auto 240px;
+            grid-gap: 10px;
+            margin: 0 7%;
+        }
+        .header {
+            grid-column: 1/-1;
+        }
+        .header > img {
+            width: 100%;
+        }
+        .menus {
+            grid-column: 1/2;
+        }
+        .menus > div {
+            /* margin-bottom: 5px; */
+        }
+        .menus > .top-menu, .status > .top-menu {
+            /* background: url(/img/menu-top.svg) center no-repeat; */
+            /* background-size: cover; */
+            border-radius: 20px 20px 0 0;
+            height: 30px;
+            padding: 8px 0px 0px 10px;
+            color: white;
+            font-weight: 700;
+            background: linear-gradient(#1E38AA,#111111);
+        }
+        .menu-item > center > a {
+            display: block;
+            background: #dddddd99;
+            color: white;
+            text-decoration: none;
+            margin: 0 auto; 
+            width: 90%;
+            padding: 4px 0 4px 0px;
+        }
+        .menu-item > center > a:hover {
+            background: #fff8dccc;
+        }
+        center {
+            display: grid;
+            grid-gap: 1px;
+        }
+        .server.status-menu > div {
+            display: grid;
+            grid-gap: 1px;
+        }
+        .menu-item > a, .status > .status-menu {
+            display: block;
+            background: #dddddd99;
+            color: white;
+            text-decoration: none;
+            margin: 0 0px;
+            padding: 4px 0 4px 12px;
+        }
+        .status > .status-menu {
+            padding-left: 0;
+        }
+        .menu-item > a:last-child, .status > .status-menu {
+            border-bottom: unset;
+        }
+        .menus > .bot-menu, .status > .bot-menu {
+            /* background: url(/img/menu-bot.jpg) bottom no-repeat;
+            background-size: cover;
+            height: 11px;
+            padding: 8px 0px 0px 10px; */
+            border-radius: 0 0 20px 20px;
+            height: 17px;
+            padding: 8px 0px 0px 10px;
+            color: white;
+            font-weight: 700;
+            background: linear-gradient(#111111,#1E38AA);
+            margin-bottom: 5px;
+        }
+        .menu-item {
+            min-height: 20px;
+            padding: 19px 3px;
+            margin-bottom: 20px;
+            background-color: #0075a7;
+            border: 1px solid #0c0d0e;
+            border-radius: 4px;
+            -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+            
+        }
+        .main {
+            grid-column: 2/3;
+            min-width: 600px;
+        }
+        .main > .top {
+            /* background-color: #f3f3f3; */
+            background: url(/img/big-edgess.png) top no-repeat;
+            background-size: cover;
+            height: 30px;
+            padding: 5px 10px;
+        }
+        .main > .mid {
+            /* background-color: #f3f3f3; */
+            background: url(/img/big-mid.png) top repeat-y;
+            background-size: contain;
+            padding: 5px 10px;
+            min-height: 600px;
+        }
+        .main > .bot {
+            background: url(/img/big-edgess.png) bottom no-repeat;
+            background-size: cover;
+            height: 58px;
+        }
+        .status {
+            grid-column: 3/-1;
+            
+        }
+        .top_player {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: #dddddd99;
+            width: 90%;
+            margin: 0 auto;
+            font-family: sans-serif;
+            font-size: small;
+        }
+        .top_player > p:nth-child(1) {
+            display: block;
+            margin-left: 5px;
+        }
+        .top_player > p:nth-child(2) {
+            display: inline-block;
+            justify-self: end;
+            margin-right: 10px;
+            background: #0074a5a1;
+            padding: 1px 3px;
+            height: 15px;
+        }
+        .server.status-menu > center > .online {
+            color: #1ea81e;
+            font-family: sans-serif;
+            font-weight: 800;
+            
+        }
+        .server-label {
+            margin: 0;
+        }
+        .server.status-menu {
+            min-height: 20px;
+            padding: 19px 3px;
+            margin-bottom: 20px;
+            background-color: #0075a7;
+            border: 1px solid #0c0d0e;
+            border-radius: 4px;
+            -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+        }
+        .server.status-menu > center > .online.offline {
+            color: #c33d3d;
+            font-family: sans-serif;
+            font-weight: 800;
+        }
+        h1.welcome {
+            font-family: "Cinzel Decorative",serif;
+            color: #9ae0bb;
+            font-weight: bold;
+            font-size: 44px;
+            text-shadow: 3px 3px 1px #d8c6c6;
+            margin-top: 50px;
+        }
+        .server-status > p {
+            margin: 0;
+        }
+        .server-status > div > p {
+            margin: 1px 0;
+        }
+        .server-status > div {
+            margin: 6px 0;
+        }
+        #modal-container {
+            min-height: 100%;
+            background: #aaaaaaaa;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: none;
+            z-index: 9999;
+        }
+        .modal-close {
+            cursor: pointer;
+            display: inline;
+        }
+        #modal-item {
+            display: grid;
+            grid-template-columns: 20px 1fr 20px;
+            grid-template-rows: 15% 1fr 15%;
+            border-radius: 10px;
+        }
+        #modal-desc {
+            grid-column: 2/2;
+            grid-row: 2/2;
+            text-align: center;
+            z-index: 9999;
+            font-family: sans-serif;
+            font-weight: 600;
+        }
+        #modal-buttons {
+            grid-column: 2/2;
+            grid-row: 3/3;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+        #modal-buttons > a {
+            justify-self: center;
+            align-self: center;
+        }
+        #modal-cross {
+            grid-column: 3/3;
+            grid-row: 1/1;
+            margin-right: 5px;
+            justify-self: center;
+            align-self: center;
+            z-index: 9999;
+        }
+        #modal-separator-1 {
+            grid-column: 1/-1;
+            grid-row: 1/1;
+            background: #cdcdcd;
+        }
+        #modal-separator-2 {
+            border-bottom: solid 1px #bababa;
+            grid-column: 1/-1;
+            grid-row: 2/2;
+        }
+        #modal-buttons > a {
+            background: #97a1a8;
+            background-image: -webkit-linear-gradient(top, #97a1a8, #52626b);
+            background-image: -moz-linear-gradient(top, #97a1a8, #52626b);
+            background-image: -ms-linear-gradient(top, #97a1a8, #52626b);
+            background-image: -o-linear-gradient(top, #97a1a8, #52626b);
+            background-image: linear-gradient(to bottom, #97a1a8, #52626b);
+            -webkit-border-radius: 28;
+            -moz-border-radius: 28;
+            border-radius: 28px;
+            font-family: Arial;
+            color: #fffcff;
+            font-size: small;
+            padding: 2px 3px;
+            min-width: 66px;
+            text-align: center;
+            text-decoration: none;
+            margin-left: 3px;
+        }
+        #modal-buttons > a:hover {
+            background: #3cb0fd;
+            background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
+            background-image: -moz-linear-gradient(top, #3cb0fd, #3498db);
+            background-image: -ms-linear-gradient(top, #3cb0fd, #3498db);
+            background-image: -o-linear-gradient(top, #3cb0fd, #3498db);
+            background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
+            text-decoration: none;
+        }
+        #modal-buttons > a:nth-child(2):hover {
+            background: #3cb0fd;
+            background-image: -webkit-linear-gradient(top, #fd3c3c, #db3434);
+            background-image: -moz-linear-gradient(top, #fd3c3c, #db3434);
+            background-image: -ms-linear-gradient(top, #fd3c3c, #db3434);
+            background-image: -o-linear-gradient(top, #fd3c3c, #db3434);
+            background-image: linear-gradient(to bottom, #fd3c3c, #db3434);
+            text-decoration: none;
+        }
+
+
+        .create-account {
+            background:    #ffbc57;
+            background:    -webkit-linear-gradient(#ffbc57, #ff9900);
+            background:    linear-gradient(#ffbc57, #ff9900);
+            border-radius: 5px;
+            padding:       8px 20px;
+            color:         #ffffff;
+            display:       inline-block;
+            font:          normal 700 24px/1 "Calibri", sans-serif;
+            text-align:    center;
+            text-shadow:   1px 1px #000000;
+            text-decoration: none;
+            margin-left: 35px;
+        }
+        .download-client {
+            background:    #3d85c6;
+            background:    -webkit-linear-gradient(#3d85c6, #073763);
+            background:    linear-gradient(#3d85c6, #073763);
+            border-radius: 5px;
+            padding:       8px 20px;
+            color:         #ffffff;
+            display:       inline-block;
+            font:          normal 700 24px/1 "Calibri", sans-serif;
+            text-align:    center;
+            text-shadow:   1px 1px #000000;
+            text-decoration: none;
+        }
+        </style>
+    </head>
+    <body>
+        <div id="modal-container" onclick="closeModal(event)"><div id="modal-item" style="width: 470px;height: 230px;background: white;/*! align-self: center; */justify-self: center;position: sticky;margin-top: 20%;"></div></div>
+        <div class="wrapper">
+            <div class="header">
+                <img src="/img/header.gif" alt="">
+            </div>
+            <div class="menus">
+<h2 class="server-label">Account</h2>
+<div class="account menu-item">
+    <center>
+    {% if app.session.get('account_id') %}
+        <a href="/account">Account</a>
+        <a href="/account/logout">Logout</a>
+    {% else %}
+        <a href="/account/login">Login</a>
+    {% endif %}
+    <a href="/account/create">Register</a>
+    </center>
+        </div>
+
+
+        <h2 class="server-label">Server</h2>
+        <div class="server menu-item">
+            <center>
+            <a href="/news">News</a>
+            <a href="/server/info">Server Info</a>
+            <a href="/player">Find Player</a>
+            <a href="/players/online">Players Online</a>
+            <a href="/highscores">Highscores</a>
+            <a href="/guilds">Guilds</a>
+            <a href="/bans">Banishments</a>
+            </center>
+        </div>
+
+        <h2 class="server-label">SMS Shop</h2>
+        <div class="server menu-item">
+            <center>
+            <!-- <a href="/shop/items">Items</a> -->
+            <a href="/points">Buy Points</a>
+            </center>
+        </div>
+
+        <h2 class="server-label">Library</h2>
+        <div class="library menu-item">
+            <center>
+            <a href="/techniques/">Techniques</a>
+            <!-- <a href="">Monsters</a> -->
+            <center>
+        </div>
+            </div>
+            <div class="main">
+            <center>
+                <h1 class="welcome">Welcome To FireFun</h1>
+                <div style="margin-bottom: 10px;">
+                    <a href="http://www.mediafire.com/file/wdcdxqjwiwc6x23/otclient-firefun.7z" class="download-client">Download <i class="fas fa-download"></i></a>
+                    <a href="http://dbomni.pl/account/create" class="create-account">Create Account</a>
+                </div>
+            </center>
+            
+                <div class="top"></div>
+                <div class="mid">
+                        {% block content %}
+                        
+                        {% endblock %}
+                </div>
+                <div class="bot"></div>
+            </div>
+            <div class="status">
+
+                <h2 class="server-label">Status</h2>
+                <div class="server status-menu">
+                    <center class="server-status">
+
+                    {% if getServerStatus() %}
+                        <p class="online">ONLINE</p>
+                        <div class="players">
+                            <p>Players</p>
+                            <p>{{ getServerStatus()['online'] }}/1000</p>
+                        </div>
+                        <div class="uptime">
+                            <p>Uptime</p>
+                            <p>{{ getServerStatus()['uptime'] }}</p>
+                        </div>
+                        <div class="ip">
+                            <p>IP</p>
+                            <p>{{ getServerStatus()['ip'] }}</p>
+                        </div>
+                    {% else %}
+                        <p class="online offline">OFFLINE</p>
+                        <!-- <p class="ip">firefun.dyn.pl</p> -->
+                    {% endif %}
+                    </center>
+                </div>
+                
+
+                <h2 class="server-label">Top 5 Players</h2>
+                <div class="server status-menu">
+                    <div>
+                    {% for player in getTop5() %}
+                        <div class="top_player">
+                            <p class="name">{{ loop.index }}. <a href="/player/{{ player.name }}">{{ player.name }}</a></p>
+                            <p class="level" style="border-radius: 5px; background: #ff0000a1;">LvL. {{ player.level }}</p>
+                        </div>
+                    {% endfor %}
+                    </div>
+                </div>
+                
+
+                <h2 class="server-label">Top 5 PowerGamers</h2>
+                <div class="server status-menu">
+                    <div>
+                    {% for player in getPowerGamers() %}
+                        <div class="top_player">
+                            <p class="name">{{ loop.index }}. <a href="/player/{{ player.name }}">{{ player.name }}</a></p>
+                        {% if player.expDiff > 999999 and player.expDiff < 999999999  %}
+                            <p class="level" style="font-size: 10px; padding-bottom: 0; border-radius: 5px; padding-top: 3px; background: green;">+{{ player.expDiff|number_format(0,'',',') }} ExP</p>
+                        {% elseif player.expDiff > 999999999 %}
+                        <p class="level" style="font-size: 9px; padding-bottom: 0; border-radius: 5px; padding-top: 3px; background: green;">+{{ player.expDiff|number_format(0,'',',') }} ExP</p>
+                        {% else %}
+                            <p class="level" style="background: green; border-radius: 5px;">+{{ player.expDiff|number_format(0,'',',') }} ExP</p>
+                        {% endif %}
+                        </div>
+                    {% endfor %}
+                    </div>
+                </div>
+                
+
+            </div>
+        </div>
+
+
+        {% block javascripts %}
+        <script>
+            
+            function closeModal(e){
+
+                if ( (window.getComputedStyle(document.querySelector("#modal-container")).getPropertyValue('display') != "none" && e.target.id == "modal-container") || e.target.classList.contains("modal-close") == true){
+                    document.querySelector("#modal-container").style.display = "none"
+                    
+                }
+            }
+            // url:string(ex. /guilds/2 ),desc:string,options:array ([0]:cancel, [1]:execute)
+            function openModal(url,desc,options){
+                
+                console.log()
+                if ( window.getComputedStyle(document.querySelector("#modal-container")).getPropertyValue('display') == "none" ){
+                    document.querySelector("#modal-container").style.display = "grid"
+                    document.querySelector("#modal-item").innerHTML = `<p id="modal-cross" class="modal-close"><i class="fas fa-times modal-close"></i></p><div id="modal-separator-1"></div><p id="modal-desc">${desc}</p><div id="modal-separator-2"></div><div id="modal-buttons"><a class="modal-close">${options[0]}</a><a id="modal-exec" href="${url}">${options[1]}</a></div>`
+                }
+            }
+
+            
+        </script>
+        {% endblock %}
+    </body>
+</html>

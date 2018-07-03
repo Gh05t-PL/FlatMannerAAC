@@ -1,0 +1,143 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin Panel - Edit Article{% endblock %}
+
+{% block content %}
+<style>
+    .example-wrapper { margin: 1em auto;  width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+
+
+    a.page {
+        background: white;
+        border: solid 1px black;
+        border-radius: 20px;
+        /* padding: 0px 5%; */
+        text-align: center;
+        margin: 0 5px;
+        display: block;
+    }
+    div.pages {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+    }
+    .page.active {
+        background:#dadada;
+    }
+</style>
+
+<div class="example-wrapper">
+    <h1>Edit Article</h1>
+<a href="/news">< Back</a>
+    <div class="news">
+        <div class="article">
+
+            <form action="/admin/edit/article/{{ article.id }}" method="post" id="admin_form" onsubmit="return submitForm(this);">
+                <fieldset>
+                <legend>Article</legend>
+        
+                    <input type="text" name="title" placeholder="Title..." value="{{ article.title }}" required>
+                    <input type="text" name="author" placeholder="Author..." value="{{ article.author }}" required>
+                    <div id="editor" form="admin_form" name="text" >{{ article.text|raw }}</div>
+        
+                    <input type="submit">
+        
+                </fieldset>
+        
+        </form>
+        </div>
+    </div>
+    <hr>
+</div>
+<script> 
+{# function a(formm){
+    var xhr = new XMLHttpRequest();
+    var formdata = new FormData (formm);
+
+    for (var element of formm.parentElement.getElementsByTagName("div")){
+        if (element.getAttribute("form") == formm.id){
+            alert(element.getAttribute("name")+", "+element.innerHTML);
+            formdata.set(element.getAttribute("name"), element.innerHTML);
+        }
+
+    }
+
+    if(formm.parentElement.querySelector("#editor")){
+    formdata.set("text", formm.parentElement.querySelector("#editor").firstChild.innerHTML);
+    }
+        xhr.onload = function(){ alert (xhr.responseText); }
+        xhr.open (formm.method, formm.action, true);
+
+        xhr.send (formdata);
+        return false;
+} #}
+
+        function submitForm(oFormElement)
+        {
+            var xhr = new XMLHttpRequest();
+            var formdata = new FormData (oFormElement)
+            formdata.set("text", document.querySelector(".ql-editor").innerHTML);
+            xhr.onload = function(){ if (xhr.status == 404){alert(xhr.responseText);}else{  alert(xhr.responseText); window.location.href = '/article/{{article.id}}'} }
+            xhr.open (oFormElement.method, oFormElement.action, true);
+
+            xhr.send (formdata);
+            return false;
+        }
+
+
+
+        hljs.configure({   // optionally configure hljs
+          languages: ['javascript', 'php', 'html', 'twig']
+        });
+
+        var toolbarOptions = [
+          ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+          ['blockquote', 'code-block', 'image'],
+
+          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+          [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+          [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+          [{ 'direction': 'rtl' }],                         // text direction
+
+          [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+
+
+          [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+          [{ 'font': [] }],
+          [{ 'align': [] }],
+
+          ['clean']                                         // remove formatting button
+        ];
+
+            var options = {
+          debug: 'info',
+          modules: {
+            toolbar: toolbarOptions,
+            syntax: true
+          },
+          placeholder: 'Compose an epic...',
+          readOnly: false,
+          theme: 'snow'
+        };
+
+        var reader = {
+          modules: {
+            syntax: true,
+            toolbar: false
+          },
+          readOnly: true,
+          theme: 'bubble'
+        };
+
+
+            if (document.getElementById("editor"))
+                var editor = new Quill('#editor',options);
+
+            if (document.getElementsByClassName("ql-editor ns text")){
+                for (let index = 0; index < document.getElementsByClassName("ql-editor ns").length; index++) {
+                    new Quill(document.getElementsByClassName("ql-editor ns")[index],reader);
+
+                }
+            }
+        </script>
+{% endblock %}

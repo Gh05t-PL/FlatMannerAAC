@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello {{ controller_name }}!{% endblock %}
+
+{% block content %}
+<style>
+    .example-wrapper { margin: 1em auto;  width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+
+    #techniques > tbody > td,#techniques > tbody > th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+
+    #techniques {
+        max-width: 500px !important;
+        margin-left: 20% !important;
+    }
+
+    #viewer > div {
+        display: grid !important;
+        grid-template-columns: minmax(0,350px) 1fr !important;
+    }
+
+    #transforms {
+        max-height: 650px;
+    }
+
+    tr.color0 {
+        background:cadetblue !important;
+    }
+
+    #techniques > tbody > tr:nth-child(even) {
+        background: #dddddd;
+    }
+</style>
+
+<div class="example-wrapper">
+    <table bgcolor="#f3f3f3" border="0" cellpadding="4" cellspacing="1" width="100%">
+        <tbody>
+            <tr bgcolor="#0075A7">
+                <td class="white" colspan="5"><center style="color: white;">This is a list of vocations to choose. Click on one and see it's techniques.</center></td>
+            </tr>
+            <tr>
+                <td>
+                    <div style="text-align:center;">
+                        <a onclick="loadDoc('/goku.php')"><img src="/img/voce/1.gif"></a>
+                        <a onclick="loadDoc('/gohan.php')"><img src="/img/voce/25.gif"></a>
+                        <a onclick="loadDoc('/vegeta.php')"><img src="/img/voce/8.gif"></a>
+                        <a onclick="loadDoc('/goten.php')"><img src="/img/voce/72.gif"></a>
+                        <a onclick="loadDoc('/chibitrunks.php')"><img src="/img/voce/79.gif"></a>
+                        <a onclick="loadDoc('/piccolo.php')"><img src="/img/voce/15.gif"></a>
+                        <a onclick="loadDoc('/tsuful.php')"><img src="/img/voce/97.gif"></a>
+                        <a onclick="loadDoc('/buu.php')"><img style="top: 9px; position: relative;" src="/img/voce/50.gif"></a>
+                        <a onclick="loadDoc('/freeza.php')"><img src="/img/voce/43.gif"></a>
+                        <a onclick="loadDoc('/c17.php')"><img src="/img/voce/20.gif"></a>
+                        <a onclick="loadDoc('/c18.php')"><img src="/img/voce/62.gif"></a>
+                        <a onclick="loadDoc('/cell.php')"><img src="/img/voce/38.gif"></a>
+                        <a onclick="loadDoc('/cooler.php')"><img src="/img/voce/86.gif"></a>
+                        <a onclick="loadDoc('/bardock.php')"><img src="/img/voce/102.gif"></a>
+                        <a onclick="loadDoc('/uub.php')"><img src="/img/voce/67.gif"></a>
+                        <a onclick="loadDoc('/dende.php')"><img src="/img/voce/92.gif"></a>
+                        <a onclick="loadDoc('/trunks.php')"><img src="/img/voce/32.gif"></a>
+                        <a onclick="loadDoc('/brolly.php')"><img src="/img/voce/57.gif"></a>
+                        <a onclick="loadDoc('/janemba.php')"><img src="/img/voce/123.gif"></a>
+                        <a onclick="loadDoc('/kuririn.php')"><img src="/img/voce/108.gif"></a>
+                        <a onclick="loadDoc('/pan.php')"><img src="/img/voce/113.gif"></a>
+                        <a onclick="loadDoc('/tenshin.php')"><img src="/img/voce/128.gif"></a>
+                        <a onclick="loadDoc('/c16.php')"><img src="/img/voce/143.gif"></a>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div id="viewer"></div>
+</div>
+{% block javascripts %}
+    <script>
+            function loadDoc(x) {
+	
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                  if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById("viewer").innerHTML = this.responseText;
+                  var newTableObject = document.getElementById("myTable")
+              sorttable.makeSortable(newTableObject);
+                  }
+                };
+                xhttp.open("GET", x, true);
+                xhttp.send();
+              
+              }
+    </script>
+{% endblock javascripts %}
+{% endblock %}

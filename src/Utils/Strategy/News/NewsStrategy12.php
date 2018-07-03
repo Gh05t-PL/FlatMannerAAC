@@ -5,7 +5,7 @@ namespace App\Utils\Strategy\News;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class NewsStrategy12
+class NewsStrategy12 implements INewsStrategy
 {
 
     private $doctrine;
@@ -15,9 +15,16 @@ class NewsStrategy12
         $this->doctrine = $doctrine;
     }
 
+
+
+
+    
+    /**
+     * CHECKERS
+     */
     function isAdmin($id){
         $account = $this->doctrine
-                ->getRepository(\App\Entity\Accounts12::class)
+                ->getRepository(\App\Entity\TFS12\Accounts::class)
         ->find($id);
 
         if ( $account->getType() >= 7 )

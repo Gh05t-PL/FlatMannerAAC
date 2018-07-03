@@ -3,7 +3,8 @@ namespace App\Utils\Strategy\Highscores;
 
 
 use Doctrine\ORM\Query\ResultSetMapping;
-class HighscoreStrategy12
+
+class HighscoreStrategy12 implements IHighscoreStrategy
 {
 
     private $doctrine;
@@ -17,7 +18,7 @@ class HighscoreStrategy12
     function getPossibleCount()
     {
         $accessLimit = 3;
-        $query = $this->doctrine->getManager()->createQuery("SELECT p FROM App\Entity\Players12 p WHERE p.groupId <= {$accessLimit} AND p.id > 1 ORDER BY p.level DESC, p.experience DESC, p.name ASC");
+        $query = $this->doctrine->getManager()->createQuery("SELECT p FROM App\Entity\TFS12\Players p WHERE p.groupId <= {$accessLimit} AND p.id > 1 ORDER BY p.level DESC, p.experience DESC, p.name ASC");
     
         $possibleCount = count($query->getResult());
 
@@ -50,7 +51,7 @@ class HighscoreStrategy12
             6 => 'skillFishing',
         ];
         $tries = $skills[$skillId] . 'Tries';
-        $query = $this->doctrine->getManager()->createQuery("SELECT p FROM App\Entity\Players12 p WHERE p.groupId <= {$accessLimit} ORDER BY p.{$skills[$skillId]} DESC, p.{$tries} DESC, p.name ASC");
+        $query = $this->doctrine->getManager()->createQuery("SELECT p FROM App\Entity\TFS12\Players p WHERE p.groupId <= {$accessLimit} ORDER BY p.{$skills[$skillId]} DESC, p.{$tries} DESC, p.name ASC");
         $query->setMaxResults($resultsLimit)->setFirstResult($resultsLimit*($page-1));
 
         $result = $query->getResult();
@@ -88,12 +89,12 @@ class HighscoreStrategy12
         ];
         
         if ($filter === "level"){
-            $query = $this->doctrine->getManager()->createQuery("SELECT p FROM App\Entity\Players12 p WHERE p.groupId <= {$accessLimit} ORDER BY p.{$orders[$filter][0]} DESC, p.{$orders[$filter][1]} DESC, p.name ASC");
+            $query = $this->doctrine->getManager()->createQuery("SELECT p FROM App\Entity\TFS12\Players p WHERE p.groupId <= {$accessLimit} ORDER BY p.{$orders[$filter][0]} DESC, p.{$orders[$filter][1]} DESC, p.name ASC");
             $query->setMaxResults($resultsLimit)->setFirstResult($resultsLimit*($page-1));
 
             $result = $query->getResult();
         }elseif ($filter === "mlvl"){
-            $query = $this->doctrine->getManager()->createQuery("SELECT p FROM App\Entity\Players12 p WHERE p.groupId <= {$accessLimit} ORDER BY p.{$orders[$filter][0]} DESC, p.{$orders[$filter][1]} DESC, p.name ASC");
+            $query = $this->doctrine->getManager()->createQuery("SELECT p FROM App\Entity\TFS12\Players p WHERE p.groupId <= {$accessLimit} ORDER BY p.{$orders[$filter][0]} DESC, p.{$orders[$filter][1]} DESC, p.name ASC");
             $query->setMaxResults($resultsLimit)->setFirstResult($resultsLimit*($page-1));
 
             $result = $query->getResult();

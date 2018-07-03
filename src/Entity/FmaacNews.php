@@ -43,12 +43,9 @@ class FmaacNews
     private $text;
 
     /**
-     * @var \Players
+     * @var string
      *
-     * @ORM\ManyToOne(targetEntity="Players")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="player_id", referencedColumnName="id")
-     * })
+     * @ORM\Column(name="author", type="string", length=50, nullable=false)
      */
     private $author;
 
@@ -93,12 +90,12 @@ class FmaacNews
         return $this->id;
     }
 
-    public function getAuthor(): ?Players
+    public function getAuthor(): ?string
     {
         return $this->author;
     }
 
-    public function setAuthor(?Players $author): self
+    public function setAuthor(string $author): self
     {
         $this->author = $author;
 

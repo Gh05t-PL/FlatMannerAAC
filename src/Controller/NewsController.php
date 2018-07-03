@@ -10,6 +10,10 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Entity\Players;
 use App\Entity\FmaacNews;
 
+use App\Utils\Strategy\News\NewsStrategy04;
+use App\Utils\Strategy\News\NewsStrategy12;
+
+use App\Utils\Configs;
 
 class NewsController extends Controller
 {
@@ -38,15 +42,14 @@ class NewsController extends Controller
         $resultsLimit = 5;
         $pagesCount = ceil(($newsCount / $resultsLimit));
 
-        $isAdmin = false;
-        if ( $session->get('account_id') !== NULL ){
-            $account = $this->getDoctrine()
-                ->getRepository(\App\Entity\Accounts::class)
-            ->find($session->get('account_id'));
+        if ( Configs::$config['version'] == "0.4" )
+            $strategy = new NewsStrategy04($this->getDoctrine());
+        elseif ( Configs::$config['version'] == "1.2" )
+            $strategy = new NewsStrategy12($this->getDoctrine());
 
-            if ( $account->getGroupId() >= 7 )
-                $isAdmin = true;
-        }
+        $isAdmin = false;
+        if ( $session->get('account_id') !== NULL )
+            $isAdmin = $strategy->isAdmin($session->get('account_id'));
                 
 
             
@@ -55,6 +58,7 @@ class NewsController extends Controller
             ->getManager()
         ->createQuery("SELECT u FROM App\Entity\FmaacNews u ORDER BY u.datetime DESC")->setMaxResults($resultsLimit)->setFirstResult($resultsLimit*($page-1));
         $news = $query->getResult();
+
 
 
 
@@ -79,15 +83,14 @@ class NewsController extends Controller
         ->find($id);
 
 
-        $isAdmin = false;
-        if ( $session->get('account_id') !== NULL ){
-            $account = $this->getDoctrine()
-                ->getRepository(\App\Entity\Accounts::class)
-            ->find($session->get('account_id'));
+        if ( Configs::$config['version'] == "0.4" )
+            $strategy = new NewsStrategy04($this->getDoctrine());
+        elseif ( Configs::$config['version'] == "1.2" )
+            $strategy = new NewsStrategy12($this->getDoctrine());
 
-            if ( $account->getGroupId() >= 7 )
-                $isAdmin = true;
-        }
+        $isAdmin = false;
+        if ( $session->get('account_id') !== NULL )
+            $isAdmin = $strategy->isAdmin($session->get('account_id'));
 
 
         return $this->render('news/article.html.twig', [
