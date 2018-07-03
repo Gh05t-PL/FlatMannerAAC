@@ -1,5 +1,5 @@
 <?php
-namespace App\Utils\Strategy\Guilds;
+namespace App\Utils\Strategy\Highscores;
 
 interface IHighscoreStrategy {
 
