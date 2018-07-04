@@ -49,15 +49,22 @@ read DB_NAME
 echo
 echo 'DB_HOST: (for example: "127.0.0.1")'
 read DB_HOST
+echo
+echo "=============================="
+echo "=       Server Version       ="
+echo "=    Available \"0.4\",\"1.2\"   ="
+echo "=============================="
+read SERV_VER
 
 echo
 aacConfig="\n###> symfony/framework-bundle ###\nAPP_ENV=$env\nAPP_SECRET=$secret\n#TRUSTED_PROXIES=127.0.0.1,127.0.0.2\n#TRUSTED_HOSTS=localhost,example.com\n###< symfony/framework-bundle ###\n\n###> symfony/swiftmailer-bundle ###\n# For Gmail as a transport, use: 'gmail://username:password@localhost'\n# For a generic SMTP server, use: 'smtp://localhost:25?encryption=&auth_mode='\n# Delivery is disabled by default via 'null://localhost'\nMAILER_URL=null://localhost\n###< symfony/swiftmailer-bundle ###\n\n###> doctrine/doctrine-bundle ###\n# Format described at http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html#connecting-using-a-url\n# For an SQLite database, use: 'sqlite:///%kernel.project_dir%/var/data.db'\n# Configure your db driver and server_version in config/packages/doctrine.yaml\nDATABASE_URL=mysql://$DB_USER:$DB_PASS@$DB_HOST:3306/$DB_NAME\n###< doctrine/doctrine-bundle ###"
 
-cronConfig="<?php\n\$cfg = ['database' => '$DB_NAME','user' => '$DB_USER','password' => '$DB_PASS','host' => '$DB_HOST'];"
+cronConfig="<?php\n\$cfg = [\n\t'database' => '$DB_NAME',\n\t'user' => '$DB_USER',\n\t'password' => '$DB_PASS',\n\t'host' => '$DB_HOST',\n\t'version' => '$SERV_VER'\n];"
 
 echo "Saving config to .env file"
 (echo -e $aacConfig > .env)
 (echo -e $cronConfig > CRON/config.php)
+(php CRON/install.php > CRON/install.log)
 echo
 echo
 
