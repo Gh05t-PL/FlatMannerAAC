@@ -13,8 +13,7 @@ use App\Entity\PlayerDeaths;
 
 use Doctrine\ORM\Query\ResultSetMapping;
 
-use App\Utils\Strategy\Highscores\HighscoreStrategy04;
-use App\Utils\Strategy\Highscores\HighscoreStrategy12;
+use App\Utils\Strategy\StrategyClient;
 
 use App\Utils\Configs;
 
@@ -34,17 +33,13 @@ class HighscoresController extends Controller
         */
         $resultsLimit = 15;
         $accessLimit = 3;
-        echo Configs::$config['version'];
-        if ( Configs::$config['version'] == "0.4" )
-            $strategy = new HighscoreStrategy04($this->getDoctrine());
-        elseif ( Configs::$config['version'] == "1.2" )
-            $strategy = new HighscoreStrategy12($this->getDoctrine());
+        $strategy = new StrategyClient($this->getDoctrine());
 
 
         // GET COUNT OF POSSIBLE RESULTS exclude group <= accessLimit AND player.id = 1
         $query = $this->getDoctrine()->getManager()->createQuery("SELECT p FROM App\Entity\Players12 p WHERE p.groupId <= {$accessLimit} AND p.id > 1 ORDER BY p.level DESC, p.experience DESC, p.name ASC");
 
-        $possibleCount = $strategy->getPossibleCount();
+        $possibleCount = $strategy->highscores->getPossibleCount();
 
         // GET POSSIBLE COUNT OF PAGES
         $pagesCount = ceil(($possibleCount / $resultsLimit));
@@ -59,7 +54,7 @@ class HighscoresController extends Controller
 
             // $result = $query->getResult();
             // //var_dump($users);
-            $result = $strategy->getHighscoresLevels($filter, $resultsLimit, $page);
+            $result = $strategy->highscores->getHighscoresLevels($filter, $resultsLimit, $page);
 
             $filterName = "Level";
         }
@@ -71,7 +66,7 @@ class HighscoresController extends Controller
             // $query->setMaxResults($resultsLimit)->setFirstResult($resultsLimit*($page-1));
 
             // $result = $query->getResult();
-            $result = $strategy->getHighscoresLevels($filter, $resultsLimit, $page);
+            $result = $strategy->highscores->getHighscoresLevels($filter, $resultsLimit, $page);
 
             $filterName = "Magic Level";
         }
@@ -83,7 +78,7 @@ class HighscoresController extends Controller
             // $query->setMaxResults($resultsLimit)->setFirstResult($resultsLimit*($page-1));
             // 
             // $result = $query->getResult();
-            $result = $strategy->getHighscoresSkills(0, $resultsLimit, $page);
+            $result = $strategy->highscores->getHighscoresSkills(0, $resultsLimit, $page);
 
             $filterName = "Fist Fighting";
         }
@@ -95,7 +90,7 @@ class HighscoresController extends Controller
             // $query->setMaxResults($resultsLimit)->setFirstResult($resultsLimit*($page-1));
 
             // $result = $query->getResult();
-            $result = $strategy->getHighscoresSkills(1, $resultsLimit, $page);
+            $result = $strategy->highscores->getHighscoresSkills(1, $resultsLimit, $page);
 
             $filterName = "Club Fighting";
         }
@@ -107,7 +102,7 @@ class HighscoresController extends Controller
             // $query->setMaxResults($resultsLimit)->setFirstResult($resultsLimit*($page-1));
 
             // $result = $query->getResult();
-            $result = $strategy->getHighscoresSkills(2, $resultsLimit, $page);
+            $result = $strategy->highscores->getHighscoresSkills(2, $resultsLimit, $page);
 
             $filterName = "Sword Fighting";
         }
@@ -119,7 +114,7 @@ class HighscoresController extends Controller
             // $query->setMaxResults($resultsLimit)->setFirstResult($resultsLimit*($page-1));
 
             // $result = $query->getResult();
-            $result = $strategy->getHighscoresSkills(3, $resultsLimit, $page);
+            $result = $strategy->highscores->getHighscoresSkills(3, $resultsLimit, $page);
 
             $filterName = "Axe Fighting";
         }
@@ -131,7 +126,7 @@ class HighscoresController extends Controller
             // $query->setMaxResults($resultsLimit)->setFirstResult($resultsLimit*($page-1));
 
             // $result = $query->getResult();
-            $result = $strategy->getHighscoresSkills(4, $resultsLimit, $page);
+            $result = $strategy->highscores->getHighscoresSkills(4, $resultsLimit, $page);
 
             $filterName = "Distance Fighting";
         }
@@ -143,7 +138,7 @@ class HighscoresController extends Controller
             // $query->setMaxResults($resultsLimit)->setFirstResult($resultsLimit*($page-1));
 
             // $result = $query->getResult();
-            $result = $strategy->getHighscoresSkills(5, $resultsLimit, $page);
+            $result = $strategy->highscores->getHighscoresSkills(5, $resultsLimit, $page);
 
             $filterName = "Shielding";
         }
@@ -155,7 +150,7 @@ class HighscoresController extends Controller
             // $query->setMaxResults($resultsLimit)->setFirstResult($resultsLimit*($page-1));
 
             // $result = $query->getResult();
-            $result = $strategy->getHighscoresSkills(6, $resultsLimit, $page);
+            $result = $strategy->highscores->getHighscoresSkills(6, $resultsLimit, $page);
 
             $filterName = "Fishing";
         }

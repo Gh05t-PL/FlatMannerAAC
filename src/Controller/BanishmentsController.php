@@ -4,8 +4,9 @@ namespace App\Controller;
 
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use App\Entity\Bans;
-use App\Entity\Players;
+
+use App\Utils\Configs;
+
 use Doctrine\ORM\Query\ResultSetMapping;
 
 class BanishmentsController extends Controller

@@ -12,12 +12,12 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
-use App\Entity\Guilds;
-use App\Entity\Players;
+use App\Utils\Configs;
 
 use App\Utils\Strategy\StrategyClient;
 
 use Doctrine\ORM\Query\ResultSetMapping;
+
 class GuildsController extends Controller
 {
     /**
@@ -25,23 +25,7 @@ class GuildsController extends Controller
      */
     public function index()
     {
-        var_dump($_ENV);
-        // $rsm = new ResultSetMapping;
-        // $rsm->addScalarResult('id', 'id');
-        // $rsm->addScalarResult('name', 'name');
-        // $rsm->addScalarResult('motd', 'motd');
-        // $rsm->addScalarResult('members', 'members');
 
-        // $guilds = $this->getDoctrine()->getManager()
-        //     ->createNativeQuery("SELECT id,name,motd,IFNULL(membersCount,0) as members FROM guilds t3 LEFT JOIN (SELECT count(*) as membersCount,guild_id FROM players t1 INNER JOIN (SELECT * FROM guild_ranks) t2 ON t1.rank_id = t2.id group by guild_id) t4 ON t3.id = t4.guild_id", $rsm)
-        // ->getArrayResult();
-        
-        // $guilds = $this->getDoctrine()
-        //     ->getRepository(Guilds::class)
-        // ->findBy(
-        //     [],
-        //     ['name' => 'ASC']
-        // );
         $strategy = new StrategyClient($this->getDoctrine());
         $guilds = $strategy->guilds->getGuildsList();
 

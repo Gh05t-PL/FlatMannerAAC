@@ -4,10 +4,15 @@ namespace App\Controller;
 
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use App\Entity\Accounts;
+
+use App\Utils\Strategy\StrategyClient;
+
 use App\Entity\FmaacShopLogs;
+
+use App\Utils\Configs;
 
 class PaymentCatcherController extends Controller
 {
@@ -50,15 +55,14 @@ class PaymentCatcherController extends Controller
      */
     public function catcher($provider, Request $request)
     {
+        $strategy = new StrategyClient($this->getDoctrine());
 
         if ( $provider == "paygol" ){
                 // if request secret key is not same (type and value) of config then return error and stop script
                 if ( $request->query->get('key') !== $this->config['paygol']['secretKey'])
                     return new Response("Error");
 
-                $account = $this->getDoctrine()
-                    ->getRepository(\App\Entity\Accounts::class)
-                ->findOneBy(['name' => $request->query->get('custom')]);
+                $account = $strategy->accounts->getAccountBy(['name' => $request->query->get('custom')]);
 
                 $account->setPoints($account->getPoints() + $this->config['paygol']['points'][$request->query->get('frmprice')]);
                 //file_put_contents("testt.txt", $this->config['paygol']['points'][$request->query->get('frmprice')].",,,".$request->query->get('frmprice').",,,".$request->query->get('custom').",,,".($account->getPoints() + $this->config['paygol']['points'][$request->query->get('frmprice')]));
@@ -97,13 +101,9 @@ class PaymentCatcherController extends Controller
 
             $em = $this->getDoctrine()->getManager();
 
-            $account = $this->getDoctrine()
-                ->getRepository(\App\Entity\Accounts::class)
-            ->findOneBy(['name' => $txt[2]]);
+            $account = $strategy->accounts->getAccountBy(['name' => $txt[2]]);
             if($account == null){
-                $account = $this->getDoctrine()
-                    ->getRepository(\App\Entity\Accounts::class)
-                ->findOneBy(['name' => '1']);
+                $account = $strategy->accounts->getAccountBy(['name' => '1']);
             }
 
             $shopLog = new FmaacShopLogs();

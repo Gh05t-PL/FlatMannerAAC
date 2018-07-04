@@ -4,14 +4,20 @@ namespace App\Controller;
 
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use App\Entity\Accounts;
+
+use App\Utils\Strategy\StrategyClient;
+
 use App\Entity\FmaacShopLogs;
+
+use App\Utils\Configs;
 
 class PointsController extends Controller
 {
@@ -67,11 +73,11 @@ class PointsController extends Controller
      */
     public function pointsBuy($provider, SessionInterface $session, Request $request)
     {
+        $strategy = new StrategyClient($this->getDoctrine());
+
         if ( $session->get('account_id') !== NULL ){
             $errors = [];
-            $account = $this->getDoctrine()
-                ->getRepository(\App\Entity\Accounts::class)
-            ->find($session->get('account_id'));
+            $account = $strategy->accounts->getAccountBy( ['id' => $session->get('account_id')] );
             
 
             if ( $provider == "paygol" ){
@@ -118,16 +124,12 @@ class PointsController extends Controller
                     // No errors found
                     if ( empty($errors) ){
                         //echo $api->data->number;
-              
+
                         $em = $this->getDoctrine()->getManager();
 
-                        $account = $this->getDoctrine()
-                            ->getRepository(\App\Entity\Accounts::class)
-                        ->findOneBy(['name' => $formData['account']]);
+                        $account = $strategy->accounts->getAccountBy(['name' => $formData['account']]);
                         if($account == null){
-                            $account = $this->getDoctrine()
-                                ->getRepository(\App\Entity\Accounts::class)
-                            ->findOneBy(['name' => '1']);
+                            $account = $strategy->accounts->getAccountBy(['name' => '1']);
                         }
 
                         $shopLog = new FmaacShopLogs();

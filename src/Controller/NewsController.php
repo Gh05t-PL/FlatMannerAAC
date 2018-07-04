@@ -10,8 +10,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Entity\Players;
 use App\Entity\FmaacNews;
 
-use App\Utils\Strategy\News\NewsStrategy04;
-use App\Utils\Strategy\News\NewsStrategy12;
+use App\Utils\Strategy\StrategyClient;
 
 use App\Utils\Configs;
 
@@ -42,14 +41,11 @@ class NewsController extends Controller
         $resultsLimit = 5;
         $pagesCount = ceil(($newsCount / $resultsLimit));
 
-        if ( Configs::$config['version'] == "0.4" )
-            $strategy = new NewsStrategy04($this->getDoctrine());
-        elseif ( Configs::$config['version'] == "1.2" )
-            $strategy = new NewsStrategy12($this->getDoctrine());
+        $strategy = new StrategyClient($this->getDoctrine());
 
         $isAdmin = false;
         if ( $session->get('account_id') !== NULL )
-            $isAdmin = $strategy->isAdmin($session->get('account_id'));
+            $isAdmin = $strategy->news->isAdmin($session->get('account_id'));
                 
 
             
@@ -83,14 +79,11 @@ class NewsController extends Controller
         ->find($id);
 
 
-        if ( Configs::$config['version'] == "0.4" )
-            $strategy = new NewsStrategy04($this->getDoctrine());
-        elseif ( Configs::$config['version'] == "1.2" )
-            $strategy = new NewsStrategy12($this->getDoctrine());
+        $strategy = new StrategyClient($this->getDoctrine());
 
         $isAdmin = false;
         if ( $session->get('account_id') !== NULL )
-            $isAdmin = $strategy->isAdmin($session->get('account_id'));
+            $isAdmin = $strategy->news->isAdmin($session->get('account_id'));
 
 
         return $this->render('news/article.html.twig', [
