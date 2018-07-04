@@ -104,7 +104,7 @@ AND THEN ENABLE PHP7.2
 
 
     CRON TASKS LOGGING INTO aac/CRON/crons.log
-    
+    INSTALLATION LOGGING INTO aac/CRON/install.log
 }
  
 </pre>
