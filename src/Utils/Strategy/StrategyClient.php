@@ -17,6 +17,7 @@ class StrategyClient
                 'players' => new Players\PlayersStrategy04($doctrine),
                 'highscores' => new Highscores\HighscoreStrategy04($doctrine),
                 'guilds' => new Guilds\GuildsStrategy04($doctrine),
+                'bans' => new Bans\BansStrategy04($doctrine),
             ];
         }
         elseif ( Configs::$config['version'] == "1.2" )
@@ -27,6 +28,7 @@ class StrategyClient
                 'players' => new Players\PlayersStrategy12($doctrine),
                 'highscores' => new Highscores\HighscoreStrategy12($doctrine),
                 'guilds' => new Guilds\GuildsStrategy12($doctrine),
+                'bans' => new Bans\BansStrategy12($doctrine),
             ];
         }
         else

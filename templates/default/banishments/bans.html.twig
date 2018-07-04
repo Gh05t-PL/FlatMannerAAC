@@ -43,7 +43,7 @@
                 {% for ban in bans %}
                     <tr>
                         <td>{{ loop.index }}</td>
-                        <td><strong><a href="/player/{{ ban[0].name }}">{{ ban[0].name }}</a></strong></td>
+                        <td><strong><a href="/player/{{ ban.name }}">{{ ban.name }}</a></strong></td>
                         <td>{{ ban.expires|date('d.m.Y H:i:s') }}</td>
                     </tr>
                 {% endfor %}
