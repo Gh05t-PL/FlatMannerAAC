@@ -30,11 +30,10 @@ Automated Account Maker created for Open Tibia Servers with Symfony 4 MVC framew
     CREATE TABLE fmAAC_news (
         id int AUTO_INCREMENT,
         title varchar(50) NOT NULL,
-        player_id int NOT NULL,
+        author varchar(50) NOT NULL,
         datetime DATETIME NOT NULL,
         text text CHARACTER SET 'utf8' NOT NULL,
-        PRIMARY KEY (id),
-        FOREIGN KEY (player_id) REFERENCES players(id)
+        PRIMARY KEY (id)
     );
 
     CREATE TABLE fmAAC_logs_actions (
@@ -197,5 +196,5 @@ AND THEN ENABLE PHP7.2
  
 </pre>
 
-Tested with TFS 0.3.6 && TFS 0.4
+Tested with TFS 0.3.6 && TFS 0.4 && TFS 1.2
 
