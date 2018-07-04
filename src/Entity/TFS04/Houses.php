@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Acme\TestBundle\Entity;
+namespace App\Entity\TFS04;
 
 use Doctrine\ORM\Mapping as ORM;
 

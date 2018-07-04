@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Acme\TestBundle\Entity;
+namespace App\Entity\TFS04;
 
 use Doctrine\ORM\Mapping as ORM;
 
@@ -36,9 +36,9 @@ class GuildRanks
     private $id;
 
     /**
-     * @var \App\Acme\TestBundle\Entity\TFS04\Guilds
+     * @var \App\Entity\TFS04\Guilds
      *
-     * @ORM\ManyToOne(targetEntity="App\Acme\TestBundle\Entity\TFS04\Guilds")
+     * @ORM\ManyToOne(targetEntity="App\Entity\TFS04\Guilds")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="guild_id", referencedColumnName="id")
      * })
