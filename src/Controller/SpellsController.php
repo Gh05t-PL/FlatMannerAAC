@@ -5,52 +5,126 @@ namespace App\Controller;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
+use App\Utils\Configs;
+
 class SpellsController extends Controller
 {
     /**
-     * @Route("/spells", name="spells")
+     * @Route("/spells/{vocName}", name="spells")
      */
-    public function index()
+    public function index($vocName = "All")
     {
-        $vocations = file_get_contents('vocations.xml');
-        $vocations = new \SimpleXMLElement($vocations);
+        // if ( $vocName !== "all" )
+        // {
+            $vocations = file_get_contents('vocations.xml');
+            $vocations = new \SimpleXMLElement($vocations);
 
-        $vocationsArr = [];
-        foreach ($vocations->vocation as $key => $value) {
-           //echo $value['id'].'   '.$value['name'];
-           $vocationsArr[(int)$value['id']] = $value['name'];
-        }
-        //var_dump($vocationsArr);
-        
-        $spells = file_get_contents('spells.xml');
-        $spells = new \SimpleXMLElement($spells);
-        $instantSpells = [];
-        foreach ($spells->instant as $key => $value) {
-            $name = "";
-            for ($i=0; $i < count($value->vocation); $i++) { 
-                
-                if ($i == 0)
-                    $name .= $vocationsArr[(int)$value->vocation[$i]['id']];
-                else
-                $name .= ", ".$vocationsArr[(int)$value->vocation[$i]['id']];
-                
+            $vocationsArr = [];
+            $vocationsArr['All'] = 'All';
+            foreach ($vocations->vocation as $key => $value) {
+
+                if ( !\array_key_exists((string)$value['name'], $vocationsArr) )
+                {
+                    $vocationsArr[(string)$value['name']] = [(int)$value['id']];
+                }
+                else {
+                    $vocationsArr[(string)$value['name']][] = (int)$value['id'];
+                }
                 
             }
-            $instantSpells[] = [
-                'vocations' => $name,
-                'name' => $value['name'],
-                'words' => $value['words'],
-                'level' => $value['lvl'],
-                'mana' => $value['mana'],
-                'prem' => (int)$value['prem'],
-            ];
+
+            $vocations = null;
+
             
-        }
-        //var_dump($instantSpells);
-        //var_dump( $spells->instant[0]['name']);
-        return $this->render('spells/index.html.twig', [
-            'controller_name' => 'SpellsController',
-            'instantSpells' => $instantSpells,
-        ]);
+            
+            $spells = file_get_contents('spells.xml');
+            $spells = new \SimpleXMLElement($spells);
+
+            $instantSpells = [];
+            if ( $vocName !== "All" )
+            {
+                foreach ($spells->instant as $key => $spell) 
+                {
+                    /* if ( empty($spell->vocation) && (int)$spell->vocation[0]['id'] !== 0  )*/
+                    if ( !isset($spell->vocation) )
+                    {
+                        $instantSpells[] = [
+                            'vocations' => $vocName,
+                            'name' => $spell['name'],
+                            'words' => $spell['words'],
+                            'level' => $spell['lvl'],
+                            'mana' => $spell['mana'],
+                            'prem' => (int)$spell['prem'],
+                        ];
+                        continue;
+                    }
+                    foreach ($spell->vocation as $key2 => $vocation) {
+                        $matches = null;
+                        if ( \preg_match('/(\d*)-(\d*)/', $spell->vocation['id'], $matches) == 1 )
+                        {
+                            if ( (\array_search($matches[1], $vocationsArr[$vocName]) || \array_search($matches[2], $vocationsArr[$vocName])) !== false )
+                            {
+                                $instantSpells[] = [
+                                    'vocations' => $vocName,
+                                    'name' => $spell['name'],
+                                    'words' => $spell['words'],
+                                    'level' => $spell['lvl'],
+                                    'mana' => $spell['mana'],
+                                    'prem' => (int)$spell['prem'],
+                                ];
+                            }
+                            break;
+                            
+                        }
+
+                        if ( \array_search((int)$vocation['id'], $vocationsArr[$vocName]) !== false )
+                        {
+                            $instantSpells[] = [
+                                'vocations' => $vocName,
+                                'name' => $spell['name'],
+                                'words' => $spell['words'],
+                                'level' => $spell['lvl'],
+                                'mana' => $spell['mana'],
+                                'prem' => (int)$spell['prem'],
+                            ];
+                            break;
+                        }
+                    }
+                }
+
+                return $this->render('spells/index.html.twig', [
+                    'controller_name' => 'SpellsController',
+                    'instantSpells' => $instantSpells,
+                    'vocationss' => $vocationsArr,
+                    'vocName' => $vocName,
+                ]);
+            }
+            else
+            {
+                foreach ($spells->instant as $key => $spell) 
+                {
+                    /* if ( empty($spell->vocation) && (int)$spell->vocation[0]['id'] !== 0  )*/
+                    if ( !isset($spell->vocation) )
+                    {
+                        $instantSpells[] = [
+                            'vocations' => $vocName,
+                            'name' => $spell['name'],
+                            'words' => $spell['words'],
+                            'level' => $spell['lvl'],
+                            'mana' => $spell['mana'],
+                            'prem' => (int)$spell['prem'],
+                        ];
+                        continue;
+                    }
+                }
+
+                return $this->render('spells/index.html.twig', [
+                    'controller_name' => 'SpellsController',
+                    'instantSpells' => $instantSpells,
+                    'vocationss' => $vocationsArr,
+                    'vocName' => $vocName,
+                ]);
+            }
+
     }
 }

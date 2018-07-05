@@ -34,7 +34,16 @@
 
 <div class="example-wrapper">
     <h1>Spells</h1>
-
+    <select id="select">
+        {% for key in vocationss|keys if key != "None" %}
+            {% if key == vocName %}
+                <option value="{{ key }}" selected>{{ key }}</option>
+            {% else %}
+                <option value="{{ key }}">{{ key }}</option>
+            {% endif %}
+        {% endfor %}
+    </select>
+    
         <table id="spells-table" class="tablesorter">
         <thead>
                 <tr>
@@ -65,6 +74,10 @@
             $("#spells-table").tablesorter( {sortList: [[3,0]]} ); 
         } 
     ); 
-       
+
+    document.querySelector("#select").addEventListener("change", function () {
+        select = document.querySelector("#select")
+        window.location.replace("/spells/"+select.value)
+    })
 </script>
 {% endblock %}
