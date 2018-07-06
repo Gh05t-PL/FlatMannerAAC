@@ -287,13 +287,13 @@ color: #b5b5b5;
 
             <p class="label">Frags</p>
             <div class="frags">
-                {% if playerPK %}
+                {% if player.pk %}
                 <table>
 
-                    {% for frags in playerPK %}
+                    {% for frags in player.pk %}
                     <tr>
-                        <td>Killed <a href="/player/{{ frags.kill.death.player.name }}">{{ frags.kill.death.player.name }}</a>({{ frags.kill.death.level }}) on {{ frags.kill.death.date|date("d.m.Y H:i:s") }}</td>
-                        <td>{{ frags.kill.unjustified ? "UnJustified" : "Justified" }}</td>
+                        <td>Killed <a href="/player/{{ frags.name }}">{{ frags.name }}</a>({{ frags.level }}) on {{ frags.date|date("d.m.Y H:i:s") }}</td>
+                        <td>{{ frags.unjustified ? "UnJustified" : "Justified" }}</td>
                     </tr>
                     {% endfor %}
                 </table>
@@ -303,10 +303,10 @@ color: #b5b5b5;
 
                 <p class="label">Deaths</p>
                 <p style="font-size: small;">By Players</p>
-                {% if playerKillers %}
+                {% if player.deathsByPlayers %}
                 <table>
 
-                    {% for death in playerKillers %}
+                    {% for death in player.deathsByPlayers %}
                     <tr>
                         {% set namess = death.names|split(',') %}
                         <td>Killed by 
@@ -326,10 +326,10 @@ color: #b5b5b5;
                 {% endif %}
 
                 <p style="font-size: small;">By Monsters</p>
-                {% if monsterKillers %}
+                {% if player.deathsByMonsters %}
                 <table>
 
-                    {% for death in monsterKillers %}
+                    {% for death in player.deathsByMonsters %}
                     <tr>
                         <td>Killed by {{ death.killers }} at Level {{ death.level }} on {{ death.date|date("d.m.Y H:i:s") }}</td>
                     </tr>
