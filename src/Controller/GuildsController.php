@@ -143,6 +143,101 @@ class GuildsController extends Controller
         return $this->redirectToRoute('guild_management', ['id' => $id]);
     }
 
+
+    /**
+     * @Route("/guilds/{id}/ranks/managment", name="guild_ranks_managment", requirements={"id"="\d+"})
+     */
+    public function guildRanksManagment($id, SessionInterface $session, Request $request)
+    {
+        $strategy = new StrategyClient($this->getDoctrine());
+
+        $guild = $strategy->guilds->getGuildById($id);
+        // get rank level for logged in account
+        $members = $strategy->guilds->getGuildMembers($id);
+
+        $access = $strategy->guilds->getAccountGuildRank($session->get('account_id'), $members);
+        
+        if ( $access < 2 )
+            return $this->redirectToRoute('guild_management', ['id' => $id]);
+        
+
+        $ranksTemp = $strategy->guilds->getGuildRanks($id);
+
+        $ranks = [];
+        foreach ($ranksTemp as $key => $value) {
+            $ranks[$value->getName()] = $value->getId();
+        }
+
+        //$ranksTemp = null;
+        // create form
+        $form = $this->createFormBuilder()
+            ->add('rankId', ChoiceType::class, [
+                'label' => 'Rank',
+                'choices' => $ranks,
+                
+            ])
+            ->add('newName', TextType::class, array(
+                'label' => 'New Name',
+                'required' => false,
+            ))
+            ->add('newAccess', TextType::class, array(
+                'label' => 'New Access',
+                'required' => false,
+            ))
+            ->add('Submit', SubmitType::class, array('label' => 'Submit'))
+        ->getForm();
+
+        //REQUEST FORM
+        $form->handleRequest($request);
+        $errors =[];
+        if ( $form->isSubmitted() && $form->isValid() ) 
+        {
+            $formData = $form->getData();
+            $rank;
+            foreach ($ranksTemp as $key => $value) {
+                if ( (int)$value->getId() === (int)$formData['rankId'] )
+                {
+                    $rank = $value;
+                }
+            }
+
+            // CHECKING FOR ERRORS
+            if ( $formData['newAccess'] !== null && $rank->getLevel() > $access )
+                $errors[] = "Sorry you can't edit higher rank then yours";
+            if ( \preg_match("([A-Za-z ]+)",$formData['newName']) == 0 )
+                $errors[] = "Rank name must contain characters [a-zA-Z ] only";
+            if ( $formData['newAccess'] !== null && $formData['newAccess'] > $access )
+                $errors[] = "Sorry you can't set higher access then yours";
+            if ( $formData['newAccess'] !== null && !((int)$formData['newAccess'] <= 3 && (int)$formData['newAccess'] > 0) )
+                $errors[] = "Access must be in range from 1 to 3";
+
+
+            if ( empty($errors) )
+            {
+                if ( !empty($formData['newName']) )
+                    $rank->setName($formData['newName']);
+
+                if ( !empty($formData['newAccess']) )
+                    $rank->setLevel((int)$formData['newAccess']);
+
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($rank);
+                $em->flush();
+
+                return $this->redirectToRoute('guild_management', ['id' => $id]);
+            }
+            
+
+        }
+
+
+        return $this->render('guilds/guild_ranks_managment.html.twig', [
+            'guild' => $guild,
+            'form' => $form->createView(),
+            'errors' => $errors,
+        ]);
+    }
+
     
     /**
      * @Route("/guilds/{id}/invitation/add", name="guild_invitation_add", requirements={"id"="\d+"})

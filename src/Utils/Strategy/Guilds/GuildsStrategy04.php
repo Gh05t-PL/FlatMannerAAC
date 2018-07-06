@@ -87,6 +87,16 @@ class GuildsStrategy04 implements IGuildsStrategy
 
         return $invitations;
     }
+
+
+    public function getGuildRanks($gId)
+    {
+        $ranks = $this->doctrine
+            ->getRepository(\App\Entity\TFS04\GuildRanks::class)
+        ->findBy(['guild' => $gId]);
+
+        return $ranks;
+    }
     
 
     public function getAccountGuildRank($aId, $members)

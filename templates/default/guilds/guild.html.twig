@@ -79,6 +79,7 @@
         <div class="action-list">
             {% if loggedRankLevel >= 2 %}
                 <a href="/guilds/{{ guild.id }}/invitation/add">Invite Player</a>
+                <a href="/guilds/{{ guild.id }}/ranks/managment">Ranks Managment</a>
             {% endif %}
             {% if loggedRankLevel == 3 %}
                 <a href="#" onclick="openModal('/guilds/{{ guild.id }}/delete', 'Are you sure you want to delete this guild?', ['No', 'Yes'])">Delete Guild</a>

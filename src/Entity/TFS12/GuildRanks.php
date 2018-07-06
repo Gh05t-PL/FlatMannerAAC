@@ -38,7 +38,7 @@ class GuildRanks
     /**
      * @var \Guilds
      *
-     * @ORM\ManyToOne(targetEntity="Guilds")
+     * @ORM\ManyToOne(targetEntity="App\Entity\TFS12\Guilds")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="guild_id", referencedColumnName="id")
      * })

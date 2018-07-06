@@ -107,6 +107,12 @@ class GuildsStrategy12 implements IGuildsStrategy
     }
 
 
+    public function getGuildRanks($gId)
+    {
+        
+    }
+
+
     public function getAccountGuildRank($aId, $members)
     {
         // check max rank of members tide to logged in account

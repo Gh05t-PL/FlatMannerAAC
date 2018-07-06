@@ -13,6 +13,8 @@ interface IGuildsStrategy {
 
     public function getGuildInvites($id);
 
+    public function getGuildRanks($gId);
+
     public function getAccountGuildRank($aId, $members);
 
     //public function getPlayerGuildRank($pId, $members);
