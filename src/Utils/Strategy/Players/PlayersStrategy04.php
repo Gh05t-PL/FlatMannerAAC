@@ -57,7 +57,7 @@ class PlayersStrategy04 implements IPlayersStrategy
         };
         usort($playerPKTemp, $ff);
 
-        echo "<br>";echo "<br>";
+
         //var_dump($playerPKTemp);echo "<br>";echo "<br>";
 
         

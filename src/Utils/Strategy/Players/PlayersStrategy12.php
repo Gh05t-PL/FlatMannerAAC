@@ -59,7 +59,7 @@ class PlayersStrategy12 implements IPlayersStrategy
             ];
         }
         $playerPK = null;
-        echo '<br><br>1.2';
+
         //\var_dump($playerPkTemp);
         $player->pk = $playerPkTemp;
 
