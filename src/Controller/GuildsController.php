@@ -154,7 +154,7 @@ class GuildsController extends Controller
         $guild = $strategy->guilds->getGuildById($id);
         // get rank level for logged in account
         $members = $strategy->guilds->getGuildMembers($id);
-
+        //var_dump($members);
         $access = $strategy->guilds->getAccountGuildRank($session->get('account_id'), $members);
         
         if ( $access < 2 )
@@ -165,12 +165,12 @@ class GuildsController extends Controller
 
         $ranks = [];
         foreach ($ranksTemp as $key => $value) {
-            $ranks[$value->getName()] = $value->getId();
+            $ranks[$value->getName() . " ({$value->getLevel()})"] = $value->getId();
         }
+        
 
-        //$ranksTemp = null;
-        // create form
-        $form = $this->createFormBuilder()
+        // FORM 1 EDIT RANKS
+        $form = $this->get('form.factory')->createNamedBuilder("form1")
             ->add('rankId', ChoiceType::class, [
                 'label' => 'Rank',
                 'choices' => $ranks,
@@ -187,9 +187,59 @@ class GuildsController extends Controller
             ->add('Submit', SubmitType::class, array('label' => 'Submit'))
         ->getForm();
 
-        //REQUEST FORM
+        // FORM 2 ADD RANK
+        $form2 = $this->get('form.factory')->createNamedBuilder("form2")
+            ->add('name', TextType::class, array(
+                'label' => 'Rank Name',
+                'required' => false,
+            ))
+            ->add('access', TextType::class, array(
+                'label' => 'Rank Access',
+                'required' => false,
+            ))
+            ->add('Add', SubmitType::class, array('label' => 'Add'))
+        ->getForm();
+
+        // FORM 3 DELETE RANK
+        $form3 = $this->get('form.factory')->createNamedBuilder("form3")
+            ->add('rankId', ChoiceType::class, [
+                'label' => 'Rank',
+                'choices' => $ranks,
+                
+            ])
+            ->add('Remove', SubmitType::class, array('label' => 'Remove'))
+        ->getForm();
+
+        $choiceMember = [];
+        foreach ($members as $key => $value) {
+            $rank;
+            foreach ($ranks as $key2 => $value2) {
+                if ( (int)$value2 == (int)$value['rankId'] )
+                    $rank = $key2;
+            }
+            $choiceMember[$value['nick'] . " [{$rank}]"] = (int)$value['id'];
+        }
+
+        // FORM 4 SET RANK
+        $form4 = $this->get('form.factory')->createNamedBuilder("form4")
+        ->add('member', ChoiceType::class, [
+            'label' => 'Member',
+            'choices' => $choiceMember,
+            
+        ])
+            ->add('rankId', ChoiceType::class, [
+                'label' => 'Rank',
+                'choices' => $ranks,
+                
+            ])
+            ->add('SetRank', SubmitType::class, array('label' => 'Set Rank'))
+        ->getForm();
+
+        //var_dump($request->request);
+
+        $errors = [];
+        // ---FORM 1 EDIT RANKS
         $form->handleRequest($request);
-        $errors =[];
         if ( $form->isSubmitted() && $form->isValid() ) 
         {
             $formData = $form->getData();
@@ -200,18 +250,17 @@ class GuildsController extends Controller
                     $rank = $value;
                 }
             }
-
             // CHECKING FOR ERRORS
             if ( $formData['newAccess'] !== null && $rank->getLevel() > $access )
                 $errors[] = "Sorry you can't edit higher rank then yours";
-            if ( \preg_match("([A-Za-z ]+)",$formData['newName']) == 0 )
+            if ( \preg_match("([A-Za-z ]+)",$formData['newName']) == 0 && !empty($formData['newName']) )
                 $errors[] = "Rank name must contain characters [a-zA-Z ] only";
             if ( $formData['newAccess'] !== null && $formData['newAccess'] > $access )
                 $errors[] = "Sorry you can't set higher access then yours";
             if ( $formData['newAccess'] !== null && !((int)$formData['newAccess'] <= 3 && (int)$formData['newAccess'] > 0) )
                 $errors[] = "Access must be in range from 1 to 3";
 
-
+            // NO ERRORS
             if ( empty($errors) )
             {
                 if ( !empty($formData['newName']) )
@@ -224,16 +273,112 @@ class GuildsController extends Controller
                 $em->persist($rank);
                 $em->flush();
 
-                return $this->redirectToRoute('guild_management', ['id' => $id]);
+                return $this->redirectToRoute('guild_ranks_managment', ['id' => $id]);
             }
             
 
+        }
+
+        // ---FORM 2 ADD RANK
+        $form2->handleRequest($request);
+        if ( $form2->isSubmitted() && $form2->isValid() ) 
+        {
+            $formData = $form2->getData();
+
+            // CHECKING FOR ERRORS
+            if ( (int)$formData['access'] > $access )
+                $errors[] = "Sorry you can't set higher access then yours";
+            if ( \preg_match("([A-Za-z ]+)",$formData['name']) == 0 )
+                $errors[] = "Rank name must contain characters [a-zA-Z ] only";
+            if ( !((int)$formData['access'] <= 3 && (int)$formData['access'] > 0) )
+                $errors[] = "Access must be in range from 1 to 3"; 
+
+            // NO ERRORS
+            if ( empty($errors) )
+            {
+                $data = [
+                    'guild' => $guild,
+                    'name' => $formData['name'],
+                    'level' => (int)$formData['access'],
+                ];
+
+
+                $strategy->guilds->createGuildRank($data);
+
+
+                return $this->redirectToRoute('guild_ranks_managment', ['id' => $id]);
+            }
+        }
+
+        // ---FORM 3 DELETE RANK
+        $form3->handleRequest($request);
+        if ( $form3->isSubmitted() && $form3->isValid() ) 
+        {
+            $formData = $form3->getData();
+            $rank = null;
+            foreach ($ranksTemp as $key => $value) {
+                if ( (int)$value->getId() === (int)$formData['rankId'] )
+                {
+                    $rank = $value;
+                }
+            }
+            // CHECKING FOR ERRORS
+            if ( $rank->getLevel() > $access )
+                $errors[] = "Sorry you can't delete rank with higher access";
+
+            foreach ($members as $key => $value) {
+                if ( (int)$value['rankId'] == $rank->getId() )
+                {
+                    $errors[] = "Sorry you can't delete rank in which members are";
+                    break;
+                }
+            }
+
+            // NO ERRORS
+            if ( empty($errors) )
+            {
+                $em = $this->getDoctrine()->getManager();
+                $em->remove($rank);
+                $em->flush();
+
+
+                return $this->redirectToRoute('guild_ranks_managment', ['id' => $id]);
+            }
+        }
+
+        // ---FORM 4 SET RANK
+        $form4->handleRequest($request);
+        if ( $form4->isSubmitted() && $form4->isValid() ) 
+        {
+            $formData = $form4->getData();
+            $rank = null;
+            foreach ($ranksTemp as $key => $value) {
+                if ( (int)$value->getId() === (int)$formData['rankId'] )
+                {
+                    $rank = $value;
+                }
+            }
+            // CHECKING FOR ERRORS
+            if ( $rank->getLevel() > $access )
+                $errors[] = "Sorry you can't delete rank with higher access";
+
+            // NO ERRORS
+            if ( empty($errors) )
+            {
+                $strategy->guilds->setRank($formData['member'], $formData['rankId']);
+
+
+                return $this->redirectToRoute('guild_ranks_managment', ['id' => $id]);
+            }
         }
 
 
         return $this->render('guilds/guild_ranks_managment.html.twig', [
             'guild' => $guild,
             'form' => $form->createView(),
+            'form2' => $form2->createView(),
+            'form3' => $form3->createView(),
+            'form4' => $form4->createView(),
             'errors' => $errors,
         ]);
     }

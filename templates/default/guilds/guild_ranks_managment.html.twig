@@ -10,26 +10,6 @@
     
     .highscores-wrapper { margin: 1em auto;  width: 95%; font: 18px/1.5 sans-serif; }
     .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-    tr:nth-child(even) {
-        background: #dddddd;
-    }
-    #members > th:nth-child(1) {
-        width: 20%;
-    }
-    #members > th:nth-child(2) {
-        width: 50%;
-    }
-    #members > th:nth-child(3) {
-        width: 30%;
-    }
-    td, th {
-        border: 1px solid #dddddd;
-        text-align: left;
-        padding: 8px;
-    }
-    table {
-        width: 100%;
-    }
 
     .button {
         background: #97a1a8;
@@ -58,7 +38,7 @@
         background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
         text-decoration: none;
     }
-    #form > div > label {display: block;}
+    form > div > div > label {display: block;}
 </style>
 
 <div class="example-wrapper">
@@ -68,10 +48,34 @@
     {% for error in errors %}
         <p>{{ error }}</p>
     {% endfor %}
+    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr">
+        <div>
+            <h3>Edit Ranks</h3>
+            {{ form_start(form) }}
+            {{ form_widget(form) }}
+            {{ form_end(form) }}
+        </div>
+        <div>
+            <h3>Add Rank</h3>
+            {{ form_start(form2) }}
+            {{ form_widget(form2) }}
+            {{ form_end(form2) }}
+        </div>
+        <div>
+            <h3>Delete Rank</h3>
+            {{ form_start(form3) }}
+            {{ form_widget(form3) }}
+            {{ form_end(form3) }}
+        </div>
+        <div>
+            <h3>Set Rank</h3>
+            {{ form_start(form4) }}
+            {{ form_widget(form4) }}
+            {{ form_end(form4) }}
+        </div>
+    </div>
 
-        {{ form_start(form) }}
-        {{ form_widget(form) }}
-        {{ form_end(form) }}
+        
 
     
     

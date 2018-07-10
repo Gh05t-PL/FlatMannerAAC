@@ -109,7 +109,25 @@ class GuildsStrategy12 implements IGuildsStrategy
 
     public function getGuildRanks($gId)
     {
-        
+        $ranks = $this->doctrine
+            ->getRepository(\App\Entity\TFS12\GuildRanks::class)
+        ->findBy(['guild' => $gId], ['level' => "DESC"]);
+
+        return $ranks;
+    }
+
+
+    public function createGuildRank($data)
+    {
+        $rank = new \App\Entity\TFS12\GuildRanks;
+
+        $rank->setGuild($data['guild']);
+        $rank->setLevel($data['level']);
+        $rank->setName($data['name']);
+
+        $em = $this->doctrine->getManager();
+        $em->persist($rank);
+        $em->flush();
     }
 
 
@@ -131,6 +149,24 @@ class GuildsStrategy12 implements IGuildsStrategy
         }
 
         return $loggedRankLevel;
+    }
+
+
+    public function setRank($pId,$rId)
+    {
+        $member = $this->doctrine
+            ->getRepository(\App\Entity\TFS12\GuildMembership::class)
+        ->find($pId);
+
+        $guildRank = $this->doctrine
+            ->getRepository(\App\Entity\TFS12\GuildRanks::class)
+        ->find($rId);
+
+        $member->setRank($guildRank);
+
+        $em = $this->doctrine->getManager();
+        $em->persist($member);
+        $em->flush();
     }
 
 

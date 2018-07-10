@@ -15,7 +15,11 @@ interface IGuildsStrategy {
 
     public function getGuildRanks($gId);
 
+    public function createGuildRank($data);
+
     public function getAccountGuildRank($aId, $members);
+
+    public function setRank($pId,$rId);
 
     //public function getPlayerGuildRank($pId, $members);
 
