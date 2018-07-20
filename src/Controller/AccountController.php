@@ -281,6 +281,53 @@ class AccountController extends Controller
     }
 
 
+
+    /**
+     * @Route("/account/delete/character/{playerId}", name="account_delete_character", requirements={"playerId"="\d+"})
+     */
+    public function deleteCharacter(int $playerId, Request $request, SessionInterface $session)
+    {
+        $strategy = new StrategyClient($this->getDoctrine());
+
+        $error = [];
+        if ( $session->get('account_id') == NULL )
+        {
+            $error[] = "You are not logged in";
+            return $this->redirectToRoute('guild_management', ['id' => $id]);
+        }
+
+
+        $player = $strategy->players->getPlayerBy(['id' => $playerId]);
+
+        if ( $player->getAccount()->getId() != $session->get('account_id') )
+        {
+            $error[] = "Account do not match to character";
+            return $this->redirectToRoute('guild_management', ['id' => $id]);
+        }
+
+        if ( empty($errors) ) 
+        {
+            $em = $this->getDoctrine()->getManager();
+            $em->remove($player);
+            $em->flush();
+
+
+            //LOG ACTION
+            $action = $this->getDoctrine()->getRepository(\App\Entity\FmaacLogsActions::class)->find(4); // action 4 = delete char
+            $log = new \App\Entity\FmaacLogs();
+            $log->setAction($action)
+                ->setDatetime(new \DateTime())
+            ->setIp($_SERVER['REMOTE_ADDR']);
+
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($log);
+            $em->flush();
+
+            return $this->redirectToRoute('account');
+        }
+    }
+
+
     /**
      * @Route("/account/create/guild", name="account_create_guild")
      */

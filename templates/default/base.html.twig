@@ -4,12 +4,13 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
 
         <!-- highlight.js library -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"></script>
         <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/vs2015.min.css">
-        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-
+        <script>hljs.initHighlightingOnLoad();</script>
+        
+        
         <!-- Font Awesome -->
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
-
 
         <!-- Main Quill library -->
         <script src="//cdn.quilljs.com/1.3.6/quill.js"></script>
@@ -18,11 +19,19 @@
         <!-- Theme included stylesheets -->
         <link href="//cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
         <link href="//cdn.quilljs.com/1.3.6/quill.bubble.css" rel="stylesheet">
+
         <!-- Main JQUERY library -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="/js/jquery.tablesorter.min.js"></script>
+
         <!-- FONTS -->
         <link href="https://fonts.googleapis.com/css?family=Cinzel+Decorative|Open+Sans" rel="stylesheet">
+
+        <!-- COOKIES -->
+        <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.3.0/highlightjs-line-numbers.min.js"></script>
+
+
         <meta charset="UTF-8">
         <title>{{ otsName }} - {% block title %}{% endblock %}</title>
         {% block stylesheets %}{% endblock %}
@@ -459,7 +468,7 @@
             </div>
         </div>
 
-
+        <!-- JAVASCRIPT -->
         {% block javascripts %}
         <script>
             

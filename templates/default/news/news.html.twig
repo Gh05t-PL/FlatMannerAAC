@@ -5,7 +5,7 @@
 {% block content %}
 <style>
     .example-wrapper { margin: 1em auto;  width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+    
 
 
     a.page {
@@ -79,109 +79,112 @@
     </div>
     {% endif %}
 </div>
+{% endblock %}
+
+{% block javascripts %}
 <script>
 
-        var percent = document.getElementById("range");
-        var pages = document.getElementsByClassName("page");
-        {# var newsCount = {{ pagesCount }}; #}
-        var newsPageCount =  {{ pagesCount }};
-        var currentPage =  {{ page }};
-        var pageCount = Math.ceil(newsPageCount/7);
-    
-        percent.oninput= function(){
-            if (pageCount == 1)
-                percent.max = 1;
-            else{
-    
-                percent.max = newsPageCount - 6;
-                for (let i = 0; i < pages.length; i++) {
-    
-                    pages[i].innerHTML = Number(percent.value)+i;
-                    pages[i].href = "/news"+`/${(Number(percent.value)+i).toString()}`;
-                    pages[i].style.display = "block";
-    
-    
-                }
-                for (let i = 0; i < pages.length; i++) {
-                    pages[i].className = "page"
-                    if (Number(pages[i].innerHTML) == currentPage)
-                        pages[i].className = "page active"
-                }
-    
-            }
+var percent = document.getElementById("range");
+var pages = document.getElementsByClassName("page");
+{# var newsCount = {{ pagesCount }}; #}
+var newsPageCount =  {{ pagesCount }};
+var currentPage =  {{ page }};
+var pageCount = Math.ceil(newsPageCount/7);
+
+percent.oninput= function(){
+    if (pageCount == 1)
+        percent.max = 1;
+    else{
+
+        percent.max = newsPageCount - 6;
+        for (let i = 0; i < pages.length; i++) {
+
+            pages[i].innerHTML = Number(percent.value)+i;
+            pages[i].href = "/news"+`/${(Number(percent.value)+i).toString()}`;
+            pages[i].style.display = "block";
+
+
         }
-        document.addEventListener("DOMContentLoaded", function() {
-            if (pageCount == 1)
-                percent.max = 1;
-    
-            else{
-                percent.max = newsPageCount - 6;
-                var value = currentPage - 3;
-                percent.value = value;
-                for (let i = 0; i < pages.length; i++) {
-                    pages[i].innerHTML = Number(percent.value)+i
-                    pages[i].href = "/news"+`/${(Number(percent.value)+i).toString()}`;
-                    pages[i].className = "page"
-                    if (Number(pages[i].innerHTML) == currentPage)
-                        pages[i].className = "page active"
-                }
-            }
-    
-        })
-    
+        for (let i = 0; i < pages.length; i++) {
+            pages[i].className = "page"
+            if (Number(pages[i].innerHTML) == currentPage)
+                pages[i].className = "page active"
+        }
 
-        hljs.configure({   // optionally configure hljs
-          languages: ['javascript', 'php', 'html', 'twig']
-        });
+    }
+}
+document.addEventListener("DOMContentLoaded", function() {
+    if (pageCount == 1)
+        percent.max = 1;
 
-        var toolbarOptions = [
-          ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-          ['blockquote', 'code-block', 'image'],
+    else{
+        percent.max = newsPageCount - 6;
+        var value = currentPage - 3;
+        percent.value = value;
+        for (let i = 0; i < pages.length; i++) {
+            pages[i].innerHTML = Number(percent.value)+i
+            pages[i].href = "/news"+`/${(Number(percent.value)+i).toString()}`;
+            pages[i].className = "page"
+            if (Number(pages[i].innerHTML) == currentPage)
+                pages[i].className = "page active"
+        }
+    }
 
-          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-          [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
-          [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
-          [{ 'direction': 'rtl' }],                         // text direction
-
-          [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+})
 
 
-          [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
-          [{ 'font': [] }],
-          [{ 'align': [] }],
+hljs.configure({   // optionally configure hljs
+    languages: ['javascript', 'php', 'html', 'twig']
+});
 
-          ['clean']                                         // remove formatting button
-        ];
+var toolbarOptions = [
+    ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+    ['blockquote', 'code-block', 'image'],
 
-            var options = {
-          debug: 'info',
-          modules: {
-            toolbar: toolbarOptions,
-            syntax: true
-          },
-          placeholder: 'Compose an epic...',
-          readOnly: false,
-          theme: 'snow'
-        };
+    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+    [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+    [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+    [{ 'direction': 'rtl' }],                         // text direction
 
-        var reader = {
-          modules: {
-            syntax: true,
-            toolbar: false
-          },
-          readOnly: true,
-          theme: 'bubble'
-        };
+    [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
 
 
-            if (document.getElementById("editor"))
-                var editor = new Quill('#editor',options);
+    [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+    [{ 'font': [] }],
+    [{ 'align': [] }],
 
-            if (document.getElementsByClassName("ql-editor ns text")){
-                for (let index = 0; index < document.getElementsByClassName("ql-editor ns").length; index++) {
-                    new Quill(document.getElementsByClassName("ql-editor ns")[index],reader);
+    ['clean']                                         // remove formatting button
+];
 
-                }
-            }
-        </script>
-{% endblock %}
+    var options = {
+    debug: 'info',
+    modules: {
+    toolbar: toolbarOptions,
+    syntax: true
+    },
+    placeholder: 'Compose an epic...',
+    readOnly: false,
+    theme: 'snow'
+};
+
+var reader = {
+    modules: {
+    syntax: true,
+    toolbar: false
+    },
+    readOnly: true,
+    theme: 'bubble'
+};
+
+
+    if (document.getElementById("editor"))
+        var editor = new Quill('#editor',options);
+
+    if (document.getElementsByClassName("ql-editor ns text")){
+        for (let index = 0; index < document.getElementsByClassName("ql-editor ns").length; index++) {
+            new Quill(document.getElementsByClassName("ql-editor ns")[index],reader);
+
+        }
+    }
+</script>
+{% endblock javascripts %}

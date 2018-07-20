@@ -5,7 +5,7 @@
 {% block content %}
 <style>
     .example-wrapper { margin: 1em auto; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+    
     tr:nth-child(even) {
         background: #dddddd;
     }
@@ -27,6 +27,14 @@
     }
     table {
         width: 100%;
+    }
+    .shopping-cart {
+        position: fixed;
+        bottom: 5px;
+        height: 40px;
+        left: 10px;
+        width: 40px;
+        background: whitesmoke;
     }
 </style>
 
@@ -50,13 +58,20 @@
     </table>
 </div>
 <!-- <div style="height: 40px; width: 40px; background: yellow; position: fixed; bottom: 0px; left:0px;"><i class="fas fa-shopping-cart" style="width: 100%; height: 100%;"></i></div> -->
-
+<div class="shopping-cart"><i class="fas fa-shopping-cart"></i>
+    <div class="items">
+        <div class="item"></div>
+        <div class="item"></div>
+        <div class="item"></div>
+        <div class="item"></div>
+    </div>
+</div>
 {% endblock %}
 
 {% block javascripts %}
 <script>
 
-    function setCookie(cname, cvalue, exh) {
+    {# function setCookie(cname, cvalue, exh) {
         var d = new Date();
         d.setTime(d.getTime() + (exh * 60 * 60 * 1000));
         var expires = "expires="+d.toUTCString();
@@ -76,9 +91,66 @@
             }
         }
         return "";
+    } #}
+
+    class Item
+    {
+        constructor(id, amount)
+        {
+            this.id = id
+            this.amount = amount
+        }
     }
 
-    setCookie("basket",'{"basket": [{"itemid": 1255},{"itemid": 7574},{"itemid": 3842},{"itemid": 1125}]}',2)
+    class Basket
+    {
+        constructor(options = {
+            max: 15
+        })
+        {
+            if ( Cookies.get('basket') !== undefined )
+            {
+                var saved = JSON.parse(Cookies.get('basket'))
+                this.container = saved.container
+                this.options = saved.options
+            }
+
+            else
+            {
+                this.options = options
+                this.container = {};
+            }
+        }
+
+        add(item)
+        {
+            if ( Object.keys(this.container).length >= this.options.max )
+                return false
+            this.container[item.id] = item
+            this.save()
+            return true
+        }
+
+        remove(id)
+        {
+            delete this.container[id]
+            this.save()
+        }
+
+        save()
+        {
+            Cookies.set('basket', JSON.stringify(this))
+        }
+    }
+
+    basket = new Basket({max: 3})
+    basket.add(new Item(2160,100))
+    basket.add(new Item(1245,100))
+    basket.add(new Item(6899,100))
+    basket.add(new Item(7415,100))
+    basket.add(new Item(3345,100))
+
+    {# setCookie("basket",'{"basket": [{"itemid": 1255},{"itemid": 7574},{"itemid": 3842},{"itemid": 1125}]}',2)
     console.log(JSON.parse(getCookie('basket')))
 
     function sendPOSTXHR(path){
@@ -99,7 +171,7 @@
         }
         xhr.send("foo=bar&lorem=ipsum"); 
     }
-    sendPOSTXHR("/account/login")
+    sendPOSTXHR("/account/login") #}
         
     
 </script>

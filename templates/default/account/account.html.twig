@@ -13,7 +13,7 @@
         grid-template-columns: 50% 50%;
         grid-gap: 30px;
         }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+    
 
         tr:nth-child(even) {
         background: #dddddd;
@@ -60,8 +60,9 @@
                 <th style="text-align: center;">Vocation</th>
             </tr>
         {% for character in accountChars %}
-            <tr>
-                <td><a href="/player/{{ character.name }}">{{ character.name }}</a></td>
+        <!-- ciecie -->
+            <tr> 
+                <td><a href="/player/{{ character.name }}">{{ character.name }}</a><a style="margin: 0;float: right;text-decoration:none;color:red;cursor:pointer;" onclick="openModal('/account/delete/character/{{ character.id }}', 'Are you sure you want to delete {{ character.name }} character?', ['No', 'Yes'])"><i class="fas fa-times"></i></a></td>
                 <td style="text-align: center;">{{ character.level }}</td>
                 <td style="text-align: center;">{{ vocations[character.vocation] }}</td>
             </tr>

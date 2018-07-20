@@ -175,6 +175,98 @@ class AdminPanelController extends Controller
         return $this->redirectToRoute('news', [], 301);
     }
 
+    /**
+     * @Route("/admin/edit/player/{name}", name="adminPanel_edit_player")
+     */
+    public function editCharacter($name = "", SessionInterface $session, Request $request)
+    {
+        $strategy = new StrategyClient($this->getDoctrine());
+
+        if ( !empty($request->request->all()) )
+        {
+            if ($session->get('account_id') === NULL)
+            {
+                return new Response("{ \"error\":\"You must be logged in\" }");
+            }
+
+
+            $account = $strategy->accounts->getAccountById($session->get('account_id'));
+
+            // var_dump(7 < 7);
+            if ($account->getGroupId() < 7)
+            {
+                return new Response("{ \"error\":\"You are not admin\" }");
+            }
+                
+/**
+ * POST REQUESTS
+ * 
+ * cap
+ * health
+ * healthmax
+ * mana
+ * manamax
+ * level
+ * maglevel
+ * soul
+ * vocation
+ * 
+ */
+            $player = $strategy->players->getPlayerBy(['name' => $name]);
+
+            if ( $request->request->get('cap') !== NULL && $player->getCap() !== (int)$request->request->get('cap') )
+                $player->setCap((int)$request->request->get('cap'));
+
+            if ( $request->request->get('health') !== NULL && $player->getHealth() !== (int)$request->request->get('health') )
+                $player->setHealth((int)$request->request->get('health'));
+
+            if ( $request->request->get('healthmax') !== NULL && $player->getHealthmax() !== (int)$request->request->get('healthmax') )
+                $player->setHealthmax((int)$request->request->get('healthmax'));
+
+            if ( $request->request->get('level') !== NULL && $player->getLevel() !== (int)$request->request->get('level') )
+                $player->setLevel((int)$request->request->get('level'));
+
+            if ( $request->request->get('maglevel') !== NULL && $player->getMaglevel() !== (int)$request->request->get('maglevel') )
+                $player->setMaglevel((int)$request->request->get('maglevel'));
+
+            if ( $request->request->get('mana') !== NULL && $player->getmana() !== (int)$request->request->get('mana') )
+                $player->setmana((int)$request->request->get('mana'));
+
+            if ( $request->request->get('manamax') !== NULL && $player->getManamax() !== (int)$request->request->get('manamax') )
+                $player->setManamax((int)$request->request->get('manamax'));
+
+            if ( $request->request->get('soul') !== NULL && $player->getSoul() !== (int)$request->request->get('soul') )
+                $player->setSoul((int)$request->request->get('soul'));
+
+            if ( $request->request->get('vocation') !== NULL && $player->getVocation() !== (int)$request->request->get('vocation') )
+                $player->setVocation((int)$request->request->get('vocation'));
+
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($player);
+            $em->flush();
+            return new Response('{ "done":true }');
+        }
+        
+
+        // NOT LOGGED IN REDIR
+        if ($session->get('account_id') === NULL)
+            return $this->redirectToRoute('account_login', [], 301);
+
+        $account = $strategy->accounts->getAccountById($session->get('account_id'));
+
+        // CHECK IF ACCOUNT HAVE ADMIN PRIVILEGES
+        if ($account->getGroupId() < 7)
+            return $this->redirectToRoute('account', [], 301);
+
+        $player = $strategy->players->getPlayerBy(['name' => $name]);
+            
+
+        return $this->render('admin_panel/edit_player.html.twig', [
+            'controller_name' => 'PlayersController',
+            'player' => @$player,
+        ]);
+    }
+
 
     /**
      * @Route("/admin", name="adminPanel")

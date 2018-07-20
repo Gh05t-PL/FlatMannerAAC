@@ -1,0 +1,144 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin Panel - Edit Player{% endblock %}
+
+{% block content %}
+<style>
+    .example-wrapper { 
+        margin: 1em auto;
+        width: 95%;
+        font: 18px/1.5 sans-serif;
+    }
+    tr:nth-child(even) {
+        background: #dddddd;
+    }
+    th:nth-child(1) {
+        width: 10%;
+    }
+    th:nth-child(2) {
+        width: 60%;
+    }
+    th:nth-child(3) {
+        width: 20%;
+    }
+    td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+    table {
+        width: 100%;
+    }
+</style>
+<div class="example-wrapper">
+    {% if player %}
+    <div class="info">
+        <p class="label">Character Info</p>
+        <table>
+            <tr>
+                <td style="width: 53%;">Name:</td>
+                <td><strong>{{ (player.isOnline ? ("<span style='color: green;'>#{player.name}</span>"): player.name)|raw }}</strong></td>
+            </tr>
+            <tr>
+                <td>Sex:</td>
+                <td>Male</td>
+                {# <td>{{ player.name }}</td> #}
+            </tr>
+            <tr>
+                <td>Profession:</td>
+                <td>
+                    <select name="vocation" id="vocation-input">
+                    {% for key, vocation in vocations %}
+                        {% if player.vocation == key %}
+                            <option value="{{ key }}" selected>{{ vocation }}*</option>
+                        {% else %}
+                            <option value="{{ key }}">{{ vocation }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                    
+                </td>
+                {# <td>{{ player.name }}</td> #}
+            </tr>
+            <tr>
+                <td>Level:</td>
+                <td><input type="text" name="level" id="level-input" value="{{ player.level }}"></td>
+            </tr>
+            <tr>
+                <td>Magic Level:</td>
+                <td><input type="text" name="maglevel" id="maglevel-input" value="{{ player.maglevel }}"></td>
+            </tr>
+            <tr>
+                <td>Max Health:</td>
+                <td><input type="text" name="health" id="health-input" value="{{ player.health }}"> / <input type="text" name="healthmax" id="healthmax-input" value="{{ player.healthmax }}"></td>
+            </tr>
+            <tr>
+                <td>Max Mana:</td>
+                <td><input type="text" name="mana" id="mana-input" value="{{ player.mana }}"> / <input type="text" name="manamax" id="manamax-input" value="{{ player.manamax }}"></td>
+            </tr>
+            <tr>
+                <td>Capacity:</td>
+                <td><input type="text" name="cap" id="cap-input" value="{{ player.cap }}"></td>
+            </tr>
+            <tr>
+                <td>Soul Points:</td>
+                <td><input type="text" name="soul" id="soul-input" value="{{ player.soul }}"></td>
+            </tr>
+        </table>
+
+        <button onclick="sendPlayer()">Submit</button>
+    </div>
+
+<p style="display: inline-block">Find Player: </p>
+<input type="search" name="search" id="search" onkeypress="enterSearch(event)">
+<input type="button" value="Search" onclick="search()">
+{% else %} 
+<p>Player not found.</p>
+<p style="display: inline-block">Find Player: </p>
+<input type="search" name="search" id="search" onkeypress="enterSearch(event)">
+<input type="button" value="Search" onclick="search()">
+{% endif %}
+</div>
+
+{% block javascripts %}
+<script>
+function search(){
+    if (document.querySelector("#search").value != "")
+        window.location.replace("/admin/edit/player/"+document.querySelector("#search").value)
+    }
+    function enterSearch(event){
+    if (event.keyCode == 13){
+        window.location.replace("/admin/edit/player/"+document.querySelector("#search").value)
+    }
+}
+
+function sendPlayer()
+{
+    list = document.querySelectorAll("td > input[name], td > select[name]")
+    data = {}
+    list.forEach(function (item,index){data[item.name] = item.value})
+    console.log(data)
+    $.ajax({
+        type: "POST",
+        url: "",
+        data: data,
+        success: function(response){
+            response = JSON.parse(response)
+            if ( response.done === true )
+            {
+                alert("Player saved");
+                location.reload();
+            }
+            else
+            {
+                alert(response.error)
+            }
+        } 
+    })
+}
+
+
+
+</script>
+{% endblock %}
+{% endblock %}

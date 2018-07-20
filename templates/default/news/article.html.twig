@@ -5,7 +5,6 @@
 {% block content %}
 <style>
     .example-wrapper { margin: 1em auto;  width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
 
 
     a.page {
@@ -44,88 +43,67 @@
                 <h2 class="title"><a href="/article/{{ article.id }}">{{ article.title }}</a></h2>
             {% endif %}
             <p class="info">By <a href="/player/{{ article.author }}">{{ article.author }}</a> on {{ article.datetime|date("d.m.Y H:i:s") }}</p>
-            <div class="ql-editor ns text">{{ article.text|raw }}</div>
+            <div class="ql-editor ns text">{{ article.text|raw }}</div> 
         </div>
     </div>
     <hr>
 </div>
+
+
 <script> 
-{# function a(formm){
-    var xhr = new XMLHttpRequest();
-    var formdata = new FormData (formm);
-
-    for (var element of formm.parentElement.getElementsByTagName("div")){
-        if (element.getAttribute("form") == formm.id){
-            alert(element.getAttribute("name")+", "+element.innerHTML);
-            formdata.set(element.getAttribute("name"), element.innerHTML);
-        }
-
-    }
-
-    if(formm.parentElement.querySelector("#editor")){
-    formdata.set("text", formm.parentElement.querySelector("#editor").firstChild.innerHTML);
-    }
-        xhr.onload = function(){ alert (xhr.responseText); }
-        xhr.open (formm.method, formm.action, true);
-
-        xhr.send (formdata);
-        return false;
-} #}
+    hljs.configure({   // optionally configure hljs
+        languages: ['javascript', 'php', 'html', 'twig']
+    });
 
 
+    var toolbarOptions = [
+        ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+        ['blockquote', 'code-block', 'image'],
 
-        hljs.configure({   // optionally configure hljs
-          languages: ['javascript', 'php', 'html', 'twig']
-        });
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+        [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+        [{ 'direction': 'rtl' }],                         // text direction
 
-        var toolbarOptions = [
-          ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-          ['blockquote', 'code-block', 'image'],
-
-          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-          [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
-          [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
-          [{ 'direction': 'rtl' }],                         // text direction
-
-          [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+        [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
 
 
-          [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
-          [{ 'font': [] }],
-          [{ 'align': [] }],
+        [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+        [{ 'font': [] }],
+        [{ 'align': [] }],
 
-          ['clean']                                         // remove formatting button
-        ];
+        ['clean']                                         // remove formatting button
+    ];
 
-            var options = {
-          debug: 'info',
-          modules: {
+    var options = {
+        debug: 'info',
+        modules: {
             toolbar: toolbarOptions,
             syntax: true
-          },
-          placeholder: 'Compose an epic...',
-          readOnly: false,
-          theme: 'snow'
+        },
+            placeholder: 'Compose an epic...',
+            readOnly: false,
+            theme: 'snow'
         };
 
         var reader = {
-          modules: {
+        modules: {
             syntax: true,
             toolbar: false
-          },
-          readOnly: true,
-          theme: 'bubble'
-        };
+        },
+            readOnly: true,
+            theme: 'bubble'
+    };
 
 
-            if (document.getElementById("editor"))
-                var editor = new Quill('#editor',options);
+        if (document.getElementById("editor"))
+            var editor = new Quill('#editor',options);
 
-            if (document.getElementsByClassName("ql-editor ns text")){
-                for (let index = 0; index < document.getElementsByClassName("ql-editor ns").length; index++) {
-                    new Quill(document.getElementsByClassName("ql-editor ns")[index],reader);
+        if (document.getElementsByClassName("ql-editor ns text")){
+            for (let index = 0; index < document.getElementsByClassName("ql-editor ns").length; index++) {
+                new Quill(document.getElementsByClassName("ql-editor ns")[index],reader);
 
-                }
             }
+        }
         </script>
 {% endblock %}
