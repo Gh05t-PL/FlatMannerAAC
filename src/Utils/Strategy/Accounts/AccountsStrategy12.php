@@ -1,8 +1,10 @@
 <?php
+
 namespace App\Utils\Strategy\Accounts;
 
 
 use Doctrine\ORM\Query\ResultSetMapping;
+
 class AccountsStrategy12 implements IAccountsStrategy
 {
 
@@ -14,30 +16,33 @@ class AccountsStrategy12 implements IAccountsStrategy
     }
 
 
-    public function getAccountById($id){
+    public function getAccountById($id)
+    {
         $account = $this->doctrine
             ->getRepository(\App\Entity\TFS12\Accounts::class)
-        ->find($id);
+            ->find($id);
 
         return $account;
     }
 
 
-    public function getAccountChars($id){
+    public function getAccountChars($id)
+    {
         $chars = $this->doctrine
             ->getRepository(\App\Entity\TFS12\Players::class)
-        ->findBy(['account' => $id]);
+            ->findBy(['account' => $id]);
 
         return $chars;
     }
 
 
-    public function getAccountBy($criteria){
+    public function getAccountBy($criteria)
+    {
         if ( isset($criteria['password']) )
             $criteria['password'] = sha1($criteria['password']);
         $account = $this->doctrine
             ->getRepository(\App\Entity\TFS12\Accounts::class)
-        ->findOneBy($criteria);
+            ->findOneBy($criteria);
 
         return $account;
     }
@@ -48,12 +53,13 @@ class AccountsStrategy12 implements IAccountsStrategy
         $charsTemp = $this->doctrine->getRepository(\App\Entity\TFS12\Players::class)->findBy(['account' => $accId]);
         $chars = [];
 
-        foreach ($charsTemp as $key => $value) {
+        foreach ($charsTemp as $key => $value)
+        {
             if ( $this->doctrine
                     ->getRepository(\App\Entity\TFS12\GuildMembership::class)
-                ->findBy(['player' => $value->getId()]) == NULL 
-                )
-            $chars[$value->getName()] = $value->getId();
+                    ->findBy(['player' => $value->getId()]) == null
+            )
+                $chars[$value->getName()] = $value->getId();
         }
         $charsTemp = null;
         return $chars;
@@ -64,7 +70,7 @@ class AccountsStrategy12 implements IAccountsStrategy
     {
         $account = $this->doctrine
             ->getRepository(\App\Entity\TFS12\Accounts::class)
-        ->find($accId);
+            ->find($accId);
 
         if ( !empty($changes['password']) )
             $account->setPassword(sha1($changes['password']));
@@ -98,8 +104,9 @@ class AccountsStrategy12 implements IAccountsStrategy
         $player->setPosy($cfg['citiesPos'][$formData['city']]['y']);
         $player->setPosz($cfg['citiesPos'][$formData['city']]['z']);
 
-        function expToLevel($level){
-            return ((50 * ($level - 1)**3 - 150 * ($level - 1)**2 + 400 * ($level - 1)) / 3);
+        function expToLevel($level)
+        {
+            return ((50 * ($level - 1) ** 3 - 150 * ($level - 1) ** 2 + 400 * ($level - 1)) / 3);
         }
 
         $player->setExperience(expToLevel($cfg['startStats']['level']));
@@ -111,7 +118,7 @@ class AccountsStrategy12 implements IAccountsStrategy
             ->setSkillAxe($cfg['startStats']['skill'])
             ->setSkillDist($cfg['startStats']['skill'])
             ->setSkillShielding($cfg['startStats']['skill'])
-        ->setSkillFishing($cfg['startStats']['skill']);
+            ->setSkillFishing($cfg['startStats']['skill']);
 
         $em = $this->doctrine->getManager();
         $em->persist($player);
@@ -124,7 +131,7 @@ class AccountsStrategy12 implements IAccountsStrategy
         $conn->insert('today_exp', [
             'id' => null,
             'exp' => expToLevel($cfg['startStats']['level']),
-            'player_id' => $player->getId()
+            'player_id' => $player->getId(),
         ]);
     }
 
@@ -142,17 +149,15 @@ class AccountsStrategy12 implements IAccountsStrategy
     }
 
 
-
-
-    
     /**
      * CHECKERS
      */
-    public function isPlayerName($name){
-        if ( $this->doctrine->getRepository(\App\Entity\TFS12\Players::class)->findOneBy(['name' => $name]) !== NULL )
+    public function isPlayerName($name)
+    {
+        if ( $this->doctrine->getRepository(\App\Entity\TFS12\Players::class)->findOneBy(['name' => $name]) !== null )
             return true;
-        
+
         return false;
     }
-    
+
 }

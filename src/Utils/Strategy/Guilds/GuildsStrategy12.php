@@ -1,8 +1,10 @@
 <?php
+
 namespace App\Utils\Strategy\Guilds;
 
 
 use Doctrine\ORM\Query\ResultSetMapping;
+
 class GuildsStrategy12 implements IGuildsStrategy
 {
 
@@ -18,15 +20,16 @@ class GuildsStrategy12 implements IGuildsStrategy
     {
         $guilds = $this->doctrine
             ->getRepository(\App\Entity\TFS12\Guilds::class)
-        ->findBy(
-            [],
-            ['name' => 'ASC']
-        );
+            ->findBy(
+                [],
+                ['name' => 'ASC']
+            );
 
-        foreach ($guilds as $key => $value) {
+        foreach ($guilds as $key => $value)
+        {
             $value->members = count($this->doctrine
                 ->getRepository(\App\Entity\TFS12\GuildMembership::class)
-            ->findBy(['guild' => $value->getId()]));
+                ->findBy(['guild' => $value->getId()]));
         }
 
         return $guilds;
@@ -37,7 +40,7 @@ class GuildsStrategy12 implements IGuildsStrategy
     {
         $guild = $this->doctrine
             ->getRepository(\App\Entity\TFS12\Guilds::class)
-        ->find($id);
+            ->find($id);
 
         return $guild;
     }
@@ -47,7 +50,7 @@ class GuildsStrategy12 implements IGuildsStrategy
     {
         $guild = $this->doctrine
             ->getRepository(\App\Entity\TFS12\Guilds::class)
-        ->findOneBy($criteria);
+            ->findOneBy($criteria);
 
         return $guild;
     }
@@ -63,7 +66,7 @@ class GuildsStrategy12 implements IGuildsStrategy
 
         $query = $this->doctrine
             ->getManager()
-        ->createQuery("SELECT m, p, r FROM App\Entity\TFS12\GuildMembership m JOIN m.player p JOIN m.rank r WHERE m.guild = {$id} ORDER BY r.level DESC, p.level DESC");
+            ->createQuery("SELECT m, p, r FROM App\Entity\TFS12\GuildMembership m JOIN m.player p JOIN m.rank r WHERE m.guild = {$id} ORDER BY r.level DESC, p.level DESC");
 
 
         $membersTemp = $query->getResult();
@@ -71,7 +74,8 @@ class GuildsStrategy12 implements IGuildsStrategy
         $members = [];
 
         // fetch data to 0.4 format
-        foreach ($membersTemp as $key => $value) {
+        foreach ($membersTemp as $key => $value)
+        {
             $members[] = [
                 'rankName' => $value->getRank()->getName(),
                 'rankLevel' => $value->getRank()->getLevel(),
@@ -101,7 +105,7 @@ class GuildsStrategy12 implements IGuildsStrategy
 
         $invitations = $this->doctrine->getManager()
             ->createNativeQuery("SELECT id, name as nick, level, vocation, account_id FROM players t1 INNER JOIN (SELECT * FROM guild_invites WHERE guild_id = {$id} ) t2 ON t1.id = t2.player_id ORDER BY level DESC", $rsm)
-        ->getArrayResult();
+            ->getArrayResult();
 
         return $invitations;
     }
@@ -111,7 +115,7 @@ class GuildsStrategy12 implements IGuildsStrategy
     {
         $ranks = $this->doctrine
             ->getRepository(\App\Entity\TFS12\GuildRanks::class)
-        ->findBy(['guild' => $gId], ['level' => "DESC"]);
+            ->findBy(['guild' => $gId], ['level' => "DESC"]);
 
         return $ranks;
     }
@@ -143,7 +147,8 @@ class GuildsStrategy12 implements IGuildsStrategy
         return $loggedRankLevel;*/
 
         $loggedRankLevel = 0;
-        foreach ($members as $value) {
+        foreach ($members as $value)
+        {
             if ( $value['accountId'] == $aId && $value['rankLevel'] > $loggedRankLevel )
                 $loggedRankLevel = $value['rankLevel'];
         }
@@ -152,15 +157,15 @@ class GuildsStrategy12 implements IGuildsStrategy
     }
 
 
-    public function setRank($pId,$rId)
+    public function setRank($pId, $rId)
     {
         $member = $this->doctrine
             ->getRepository(\App\Entity\TFS12\GuildMembership::class)
-        ->find($pId);
+            ->find($pId);
 
         $guildRank = $this->doctrine
             ->getRepository(\App\Entity\TFS12\GuildRanks::class)
-        ->find($rId);
+            ->find($rId);
 
         $member->setRank($guildRank);
 
@@ -170,16 +175,13 @@ class GuildsStrategy12 implements IGuildsStrategy
     }
 
 
-
-
-
-    public function createGuild($formData)
+    public function createGuild(string $name, int $leader)
     {
         $guild = new \App\Entity\TFS12\Guilds();
 
-        $guild->setName($formData['name']);
-        
-        $guild->setOwnerid($this->doctrine->getRepository(\App\Entity\TFS12\Players::class)->findOneBy( ['id' => $formData['leader']] ));
+        $guild->setName($name);
+
+        $guild->setOwnerid($this->doctrine->getRepository(\App\Entity\TFS12\Players::class)->findOneBy(['id' => $leader]));
         $guild->setCreationdata(time());
         $guild->setMotd("Please edit motd in leader action panel");
         //SELECT id FROM `guild_ranks` WHERE guild_id = 4 and level = 3
@@ -195,16 +197,16 @@ class GuildsStrategy12 implements IGuildsStrategy
 
         $leaderRank = $this->doctrine->getManager()
             ->createNativeQuery("SELECT id FROM `guild_ranks` WHERE guild_id = {$guild->getId()} and level = 3", $rsm)
-        ->getSingleScalarResult();
+            ->getSingleScalarResult();
 
-        $player = $this->doctrine->getRepository(\App\Entity\TFS12\Players::class)->find($formData['leader']);
-        
+        $player = $this->doctrine->getRepository(\App\Entity\TFS12\Players::class)->find($leader);
+
 
         $guildMember = new \App\Entity\TFS12\GuildMembership();
         $guildRank = $this->doctrine->getRepository(\App\Entity\TFS12\GuildRanks::class)->findOneBy(['guild' => $guild, 'level' => 3]);
         $guildMember->setGuild($guild)
             ->setPlayer($player)
-        ->setRank($guildRank);
+            ->setRank($guildRank);
 
         $em->persist($guildMember);
         $em->flush();
@@ -217,7 +219,7 @@ class GuildsStrategy12 implements IGuildsStrategy
     {
         $guild = $this->doctrine
             ->getRepository(\App\Entity\TFS12\Guilds::class)
-        ->find($id);
+            ->find($id);
 
         $em = $this->doctrine->getManager();
         $em->remove($guild);
@@ -229,49 +231,48 @@ class GuildsStrategy12 implements IGuildsStrategy
     {
         $guildMember = $this->doctrine
             ->getRepository(\App\Entity\TFS12\GuildMembership::class)
-        ->findOneBy(['player' => $data['playerId']]);
+            ->findOneBy(['player' => $data['playerId']]);
 
-        if ( $guildMember !== NULL )
+        if ( $guildMember !== null )
         {
             $player = $this->doctrine
                 ->getRepository(\App\Entity\TFS12\Players::class)
-            ->find($data['playerId']);
+                ->find($data['playerId']);
 
             $guild = $this->doctrine
                 ->getRepository(\App\Entity\TFS12\Guilds::class)
-            ->find($data['guildId']);
+                ->find($data['guildId']);
 
             $guildRank = $this->doctrine
                 ->getRepository(\App\Entity\TFS12\GuildRanks::class)
-            ->findOneBy(['guild' => $guild, 'level' => 1]);
+                ->findOneBy(['guild' => $guild, 'level' => 1]);
 
             $guildMember->setGuild($guild)
                 ->setPlayer($player)
-            ->setRank($guildRank);
+                ->setRank($guildRank);
 
             $em = $this->doctrine->getManager();
             $em->persist($guildMember);
             $em->flush();
-        }
-        else
+        } else
         {
             $player = $this->doctrine
                 ->getRepository(\App\Entity\TFS12\Players::class)
-            ->find($data['playerId']);
+                ->find($data['playerId']);
 
             $guild = $this->doctrine
                 ->getRepository(\App\Entity\TFS12\Guilds::class)
-            ->find($data['guildId']);
+                ->find($data['guildId']);
 
             $guildMember = new \App\Entity\TFS12\GuildMembership();
 
             $guildRank = $this->doctrine
                 ->getRepository(\App\Entity\TFS12\GuildRanks::class)
-            ->findOneBy(['guild' => $guild, 'level' => 1]);
+                ->findOneBy(['guild' => $guild, 'level' => 1]);
 
             $guildMember->setGuild($guild)
                 ->setPlayer($player)
-            ->setRank($guildRank);
+                ->setRank($guildRank);
 
             $em = $this->doctrine->getManager();
             $em->persist($guildMember);
@@ -286,7 +287,7 @@ class GuildsStrategy12 implements IGuildsStrategy
     {
         $guildMember = $this->doctrine
             ->getRepository(\App\Entity\TFS12\GuildMembership::class)
-        ->findOneBy(['player' => $pId]);
+            ->findOneBy(['player' => $pId]);
 
         $em = $this->doctrine->getManager();
         $em->remove($guildMember);
@@ -298,12 +299,12 @@ class GuildsStrategy12 implements IGuildsStrategy
     {
         $guildMember = $this->doctrine
             ->getRepository(\App\Entity\TFS12\GuildMembership::class)
-        ->findOneBy(['player' => $pId]);
+            ->findOneBy(['player' => $pId]);
 
-        if ( $guildMember !== NULL )
+        if ( $guildMember !== null )
             return true;
 
         return false;
     }
-    
+
 }

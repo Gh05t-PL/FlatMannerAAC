@@ -23,3 +23,27 @@ yarn-error.log
 ###< symfony/web-server-bundle ###
 
 src/Controller/configs\.json
+/nbproject/private/
+nbproject/
+
+\.idea/
+
+public/html/
+
+public/html2/
+
+public/configss\.json
+
+public/vocations\.xml2
+
+public/Nowy folder/
+
+src/Utils/Strategy/UnifiedEntities/
+
+src/Utils/Strategy/Unifiers/
+
+src/Utils/Strategy/GreatUnifier\.php
+
+templates/thora/
+
+public/templates/thora/

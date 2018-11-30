@@ -27,36 +27,30 @@ class NewsController extends Controller
     }
 
 
-
     /**
      * @Route("/news/{page}", name="news", requirements={"page"="\d+"})
      */
-    public function news($page = 1, SessionInterface $session)
+    public function news($page = 1, SessionInterface $session, StrategyClient $strategy)
     {
         $newsCount = count($this->getDoctrine()
             ->getRepository(FmaacNews::class)
-        ->findAll());
+            ->findAll());
         //var_dump($newsCount);
 
-        $resultsLimit = 5;
+        $resultsLimit = Configs::$config['news']['resultLimit'];
         $pagesCount = ceil(($newsCount / $resultsLimit));
 
-        $strategy = new StrategyClient($this->getDoctrine());
-
         $isAdmin = false;
-        if ( $session->get('account_id') !== NULL )
-            $isAdmin = $strategy->news->isAdmin($session->get('account_id'));
-                
+        if ( $session->get('account_id') !== null )
+            $isAdmin = $strategy->getNews()->isAdmin($session->get('account_id'));
 
-            
 
         $query = $this->getDoctrine()
             ->getManager()
-        ->createQuery("SELECT u FROM App\Entity\FmaacNews u ORDER BY u.datetime DESC")->setMaxResults($resultsLimit)->setFirstResult($resultsLimit*($page-1));
+            ->createQuery("SELECT u FROM App\Entity\FmaacNews u ORDER BY u.datetime DESC")
+            ->setMaxResults($resultsLimit)
+            ->setFirstResult($resultsLimit * ($page - 1));
         $news = $query->getResult();
-
-
-
 
 
         return $this->render('news/news.html.twig', [
@@ -71,19 +65,16 @@ class NewsController extends Controller
     /**
      * @Route("/article/{id}", name="article", requirements={"id"="\d+"})
      */
-    public function article($id = 1, SessionInterface $session)
+    public function article($id = 1, SessionInterface $session, StrategyClient $strategy)
     {
 
         $article = $this->getDoctrine()
             ->getRepository(FmaacNews::class)
-        ->find($id);
-
-
-        $strategy = new StrategyClient($this->getDoctrine());
+            ->find($id);
 
         $isAdmin = false;
-        if ( $session->get('account_id') !== NULL )
-            $isAdmin = $strategy->news->isAdmin($session->get('account_id'));
+        if ( $session->get('account_id') !== null )
+            $isAdmin = $strategy->getNews()->isAdmin($session->get('account_id'));
 
 
         return $this->render('news/article.html.twig', [

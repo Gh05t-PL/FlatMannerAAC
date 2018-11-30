@@ -1,7 +1,9 @@
 <?php
+
 namespace App\Utils\Strategy\Accounts;
 
-interface IAccountsStrategy {
+interface IAccountsStrategy
+{
 
     /**
      * @return [Account Entity] from version folder
@@ -15,7 +17,7 @@ interface IAccountsStrategy {
 
     /**
      * @param [Associative Array] of criteria eg. ['name' => 'test'] $criteria
-     * 
+     *
      * @return Account Entity from version folder
      */
     public function getAccountBy($criteria);
@@ -42,5 +44,5 @@ interface IAccountsStrategy {
      * @param [Associative Array] $changes
      */
     public function changeAccountDetails($accId, $changes);
-  
+
 }

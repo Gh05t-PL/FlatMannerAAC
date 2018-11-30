@@ -33,20 +33,15 @@ class PlayersController extends Controller
     /**
      * @Route("/player/{name}", name="player")
      */
-    public function player($name)
+    public function player($name, StrategyClient $strategy)
     {
-        $strategy = new StrategyClient($this->getDoctrine());
 
-        $player = $strategy->players->getPlayerByName($name);
-            
+        $player = $strategy->getPlayers()->getPlayerByName($name);
+
 
         return $this->render('players/player.html.twig', [
             'controller_name' => 'PlayersController',
-            'player' => @$player,
-            'playerSkills' => @$playerSkills,
-            'playerPK' => @$playerPK,
-            'playerKillers' => @$playerKillers,
-            'monsterKillers' => @$monsterKillers,
+            'player' => $player,
         ]);
     }
 
@@ -54,11 +49,10 @@ class PlayersController extends Controller
     /**
      * @Route("/players/online", name="player_online")
      */
-    public function playerOnline()
+    public function playerOnline(StrategyClient $strategy)
     {
-        $strategy = new StrategyClient($this->getDoctrine());
 
-        $onlines = $strategy->players->getOnlinePlayers();
+        $onlines = $strategy->getPlayers()->getOnlinePlayers();
 
         return $this->render('players/online.html.twig', [
             'controller_name' => 'PlayersController',

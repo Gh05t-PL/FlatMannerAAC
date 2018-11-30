@@ -62,7 +62,7 @@ class ShopController extends Controller
                 'type' => 6,
                 'desc' => "Legends says when you get seven of them you can gain immortality",
                 'price' => 42,
-            ]
+            ],
         ];
 
         return $this->render('shop/items.html.twig', [
@@ -85,43 +85,48 @@ class ShopController extends Controller
 
 
     /** CART
-     * 
+     *
      */
 
-        /**
+    /**
      * @Route("/shop/cart", name="shop_cart")
      */
-    public function shopCart(Request $request, SessionInterface $session){
+    public function shopCart(Request $request, SessionInterface $session)
+    {
         var_dump($session->get('cart'));
-        if ( $request->query->get('json') !== null ){
+        if ( $request->query->get('json') !== null )
+        {
             $object = \json_decode($request->query->get('json'));
-            if ( $object->action == "refresh" ){
+            if ( $object->action == "refresh" )
+            {
 
-            }
-            elseif ( $object->action == "add" ){
+            } elseif ( $object->action == "add" )
+            {
                 $cart = $session->get('cart');
-                if ( $cart === null ){
+                if ( $cart === null )
+                {
                     $cart = $object->items;
                     $session->set('cart', $cart);
                     return new Response("OK");
-                }
-                elseif ( is_array($cart) && count($cart) <= 15 ){
-                    
-                    foreach ($object->items as $key => $value) {
+                } elseif ( is_array($cart) && count($cart) <= 15 )
+                {
+
+                    foreach ($object->items as $key => $value)
+                    {
                         \array_push($cart, $value);
                     }
 
-                    $session->set('cart',$cart);
+                    $session->set('cart', $cart);
                     return new Response("OK");
-                }else{
+                } else
+                {
                     return new Response("ERROR ADD");
                 }
-            }
-            elseif ( $object->action == "remove" ){
+            } elseif ( $object->action == "remove" )
+            {
 
             }
-        }
-        else
+        } else
             return new Response("ERROR");
     }
 }

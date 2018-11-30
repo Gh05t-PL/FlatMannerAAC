@@ -1,8 +1,10 @@
 <?php
+
 namespace App\Utils\Strategy\Accounts;
 
 
 use Doctrine\ORM\Query\ResultSetMapping;
+
 class AccountsStrategy04 implements IAccountsStrategy
 {
 
@@ -18,7 +20,7 @@ class AccountsStrategy04 implements IAccountsStrategy
     {
         $account = $this->doctrine
             ->getRepository(\App\Entity\TFS04\Accounts::class)
-        ->find($id);
+            ->find($id);
 
         return $account;
     }
@@ -28,7 +30,7 @@ class AccountsStrategy04 implements IAccountsStrategy
     {
         $chars = $this->doctrine
             ->getRepository(\App\Entity\TFS04\Players::class)
-        ->findBy(['account' => $id]);
+            ->findBy(['account' => $id]);
 
         return $chars;
     }
@@ -38,7 +40,7 @@ class AccountsStrategy04 implements IAccountsStrategy
     {
         $account = $this->doctrine
             ->getRepository(\App\Entity\TFS04\Accounts::class)
-        ->findOneBy($criteria);
+            ->findOneBy($criteria);
 
         return $account;
     }
@@ -49,9 +51,10 @@ class AccountsStrategy04 implements IAccountsStrategy
         $charsTemp = $this->doctrine->getRepository(\App\Entity\TFS04\Players::class)->findBy(['account' => $accId]);
         $chars = [];
 
-        foreach ($charsTemp as $key => $value) {
+        foreach ($charsTemp as $key => $value)
+        {
             if ( $value->getRankId() == 0 )
-            $chars[$value->getName()] = $value->getId();
+                $chars[$value->getName()] = $value->getId();
         }
         $charsTemp = null;
         return $chars;
@@ -62,7 +65,7 @@ class AccountsStrategy04 implements IAccountsStrategy
     {
         $account = $this->doctrine
             ->getRepository(\App\Entity\TFS04\Accounts::class)
-        ->find($accId);
+            ->find($accId);
 
         if ( !empty($changes['password']) )
             $account->setPassword($changes['password']);
@@ -96,8 +99,9 @@ class AccountsStrategy04 implements IAccountsStrategy
         $player->setPosy($cfg['citiesPos'][$formData['city']]['y']);
         $player->setPosz($cfg['citiesPos'][$formData['city']]['z']);
 
-        function expToLevel($level){
-            return ((50 * ($level - 1)**3 - 150 * ($level - 1)**2 + 400 * ($level - 1)) / 3);
+        function expToLevel($level)
+        {
+            return ((50 * ($level - 1) ** 3 - 150 * ($level - 1) ** 2 + 400 * ($level - 1)) / 3);
         }
 
         $player->setExperience(expToLevel($cfg['startStats']['level']));
@@ -110,25 +114,26 @@ class AccountsStrategy04 implements IAccountsStrategy
         // GET SKILLS
         $skills = $this->doctrine
             ->getRepository(\App\Entity\TFS04\PlayerSkill::class)
-        ->findBy([
-            'player' => $player,
-        ]);
-            
+            ->findBy([
+                'player' => $player,
+            ]);
+
         // SET STARTING SKILLS
-        foreach ($skills as $key => $value) {
+        foreach ($skills as $key => $value)
+        {
             $value->setValue($cfg['startStats']['skill']);
             $em->persist($value);
         }
         // SAVE PLAYER SKILLS
         $em->flush();
-        
+
 
         //today exp
         $conn = $em->getConnection();
         $conn->insert('today_exp', [
             'id' => null,
             'exp' => expToLevel($cfg['startStats']['level']),
-            'player_id' => $player->getId()
+            'player_id' => $player->getId(),
         ]);
     }
 
@@ -146,17 +151,14 @@ class AccountsStrategy04 implements IAccountsStrategy
     }
 
 
-
-
-
     /**
      * CHECKERS
      */
     public function isPlayerName($name)
     {
-        if ( $this->doctrine->getRepository(\App\Entity\TFS04\Players::class)->findOneBy(['name' => $name]) !== NULL )
+        if ( $this->doctrine->getRepository(\App\Entity\TFS04\Players::class)->findOneBy(['name' => $name]) !== null )
             return true;
-        
+
         return false;
     }
 

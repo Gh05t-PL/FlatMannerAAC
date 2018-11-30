@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Utils\Strategy\News;
 
 
@@ -16,17 +17,14 @@ class NewsStrategy04 implements INewsStrategy
     }
 
 
-
-
-    
     /**
      * CHECKERS
      */
     function isAdmin($id)
     {
         $account = $this->doctrine
-                ->getRepository(\App\Entity\TFS04\Accounts::class)
-        ->find($id);
+            ->getRepository(\App\Entity\TFS04\Accounts::class)
+            ->find($id);
 
         if ( $account->getGroupId() >= 7 )
             return true;

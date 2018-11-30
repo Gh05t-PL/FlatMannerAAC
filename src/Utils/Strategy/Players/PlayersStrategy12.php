@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Utils\Strategy\Players;
 
 
@@ -15,27 +16,27 @@ class PlayersStrategy12 implements IPlayersStrategy
         $this->doctrine = $doctrine;
     }
 
-    
 
-    function getPlayerByName($name){
+    function getPlayerByName($name)
+    {
         //TFS0.4
         $config['ver'] = "0.4";
-        
+
 
         $player = $this->doctrine
             ->getRepository(\App\Entity\TFS12\Players::class)
-        ->findOneBy([
-            'name' => $name,
-        ]);
-        if ( $player == NULL )
-            return NULL;
+            ->findOneBy([
+                'name' => $name,
+            ]);
+        if ( $player == null )
+            return null;
         // Player Kills
         $rsm = new ResultSetMapping;
         $rsm->addScalarResult('count(*)', 'count');
 
         $player->kills = $this->doctrine->getManager()
             ->createNativeQuery("SELECT count(*) FROM `player_deaths` WHERE `killed_by` in (select name from players where id = {$player->getId()}) AND is_player = 1", $rsm)
-        ->getSingleScalarResult();
+            ->getSingleScalarResult();
 
         // Player Frags player::$pk [["name"]=> string( name of killed person ), ["level"]=> int( level of killed person), ["date"]=> int( when killed that person )], 
         // ["unjustified"]=> int( sqlbool 0:false, 1:true )]] 
@@ -48,9 +49,10 @@ class PlayersStrategy12 implements IPlayersStrategy
 
         $playerPK = $this->doctrine->getManager()
             ->createNativeQuery("SELECT id, t1.name as fragName, t2.time as date, t2.level as fragLevel, t2.unjustified FROM players t1 INNER JOIN (SELECT * FROM `player_deaths` WHERE `killed_by` in (select name from players where id = {$player->getId()}) AND is_player = 1) t2 ON t1.id = t2.player_id ORDER BY date DESC LIMIT 10", $rsm)
-        ->getResult();
+            ->getResult();
         $playerPkTemp = [];
-        foreach ($playerPK as $key => $value) {
+        foreach ($playerPK as $key => $value)
+        {
             $playerPkTemp[] = (object)[
                 'name' => $value['name'],
                 'level' => $value['level'],
@@ -70,7 +72,7 @@ class PlayersStrategy12 implements IPlayersStrategy
 
         $playerOnline = $this->doctrine->getManager()
             ->createNativeQuery("SELECT * FROM players_online WHERE player_id = {$player->getId()}", $rsm)
-        ->getResult();
+            ->getResult();
         if ( empty($playerOnline) )
             $player->online = false;
         else
@@ -81,11 +83,11 @@ class PlayersStrategy12 implements IPlayersStrategy
         $rsm->addScalarResult('killed_by', 'names');
         $rsm->addScalarResult('level', 'level');
         $rsm->addScalarResult('time', 'date');
-        $rsm->addScalarResult('unjustified', 'unjustified');  
+        $rsm->addScalarResult('unjustified', 'unjustified');
 
         $deathsByPlayers = $this->doctrine->getManager()
             ->createNativeQuery("SELECT time,level,killed_by,unjustified FROM `player_deaths` WHERE `player_id` = {$player->getId()} AND is_player = 1", $rsm)
-        ->getArrayResult();
+            ->getArrayResult();
 
         $player->deathsByPlayers = $deathsByPlayers;
 
@@ -94,39 +96,45 @@ class PlayersStrategy12 implements IPlayersStrategy
         $rsm->addScalarResult('killed_by', 'killers');
         $rsm->addScalarResult('level', 'level');
         $rsm->addScalarResult('time', 'date');
-        $rsm->addScalarResult('unjustified', 'unjustified');  
+        $rsm->addScalarResult('unjustified', 'unjustified');
 
         $deathsByMonsters = $this->doctrine->getManager()
             ->createNativeQuery("SELECT time,level,killed_by,unjustified FROM `player_deaths` WHERE `player_id` = {$player->getId()} AND is_player = 0", $rsm)
-        ->getResult();
+            ->getResult();
 
         $player->deathsByMonsters = $deathsByMonsters;
 
         //player::$guild [["guildName"]=> string(), ["rankName"]=> string(), ["guildId"]=> string()]]
         $member = $this->doctrine
             ->getRepository(\App\Entity\TFS12\GuildMembership::class)
-        ->findOneBy([
-            'player' => $player
-        ]);
+            ->findOneBy([
+                'player' => $player,
+            ]);
 
-        
-        if ($member !== NULL){
+
+        if ( $member !== null )
+        {
             $player->guilds = [
                 "guildName" => $member->getGuild()->getName(),
                 "rankName" => $member->getRank()->getName(),
                 "guildId" => $member->getGuild()->getId(),
             ];
-        }else{
+        } else
+        {
             $player->guilds = "No Membership";
         }
         // EXP DIFF
         $rsm = new ResultSetMapping;
         $rsm->addScalarResult('expDiff', 'expDiff');
-        try {
+        try
+        {
             $expDiff = $this->doctrine->getManager()
                 ->createNativeQuery("SELECT (t1.experience - expBefore) as expDiff FROM players t1 INNER JOIN (SELECT player_id, exp as expBefore FROM today_exp) t2 ON t1.id = t2.player_id where id = {$player->getId()}", $rsm)
-            ->getSingleScalarResult();
-        } catch (\Exception $e){$expDiff = 0;}
+                ->getSingleScalarResult();
+        } catch (\Exception $e)
+        {
+            $expDiff = 0;
+        }
         $player->expDiff = $expDiff;
 
 
@@ -139,8 +147,6 @@ class PlayersStrategy12 implements IPlayersStrategy
             (object)['value' => $player->getSkillShielding()],
             (object)['value' => $player->getSkillFishing()],
         ];
-
-
 
 
         echo $player->getStamina();
@@ -167,9 +173,12 @@ class PlayersStrategy12 implements IPlayersStrategy
             'kills' => $player->kills,
             'guild' => $player->guilds,
             'expDiff' => $player->expDiff,
+            'townId' => $player->getTownId(),
+            'lastlogin' => $player->getLastlogin(),
+            'balance' => $player->getBalance(),
         ];
         return $finalResult;
-    
+
     }
 
 
@@ -177,7 +186,7 @@ class PlayersStrategy12 implements IPlayersStrategy
     {
         return $this->doctrine
             ->getRepository(\App\Entity\TFS12\Players::class)
-        ->findOneBy($criteria);
+            ->findOneBy($criteria);
     }
 
 
@@ -190,15 +199,9 @@ class PlayersStrategy12 implements IPlayersStrategy
 
         $onlines = $this->doctrine->getManager()
             ->createNativeQuery("SELECT name, level, vocation FROM players t1 INNER JOIN (SELECT * FROM `players_online` WHERE 1) t2 ON t1.id = t2.`player_id`", $rsm)
-        ->getResult();
+            ->getResult();
         return $onlines;
     }
 
 
 }
-
-
-
-
-
-?>

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Utils\Strategy\News;
 
 
@@ -16,16 +17,14 @@ class NewsStrategy12 implements INewsStrategy
     }
 
 
-
-
-    
     /**
      * CHECKERS
      */
-    function isAdmin($id){
+    function isAdmin($id)
+    {
         $account = $this->doctrine
-                ->getRepository(\App\Entity\TFS12\Accounts::class)
-        ->find($id);
+            ->getRepository(\App\Entity\TFS12\Accounts::class)
+            ->find($id);
 
         if ( $account->getType() >= 7 )
             return true;

@@ -1,7 +1,9 @@
 <?php
+
 namespace App\Utils\Strategy\Highscores;
 
-interface IHighscoreStrategy {
+interface IHighscoreStrategy
+{
 
     public function getPossibleCount();
 

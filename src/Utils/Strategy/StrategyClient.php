@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Utils\Strategy;
 
 use App\Utils\Configs;
@@ -7,39 +8,61 @@ class StrategyClient
 {
     private $strategies;
 
-    public function __construct($doctrine)
+    public function __construct(\Symfony\Bridge\Doctrine\RegistryInterface $doctrine)
     {
-        if ( Configs::$config['version'] == "0.4" )
+        //Configs::$config['version']
+        $strategies = [
+            'accounts' => "App\Utils\Strategy\Accounts\AccountsStrategy",
+            'news' => "App\Utils\Strategy\News\NewsStrategy",
+            'players' => "App\Utils\Strategy\Players\PlayersStrategy",
+            'highscores' => "App\Utils\Strategy\Highscores\HighscoreStrategy",
+            'guilds' => "App\Utils\Strategy\Guilds\GuildsStrategy",
+            'bans' => "App\Utils\Strategy\Bans\BansStrategy",
+        ];
+
+        foreach ($strategies as $key => $value)
         {
-            $this->strategies = [
-                'accounts' => new Accounts\AccountsStrategy04($doctrine),
-                'news' => new News\NewsStrategy04($doctrine),
-                'players' => new Players\PlayersStrategy04($doctrine),
-                'highscores' => new Highscores\HighscoreStrategy04($doctrine),
-                'guilds' => new Guilds\GuildsStrategy04($doctrine),
-                'bans' => new Bans\BansStrategy04($doctrine),
-            ];
+            $val = $value . str_replace(".", "", Configs::$config['version']);
+            if ( !class_exists($val) )
+                throw new \Exception("Unsupported Server Version Exception");
+            $this->strategies[$key] = new $val($doctrine);
         }
-        elseif ( Configs::$config['version'] == "1.2" )
-        {
-            $this->strategies = [
-                'accounts' => new Accounts\AccountsStrategy12($doctrine),
-                'news' => new News\NewsStrategy12($doctrine),
-                'players' => new Players\PlayersStrategy12($doctrine),
-                'highscores' => new Highscores\HighscoreStrategy12($doctrine),
-                'guilds' => new Guilds\GuildsStrategy12($doctrine),
-                'bans' => new Bans\BansStrategy12($doctrine),
-            ];
-        }
-        else
-        {
-            throw new UnsupportedServerVersionException;
-        }
+
     }
 
-
+/*
     public function __get($property)
     {
         return $this->strategies[strtolower($property)];
+    }
+*/
+    public function getAccounts(): \App\Utils\Strategy\Accounts\IAccountsStrategy
+    {
+        return $this->strategies['accounts'];
+    }
+
+    public function getNews(): \App\Utils\Strategy\News\INewsStrategy
+    {
+        return $this->strategies['news'];
+    }
+
+    public function getPlayers(): \App\Utils\Strategy\Players\IPlayersStrategy
+    {
+        return $this->strategies['players'];
+    }
+
+    public function getHighscores(): \App\Utils\Strategy\Highscores\IHighscoreStrategy
+    {
+        return $this->strategies['highscores'];
+    }
+
+    public function getGuilds(): \App\Utils\Strategy\Guilds\IGuildsStrategy
+    {
+        return $this->strategies['guilds'];
+    }
+
+    public function getBans(): \App\Utils\Strategy\Bans\IBansStrategy
+    {
+        return $this->strategies['bans'];
     }
 }

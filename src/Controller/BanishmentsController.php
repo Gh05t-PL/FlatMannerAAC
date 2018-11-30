@@ -16,12 +16,10 @@ class BanishmentsController extends Controller
     /**
      * @Route("/bans", name="banishments")
      */
-    public function bans()
+    public function bans(StrategyClient $strategy)
     {
 
-        $strategy = new StrategyClient($this->getDoctrine());
-
-        $result = $strategy->bans->getBansList();
+        $result = $strategy->getBans()->getBansList();
 
         return $this->render('banishments/bans.html.twig', [
             'controller_name' => 'PlayersController',

@@ -1,8 +1,10 @@
 <?php
+
 namespace App\Utils\Strategy\Guilds;
 
-interface IGuildsStrategy {
-    
+interface IGuildsStrategy
+{
+
     public function getGuildsList();
 
     public function getGuildById($id);
@@ -19,14 +21,14 @@ interface IGuildsStrategy {
 
     public function getAccountGuildRank($aId, $members);
 
-    public function setRank($pId,$rId);
+    public function setRank($pId, $rId);
 
     //public function getPlayerGuildRank($pId, $members);
 
     /**
      * @param $data [ASSOCIATIVE ARRAY] ['name' => string(guild_name), 'leader' => int(player_id)]
      */
-    public function createGuild($data);
+    public function createGuild(string $name, int $leader);
 
     public function deleteGuild($id);
 
@@ -36,6 +38,6 @@ interface IGuildsStrategy {
     public function acceptInvite($data);
 
     public function leaveGuild($pId);
-    
+
     public function isMember($pId);
 }

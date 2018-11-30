@@ -48,10 +48,10 @@ class PointsController extends Controller
                 '91900' => 2,
                 '92022' => 2,
                 '92521' => 2,
-                '92550' => 2, 
-            ]
-        ]
-        
+                '92550' => 2,
+            ],
+        ],
+
     ];
 
 
@@ -71,35 +71,34 @@ class PointsController extends Controller
      *      "provider"="paygol|paypal|microsms"
      * }))
      */
-    public function pointsBuy($provider, SessionInterface $session, Request $request)
+    public function pointsBuy($provider, SessionInterface $session, Request $request, StrategyClient $strategy)
     {
-        $strategy = new StrategyClient($this->getDoctrine());
 
-        if ( $session->get('account_id') !== NULL ){
+        if ( $session->get('account_id') !== null )
+        {
             $errors = [];
-            $account = $strategy->accounts->getAccountBy( ['id' => $session->get('account_id')] );
-            
+            $account = $strategy->getAccounts()->getAccountBy(['id' => $session->get('account_id')]);
 
-            if ( $provider == "paygol" ){
-                
-            }
 
-            if ( $provider == "microsms" ){
+            if ( $provider == "paygol" )
+            {
+
+            } elseif ( $provider == "microsms" )
+            {
                 $form = $this->createFormBuilder()
                     ->add('account', TextType::class, ['label' => 'Account Name', 'data' => $account->getName(), 'attr' => ['display' => 'block']])
                     ->add('code', TextType::class, ['label' => 'SMS Code', 'attr' => ['display' => 'block']])
                     ->add('submit', SubmitType::class, ['label' => 'Submit'])
-                ->getForm();
+                    ->getForm();
 
                 $form->handleRequest($request);
-                
-                if ( $form->isSubmitted() && $form->isValid() ) {
+
+                if ( $form->isSubmitted() && $form->isValid() )
+                {
                     $formData = $form->getData();
-                    //string(133) "{"connect":true,"data":{"status":1,"service":"4986","number":"71480","phone":"48574678695","reply":"Twoj kod dostepu to: a2p3k1e6."}}" 71480
                     $api = @file_get_contents("http://microsms.pl/api/v2/multi.php?userid=" . $this->config['microsms']['userid'] . "&code=" . $formData['code'] . '&serviceid=' . $this->config['microsms']['serviceid']);
-                    //var_dump($api);
-                    // Checking for errors
-                    if ( $api == NULL || $api == false ){
+                    if ( $api == null || $api == false )
+                    {
                         $errors[] = "Can't connect with MicroSMS";
                         return $this->render('points/buy.html.twig', [
                             'provider' => 'microsms',
@@ -114,22 +113,22 @@ class PointsController extends Controller
                         $errors[] = "Can't read payment information";
                     if ( isset($api->error) && $api->error )
                         $errors[] = 'Error Code: ' . $api->error->errorCode . ' - ' . $api->error->message;
-                    if (  isset($api->connect) && $api->connect == FALSE )
+                    if ( isset($api->connect) && $api->connect == false )
                         $errors[] = 'Error Code: ' . $api->data->errorCode . ' - ' . $api->data->message;
                     if ( isset($api->data->status) && $api->data->status != 1 )
                         $errors[] = "Your Code {$formData['code']} is Invalid";
 
 
-
                     // No errors found
-                    if ( empty($errors) ){
-                        //echo $api->data->number;
+                    if ( empty($errors) )
+                    {
 
                         $em = $this->getDoctrine()->getManager();
 
-                        $account = $strategy->accounts->getAccountBy(['name' => $formData['account']]);
-                        if($account == null){
-                            $account = $strategy->accounts->getAccountBy(['name' => '1']);
+                        $account = $strategy->getAccounts()->getAccountBy(['name' => $formData['account']]);
+                        if ( $account == null )
+                        {
+                            $account = $strategy->getAccounts()->getAccountBy(['name' => '1']);
                         }
 
                         $shopLog = new FmaacShopLogs();
@@ -158,17 +157,17 @@ class PointsController extends Controller
                     'form' => $form->createView(),
                 ]);
             }
-            
+
             return $this->render('points/buy.html.twig', [
                 'provider' => $provider,
                 'account' => $account,
                 'config' => $this->config,
-                'errors' => $errors
+                'errors' => $errors,
             ]);
 
-        }
-        else{
-            
+        } else
+        {
+
             return $this->redirectToRoute('account_login', [], 301);
         }
     }

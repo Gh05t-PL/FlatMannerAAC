@@ -23,8 +23,8 @@ class PaymentCatcherController extends Controller
             'points' => [
                 '1.30' => 10, # key=from price value=points
                 '2.45' => 22,
-                '5.00' => 60
-            ]
+                '5.00' => 60,
+            ],
         ],
         'microsms' => [
             'userid' => 'xxxxxx',
@@ -40,12 +40,11 @@ class PaymentCatcherController extends Controller
                 '91900' => 9,
                 '92022' => 10,
                 '92521' => 11,
-                '92550' => 12, 
-            ]
-        ]
-        
-    ];
+                '92550' => 12,
+            ],
+        ],
 
+    ];
 
 
     /**
@@ -53,47 +52,49 @@ class PaymentCatcherController extends Controller
      *      "provider"="paygol|paypal|microsms"
      * })))
      */
-    public function catcher($provider, Request $request)
+    public function catcher($provider, Request $request, StrategyClient $strategy)
     {
-        $strategy = new StrategyClient($this->getDoctrine());
 
-        if ( $provider == "paygol" ){
-                // if request secret key is not same (type and value) of config then return error and stop script
-                if ( $request->query->get('key') !== $this->config['paygol']['secretKey'])
-                    return new Response("Error");
+        if ( $provider == "paygol" )
+        {
+            // if request secret key is not same (type and value) of config then return error and stop script
+            if ( $request->query->get('key') !== $this->config['paygol']['secretKey'] )
+                return new Response("Error");
 
-                $account = $strategy->accounts->getAccountBy(['name' => $request->query->get('custom')]);
+            $account = $strategy->getAccounts()->getAccountBy(['name' => $request->query->get('custom')]);
 
-                $account->setPoints($account->getPoints() + $this->config['paygol']['points'][$request->query->get('frmprice')]);
-                //file_put_contents("testt.txt", $this->config['paygol']['points'][$request->query->get('frmprice')].",,,".$request->query->get('frmprice').",,,".$request->query->get('custom').",,,".($account->getPoints() + $this->config['paygol']['points'][$request->query->get('frmprice')]));
-                $em = $this->getDoctrine()->getManager();
+            $account->setPoints($account->getPoints() + $this->config['paygol']['points'][$request->query->get('frmprice')]);
+            $em = $this->getDoctrine()->getManager();
 
-                $em->persist($account);
-                $em->flush();
+            $em->persist($account);
+            $em->flush();
 
-                $shopLog = new FmaacShopLogs();
-                $shopLog->setPoints($this->config['paygol']['points'][$request->query->get('frmprice')]);
-                $shopLog->setDatetime(new \DateTime());
-                $shopLog->setAccount($account);
+            $shopLog = new FmaacShopLogs();
+            $shopLog->setPoints($this->config['paygol']['points'][$request->query->get('frmprice')]);
+            $shopLog->setDatetime(new \DateTime());
+            $shopLog->setAccount($account);
 
-                $em->persist($shopLog);
-                $em->flush();
-                return new Response("OK");
+            $em->persist($shopLog);
+            $em->flush();
+            return new Response("OK");
 
-        }
-        elseif ( $provider == "microsms" ){
-            if (!in_array($_SERVER['REMOTE_ADDR'], explode(',', file_get_contents('http://microsms.pl/psc/ips/'))) == TRUE)
+        } elseif ( $provider == "microsms" )
+        {
+            if ( !in_array($_SERVER['REMOTE_ADDR'], explode(',', file_get_contents('http://microsms.pl/psc/ips/'))) == true )
                 return new Response("ERROR 1");
-            if ($request->request->get('userID') !== $this->config['microsms']['userid'])
+            if ( $request->request->get('userID') !== $this->config['microsms']['userid'] )
                 return new Response("ERROR 2");
-            
-            
-            if (strpos($request->request->get('text'), ".")) {
+
+
+            if ( strpos($request->request->get('text'), ".") )
+            {
                 $txt = explode('.', $request->request->get('text'));
-                if (!isset($txt[1])) {
+                if ( !isset($txt[1]) )
+                {
                     $txt = explode(' ', $request->request->get('text'));
                 }
-            } else {
+            } else
+            {
                 $txt[0] = $request->request->get('text');
                 $txt[1] = '';
             }
@@ -101,9 +102,10 @@ class PaymentCatcherController extends Controller
 
             $em = $this->getDoctrine()->getManager();
 
-            $account = $strategy->accounts->getAccountBy(['name' => $txt[2]]);
-            if($account == null){
-                $account = $strategy->accounts->getAccountBy(['name' => '1']);
+            $account = $strategy->getAccounts()->getAccountBy(['name' => $txt[2]]);
+            if ( $account == null )
+            {
+                $account = $strategy->getAccounts()->getAccountBy(['name' => '1']);
             }
 
             $shopLog = new FmaacShopLogs();

@@ -1,8 +1,10 @@
 <?php
+
 namespace App\Utils\Strategy\Bans;
 
-interface IBansStrategy {
-    
+interface IBansStrategy
+{
+
     public function getBansList();
 
 }
