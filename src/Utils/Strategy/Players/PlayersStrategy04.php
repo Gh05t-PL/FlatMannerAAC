@@ -75,9 +75,9 @@ class PlayersStrategy04 implements IPlayersStrategy
             $rsm->addScalarResult('guild_name', 'guildName');
             $rsm->addScalarResult('guildId', 'guildId');
             $rsm->addScalarResult('rank_name', 'rankName');
-            var_dump($player->guild = $this->doctrine->getManager()
+            /*var_dump($player->guild = $this->doctrine->getManager()
                 ->createNativeQuery("SELECT guild_name,rank_name,guildId FROM players t3 INNER JOIN ( SELECT t2.name as guild_name, t2.id as guildId, t1.name as rank_name, t1.id as rankID FROM guild_ranks t1 INNER JOIN (SELECT * FROM guilds) t2 ON t1.guild_id = t2.id) t4 ON t3.rank_id = t4.rankID WHERE id = {$player->getId()}", $rsm)
-                ->getScalarResult());
+                ->getScalarResult());*/
             $player->guild = $this->doctrine->getManager()
                 ->createNativeQuery("SELECT guild_name,rank_name,guildId FROM players t3 INNER JOIN ( SELECT t2.name as guild_name, t2.id as guildId, t1.name as rank_name, t1.id as rankID FROM guild_ranks t1 INNER JOIN (SELECT * FROM guilds) t2 ON t1.guild_id = t2.id) t4 ON t3.rank_id = t4.rankID WHERE id = {$player->getId()}", $rsm)
                 ->getScalarResult()[0];

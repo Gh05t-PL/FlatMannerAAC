@@ -38,7 +38,6 @@ class PlayersController extends Controller
 
         $player = $strategy->getPlayers()->getPlayerByName($name);
 
-
         return $this->render('players/player.html.twig', [
             'controller_name' => 'PlayersController',
             'player' => $player,
