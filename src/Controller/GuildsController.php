@@ -516,7 +516,7 @@ class GuildsController extends Controller
                     $access = $value['rankLevel'];
             }
 
-            if ( $access == 3 )
+            if ( $access == 3 || count($members) == 1 )
             {
                 $guild = $strategy->getGuilds()->getGuildById($id);
 
