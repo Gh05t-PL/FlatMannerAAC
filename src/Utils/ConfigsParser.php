@@ -15,7 +15,7 @@ class ConfigsParser
 
     public function __construct()
     {
-        $this->file = file_get_contents(Configs::$config['dir'] . "\\config.lua");
+        $this->file = file_get_contents(Configs::$config['dir'] . "/config.lua");
     }
 
     public function parse()
@@ -30,7 +30,7 @@ class ConfigsParser
         {
             $array[$value[1]] = $value[2];
         }
-        $array['configModTime'] = filemtime(Configs::$config['dir'] . "\\config.lua");
+        $array['configModTime'] = filemtime(Configs::$config['dir'] . "/config.lua");
 //        $json = \json_encode($array);
 
         return $array;

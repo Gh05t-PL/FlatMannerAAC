@@ -16,10 +16,10 @@ class SpellsController extends Controller
     public function index($vocName = "All")
     {
 
-        $vocations = new VocationCollector(Configs::$config['dir'] . "\\data\\XML\\" . "vocations.xml");
+        $vocations = new VocationCollector(Configs::$config['dir'] . "/data/XML/" . "vocations.xml");
         $vocationsArr = $vocations->getIdsOfSameVocationName();
         $vocations = null;
-        $spells = new SpellsCollector(Configs::$config['dir'] . "\\data\\spells\\" . "spells.xml");
+        $spells = new SpellsCollector(Configs::$config['dir'] . "/data/spells/" . "spells.xml");
 
         $instantSpells = [];
         if ( $vocName !== "All" )

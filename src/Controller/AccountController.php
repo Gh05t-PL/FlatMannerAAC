@@ -9,18 +9,12 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+//use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
-
-use App\Entity\FmaacLogs;
-use App\Entity\FmaacLogsActions;
-
-use Doctrine\ORM\Query\ResultSetMapping;
 
 use App\Utils\Strategy\StrategyClient;
 
@@ -33,17 +27,13 @@ class AccountController extends Controller
     /**
      * @Route("/account", name="account")
      */
-    public function account(SessionInterface $session, StrategyClient $strategy)
+    public function account(StrategyClient $strategy, LoginHelper $loginHelper)
     {
-
-        // if session['account_id'] !== NULL AND loginIp == CurrentIp then
-        // LOGGED IN
-        if ( $session->get('account_id') !== null )
+        if ( $loginHelper->isLoggedIn() )
         {
+            $account = $strategy->getAccounts()->getAccountById($loginHelper->getAccountId());
 
-            $account = $strategy->getAccounts()->getAccountById($session->get('account_id'));
-
-            $accountChars = $strategy->getAccounts()->getAccountChars($session->get('account_id'));
+            $accountChars = $strategy->getAccounts()->getAccountChars($loginHelper->getAccountId());
 
             return $this->render('account/account.html.twig', [
                 "account" => $account,
@@ -62,8 +52,6 @@ class AccountController extends Controller
      */
     public function logout(LoginHelper $loginHelper)
     {
-
-        // if session['account_id'] !== NULL AND loginIp == CurrentIp then
         if ( $loginHelper->isLoggedIn() )
         {
             $loginHelper->logout();
@@ -111,7 +99,6 @@ class AccountController extends Controller
             }
         }
 
-
         return $this->render('account/account_login.html.twig', [
             'form' => $form->createView(),
             'request' => $request,
@@ -154,23 +141,17 @@ class AccountController extends Controller
             if ( strlen($formData['password']) > 20 || strlen($formData['password']) < 6 )
                 $errors[] = "Password must contain at least 6 characters and must be shorter than 20 characters";
 
-
             // No errors found
             if ( empty($errors) )
             {
                 $strategy->getAccounts()->createAccount($formData);
 
-
                 //LOG ACTION
                 $logger->setAction(1); // action 1 = created account
                 $logger->save();
 
-
                 return $this->redirectToRoute('account_login');
-
             }
-
-
         }
 
         return $this->render('account/account_create.html.twig', [
@@ -184,7 +165,7 @@ class AccountController extends Controller
     /**
      * @Route("/account/create/character", name="account_create_character")
      */
-    public function createCharacter(Request $request, SessionInterface $session, StrategyClient $strategy, \App\Utils\ActionLogger $logger)
+    public function createCharacter(Request $request, StrategyClient $strategy, \App\Utils\ActionLogger $logger, LoginHelper $loginHelper)
     {
         // this variable defines how big level is on start
 
@@ -193,7 +174,7 @@ class AccountController extends Controller
          */
 
 
-        if ( $session->get('account_id') !== null )
+        if ( $loginHelper->isLoggedIn() )
         {
             $form = $this->createFormBuilder()
                 ->add('name', TextType::class, ['label' => 'Name', 'attr' => ['display' => 'block']])
@@ -222,7 +203,6 @@ class AccountController extends Controller
             {
                 $formData = $form->getData();
 
-
                 // Checking for errors
                 if ( $strategy->getAccounts()->isPlayerName($formData['name']) )
                     $errors[] = "Name taken";
@@ -239,8 +219,7 @@ class AccountController extends Controller
                 // No errors found
                 if ( empty($errors) )
                 {
-
-                    $strategy->getAccounts()->createCharacter($formData, $session->get('account_id'), Configs::$config['player']);
+                    $strategy->getAccounts()->createCharacter($formData, $loginHelper->getAccountId(), Configs::$config['player']);
 
                     //LOG ACTION
                     $logger->setAction(3); // action 3 = create char
@@ -248,7 +227,6 @@ class AccountController extends Controller
 
                     return $this->redirectToRoute('account');
                 }
-
                 return $this->render('account/account_create_character.html.twig', [
                     'form' => $form->createView(),
                     'request' => $request,
@@ -270,20 +248,19 @@ class AccountController extends Controller
     /**
      * @Route("/account/delete/character/{playerId}", name="account_delete_character", requirements={"playerId"="\d+"})
      */
-    public function deleteCharacter(int $playerId, Request $request, SessionInterface $session, StrategyClient $strategy, \App\Utils\ActionLogger $logger)
+    public function deleteCharacter(int $playerId, Request $request, StrategyClient $strategy, \App\Utils\ActionLogger $logger, LoginHelper $loginHelper)
     {
 
         $error = [];
-        if ( $session->get('account_id') == null )
+        if ( !$loginHelper->isLoggedIn() )
         {
             $error[] = "You are not logged in";
             return $this->redirectToRoute('account_login');
         }
 
-
         $player = $strategy->getPlayers()->getPlayerBy(['id' => $playerId]);
 
-        if ( $player->getAccount()->getId() != $session->get('account_id') )
+        if ( $player->getAccount()->getId() != $loginHelper->getAccountId() )
         {
             $error[] = "Account do not match to character";
             return $this->redirectToRoute('account_login');
@@ -294,7 +271,6 @@ class AccountController extends Controller
             $em = $this->getDoctrine()->getManager();
             $em->remove($player);
             $em->flush();
-
 
             //LOG ACTION
             $logger->setAction(4); // action 4 = delete char
@@ -308,14 +284,14 @@ class AccountController extends Controller
     /**
      * @Route("/account/create/guild", name="account_create_guild")
      */
-    public function createGuild(Request $request, SessionInterface $session, StrategyClient $strategy)
+    public function createGuild(Request $request, StrategyClient $strategy, LoginHelper $loginHelper)
     {
 
 
-        if ( $session->get('account_id') !== null )
+        if ( $loginHelper->isLoggedIn() )
         {
             // fetch all account chars
-            $chars = $strategy->getAccounts()->getNoGuildPlayers($session->get('account_id'));
+            $chars = $strategy->getAccounts()->getNoGuildPlayers($loginHelper->getAccountId());
 
 
             $form = $this->createFormBuilder()
@@ -337,7 +313,7 @@ class AccountController extends Controller
                 // Checking for errors
                 if ( $strategy->getGuilds()->getGuildBy(['name' => $formData['name']]) !== null )
                     $errors[] = "Guild name taken";
-                if ( $strategy->getPlayers()->getPlayerBy(['id' => $formData['leader'], 'account' => $session->get('account_id')]) == null )
+                if ( $strategy->getPlayers()->getPlayerBy(['id' => $formData['leader'], 'account' => $loginHelper->getAccountId()]) == null )
                     $errors[] = "This character don't belong to you";
                 if ( strlen($formData['name']) > 20 )
                     $errors[] = "Guild name longer than 20 char";
@@ -355,7 +331,6 @@ class AccountController extends Controller
 
                     return $this->redirectToRoute('guild_management', ['id' => $guild]);
                 }
-
             }
             return $this->render('account/account_create_guild.html.twig', [
                 'form' => $form->createView(),
@@ -373,12 +348,11 @@ class AccountController extends Controller
     /**
      * @Route("/account/change/password", name="account_change_password")
      */
-    public function changePassword(Request $request, SessionInterface $session, StrategyClient $strategy, \App\Utils\ActionLogger $logger)
+    public function changePassword(Request $request, StrategyClient $strategy, \App\Utils\ActionLogger $logger, LoginHelper $loginHelper)
     {
         $action = 'Password';
-        if ( $session->get('account_id') !== null )
+        if ( $loginHelper->isLoggedIn() )
         {
-
             $form = $this->createFormBuilder()
                 ->add('currentPassword', TextType::class, ['label' => 'Current Password'])
                 ->add('password', TextType::class, ['label' => 'Password'])
@@ -394,7 +368,7 @@ class AccountController extends Controller
                 $formData = $form->getData();
 
                 // Checking for errors
-                if ( $strategy->getAccounts()->getAccountBy(['id' => $session->get('account_id'), 'password' => $formData['password']]) !== null )
+                if ( $strategy->getAccounts()->getAccountBy(['id' => $loginHelper->getAccountId(), 'password' => $formData['password']]) !== null )
                     $errors[] = "Password incorrect";
                 if ( $formData['password'] != $formData['repeatPassword'] )
                     $errors[] = "Passwords don't match";
@@ -403,7 +377,7 @@ class AccountController extends Controller
                 if ( empty($errors) )
                 {
 
-                    $strategy->getAccounts()->changeAccountDetails($session->get('account_id'), ['password' => $formData['password']]);
+                    $strategy->getAccounts()->changeAccountDetails($loginHelper->getAccountId(), ['password' => $formData['password']]);
 
                     //LOG ACTION
                     $logger->setAction(6); // action 6 = account changes
@@ -428,12 +402,11 @@ class AccountController extends Controller
     /**
      * @Route("/account/change/email", name="account_change_email")
      */
-    public function changeEmail(Request $request, SessionInterface $session, StrategyClient $strategy, ActionLogger $logger)
+    public function changeEmail(Request $request, StrategyClient $strategy, ActionLogger $logger, LoginHelper $loginHelper)
     {
         $action = 'Email';
-        if ( $session->get('account_id') !== null )
+        if ( $loginHelper->isLoggedIn() )
         {
-
             $form = $this->createFormBuilder()
                 ->add('email', TextType::class, ['label' => 'New Email'])
                 ->add('repeatEmail', TextType::class, ['label' => 'Repeat Email'])
@@ -449,7 +422,7 @@ class AccountController extends Controller
                 $formData = $form->getData();
 
                 // Checking for errors
-                if ( $strategy->getAccounts()->getAccountBy(['id' => $session->get('account_id'), 'password' => $formData['password']]) == null )
+                if ( $strategy->getAccounts()->getAccountBy(['id' => $loginHelper->getAccountId(), 'password' => $formData['password']]) == null )
                     $errors[] = "Password incorrect";
                 if ( $formData['email'] != $formData['repeatEmail'] )
                     $errors[] = "Emails don't match";
@@ -457,8 +430,7 @@ class AccountController extends Controller
                 // No errors found
                 if ( empty($errors) )
                 {
-
-                    $strategy->getAccounts()->changeAccountDetails($session->get('account_id'), ['email' => $formData['email']]);
+                    $strategy->getAccounts()->changeAccountDetails($loginHelper->getAccountId(), ['email' => $formData['email']]);
 
                     //LOG ACTION
                     $logger->setAction(6); // action 6 = account changes

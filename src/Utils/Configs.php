@@ -15,8 +15,7 @@ class Configs
          *
          */
         'version' => "0.4",
-        'dir' => "C:\Users\wiktor\Desktop\OTS\ots2",
-
+        'dir' => "C:/Users/wiktor/Desktop/OTS/ots2",
 
         'template' => "thora",
 
