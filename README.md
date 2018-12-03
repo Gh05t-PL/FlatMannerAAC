@@ -85,11 +85,11 @@ $ mv FlatMannerAAC-master/{.,}* aac
 #install all the dependencies
 $ composer install
  
-#set rights for files recursively
-chmod 777 -R /var/www/html/aac
+#set rights for files recursively (if not working use sudo)
+$ chmod 777 -R /var/www/html/aac
 
 #enable mod_rewrite in apache
-sudo a2enmod rewrite
+$ sudo a2enmod rewrite
  
 #IF YOU HAVE OTHER PHP INSTALLATION YOU MUST DISABLE IT WITH
     $ sudo a2dismod php{phpVersion}
