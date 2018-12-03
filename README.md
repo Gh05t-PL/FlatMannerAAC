@@ -13,7 +13,6 @@ Automated Account Maker created for Open Tibia Servers with Symfony 4 MVC framew
 
 
 1. Install 7z for extracting files, apache web server, php7.2, mysql server and composer for futher installation process
-
 ```shell
 #install 7z
 $ sudo apt-get install p7zip-full
@@ -43,10 +42,8 @@ $ sudo apt-get install mysql-server
 $ sudo apt-get install composer
 ```
 
- 
- 
-2. EDIT FILE /etc/apache2/sites-enabled/000-default.conf
 
+2. EDIT FILE /etc/apache2/sites-enabled/000-default.conf
 ```
 CHANGE
 
@@ -62,10 +59,9 @@ TO
     </Directory>
     
 ```
- 
- 
- 
-3 IN CONSOLE
+
+
+3. Download and extract fmAAC to web server root directory
 ```shell
 #navigate to web server root directory
 $ cd /var/www/html
@@ -82,10 +78,9 @@ $ 7z x master.zip
 #move all files to aac directory
 $ mv FlatMannerAAC-master/{.,}* aac
 ```
- 
- 
 
-4 Navigate to aac directory, 
+
+4. Download dependencies for Symfony framework and make it runnable
 ```shell
 #install all the dependencies
 $ composer install
@@ -96,23 +91,23 @@ chmod 777 -R /var/www/html/aac
 #enable mod_rewrite in apache
 sudo a2enmod rewrite
  
-IF YOU HAVE OTHER PHP INSTALLATION YOU MUST DISABLE IT WITH
+#IF YOU HAVE OTHER PHP INSTALLATION YOU MUST DISABLE IT WITH
     $ sudo a2dismod php{phpVersion}
-FOR EXAMPLE
+#FOR EXAMPLE
     $ sudo a2dismod php7.0
-AND THEN ENABLE PHP7.2
+#AND THEN ENABLE PHP7.2
     $ sudo a2enmod php7.2
 ```
 
 
-
-5 IN CONSOLE
+5. Install FlatMannerAAC
 ```shell
 #run FlatMannerAAC installation script
 $ bash install.sh
 ```
 PROCEED WITH CAUTION!
 IN CASE OF ERROR GO TO
+
 https://otland.net/threads/fmaac-flatmanneraac-mvc-symfony4.258502/
 
 
