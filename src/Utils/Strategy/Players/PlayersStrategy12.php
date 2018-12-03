@@ -3,6 +3,7 @@
 namespace App\Utils\Strategy\Players;
 
 
+use App\Utils\Strategy\UnifiedEntities\Player;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -17,7 +18,7 @@ class PlayersStrategy12 implements IPlayersStrategy
     }
 
 
-    function getPlayerByName($name)
+    function getPlayerByName(string $name): Player
     {
         //TFS0.4
         $config['ver'] = "0.4";
@@ -149,7 +150,7 @@ class PlayersStrategy12 implements IPlayersStrategy
         ];
 
 
-        echo $player->getStamina();
+        /*echo $player->getStamina();
         $finalResult = (object)[
             'name' => $player->getName(),
             'isOnline' => $player->online,
@@ -164,10 +165,8 @@ class PlayersStrategy12 implements IPlayersStrategy
             'soul' => $player->getSoul(),
             'cap' => $player->getCap(),
             'stamina' => ($player->getStamina() * 60 * 1000),
-            'maglevel' => $player->getMaglevel(),
             'skills' => $player->skills,
             'deathsByPlayers' => $player->deathsByPlayers,
-            'deathsByMonsters' => $player->deathsByMonsters,
             'deathsByMonsters' => $player->deathsByMonsters,
             'pk' => $player->pk,
             'kills' => $player->kills,
@@ -177,7 +176,33 @@ class PlayersStrategy12 implements IPlayersStrategy
             'lastlogin' => $player->getLastlogin(),
             'balance' => $player->getBalance(),
         ];
-        return $finalResult;
+        return $finalResult;*/
+        $pplayer = new Player($player->getId());
+        $pplayer->setName($player->getName())
+            ->setIsOnline($player->isOnline())
+            ->setVocation($player->getVocation())
+            ->setLevel($player->getLevel())
+            ->setExperience($player->getExperience())
+            ->setMaglevel($player->getMaglevel())
+            ->setHealth($player->getHealth())
+            ->setHealthmax($player->getHealthmax())
+            ->setMana($player->getMana())
+            ->setManamax($player->getManamax())
+            ->setSoul($player->getSoul())
+            ->setCap($player->getCap())
+            ->setStamina($player->getStamina())
+            ->setTownId($player->getTownId())
+            ->setLastlogin($player->getLastlogin())
+            ->setBalance($player->getBalance())
+            ->setSkills($player->skills)
+            ->setDeathsByPlayers($player->deathsByPlayers)
+            ->setDeathsByMonsters($player->deathsByMonsters)
+            ->setPk($player->pk)
+            ->setKills($player->kills)
+            ->setGuild($player->guilds)
+            ->setExpDiff($player->expDiff);
+
+        return $pplayer;
 
     }
 

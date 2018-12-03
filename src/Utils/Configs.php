@@ -22,6 +22,8 @@ class Configs
         'news' => [
             'resultLimit' => 5,
         ],
+        'deathListLimit' => 4,
+
         // used in account controller for creating character
         'player' => [
             "startStats" => [
