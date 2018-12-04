@@ -27,9 +27,14 @@ class GuildsStrategy12 implements IGuildsStrategy
 
         foreach ($guilds as $key => $value)
         {
-            $value->members = count($this->doctrine
-                ->getRepository(\App\Entity\TFS12\GuildMembership::class)
-                ->findBy(['guild' => $value->getId()]));
+            $guilds[$key] = [
+                'id' => $value->getId(),
+                'name' => $value->getName(),
+                'motd' => $value->getMotd(),
+                'members' => count($this->doctrine
+                    ->getRepository(\App\Entity\TFS12\GuildMembership::class)
+                    ->findBy(['guild' => $value->getId()]))
+            ];
         }
 
         return $guilds;

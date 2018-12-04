@@ -123,35 +123,36 @@ class PlayersStrategy04 implements IPlayersStrategy
         //echo json_encode($finalResult);
         return $pplayer;
     }
-/*
- *
- *     public function getPlayerBy($criteria)
-    {
-        $player = $this->doctrine
-            ->getRepository(\App\Entity\TFS04\Players::class)
-            ->findOneBy($criteria);
-        $pplayer = new Player($player->getId());
-        $pplayer->setName($player->getName())
-            ->setIsOnline($player->isOnline())
-            ->setVocation($player->getVocation())
-            ->setLevel($player->getLevel())
-            ->setExperience($player->getExperience())
-            ->setMaglevel($player->getMaglevel())
-            ->setHealth($player->getHealth())
-            ->setHealthmax($player->getHealthmax())
-            ->setMana($player->getMana())
-            ->setManamax($player->getManamax())
-            ->setSoul($player->getSoul())
-            ->setCap($player->getCap())
-            ->setStamina($player->getStamina())
-            ->setTownId($player->getTownId())
-            ->setLastlogin($player->getLastlogin())
-            ->setBalance($player->getBalance());
-        return $pplayer;
-    }
 
- *
- */
+    /*
+     *
+     *     public function getPlayerBy($criteria)
+        {
+            $player = $this->doctrine
+                ->getRepository(\App\Entity\TFS04\Players::class)
+                ->findOneBy($criteria);
+            $pplayer = new Player($player->getId());
+            $pplayer->setName($player->getName())
+                ->setIsOnline($player->isOnline())
+                ->setVocation($player->getVocation())
+                ->setLevel($player->getLevel())
+                ->setExperience($player->getExperience())
+                ->setMaglevel($player->getMaglevel())
+                ->setHealth($player->getHealth())
+                ->setHealthmax($player->getHealthmax())
+                ->setMana($player->getMana())
+                ->setManamax($player->getManamax())
+                ->setSoul($player->getSoul())
+                ->setCap($player->getCap())
+                ->setStamina($player->getStamina())
+                ->setTownId($player->getTownId())
+                ->setLastlogin($player->getLastlogin())
+                ->setBalance($player->getBalance());
+            return $pplayer;
+        }
+
+     *
+     */
 
     public function getPlayerBy($criteria)
     {
@@ -242,7 +243,7 @@ class PlayersStrategy04 implements IPlayersStrategy
         $rsm->addScalarResult('date', 'date');
 
         return $this->doctrine->getManager()
-            ->createNativeQuery("SELECT GROUP_CONCAT(name SEPARATOR ',') as names,date, `death_id`,levels FROM players t5 RIGHT JOIN (SELECT t3.player_id, level as levels, date, `death_id` FROM player_killers t3 INNER JOIN (SELECT * FROM player_deaths t1 INNER JOIN (SELECT `id` as `killer_id`, `death_id` FROM `killers`) t2 on t1.id = t2.death_id WHERE `player_id`={$id}) t4 on t3.kill_id = t4.killer_id ) t6 on t5.id = t6.player_id GROUP BY death_id ORDER BY date DESC LIMIT ".Configs::$config['deathListLimit'], $rsm)
+            ->createNativeQuery("SELECT GROUP_CONCAT(name SEPARATOR ',') as names,date, `death_id`,levels FROM players t5 RIGHT JOIN (SELECT t3.player_id, level as levels, date, `death_id` FROM player_killers t3 INNER JOIN (SELECT * FROM player_deaths t1 INNER JOIN (SELECT `id` as `killer_id`, `death_id` FROM `killers`) t2 on t1.id = t2.death_id WHERE `player_id`={$id}) t4 on t3.kill_id = t4.killer_id ) t6 on t5.id = t6.player_id GROUP BY death_id ORDER BY date DESC LIMIT " . Configs::$config['deathListLimit'], $rsm)
             ->getArrayResult();
     }
 
@@ -254,7 +255,7 @@ class PlayersStrategy04 implements IPlayersStrategy
         $rsm->addScalarResult('date', 'date');
 
         return $this->doctrine->getManager()
-            ->createNativeQuery("SELECT GROUP_CONCAT(name SEPARATOR ', ') as killers_name, level, date FROM environment_killers t3 INNER JOIN (SELECT * FROM player_deaths t1 INNER JOIN (SELECT `id` as `killer_id`, `death_id` FROM `killers`) t2 on t1.id = t2.death_id WHERE `player_id`={$id}) t4 on t3.kill_id = t4.killer_id GROUP BY death_id ORDER BY date DESC LIMIT ".Configs::$config['deathListLimit'], $rsm)
+            ->createNativeQuery("SELECT GROUP_CONCAT(name SEPARATOR ', ') as killers_name, level, date FROM environment_killers t3 INNER JOIN (SELECT * FROM player_deaths t1 INNER JOIN (SELECT `id` as `killer_id`, `death_id` FROM `killers`) t2 on t1.id = t2.death_id WHERE `player_id`={$id}) t4 on t3.kill_id = t4.killer_id GROUP BY death_id ORDER BY date DESC LIMIT " . Configs::$config['deathListLimit'], $rsm)
             ->getResult();
     }
 

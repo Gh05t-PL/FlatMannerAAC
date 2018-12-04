@@ -3,6 +3,7 @@
 namespace App\Utils\Strategy\Players;
 
 
+use App\Utils\Configs;
 use App\Utils\Strategy\UnifiedEntities\Player;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -20,10 +21,6 @@ class PlayersStrategy12 implements IPlayersStrategy
 
     function getPlayerByName(string $name): Player
     {
-        //TFS0.4
-        $config['ver'] = "0.4";
-
-
         $player = $this->doctrine
             ->getRepository(\App\Entity\TFS12\Players::class)
             ->findOneBy([
@@ -32,111 +29,24 @@ class PlayersStrategy12 implements IPlayersStrategy
         if ( $player == null )
             return null;
         // Player Kills
-        $rsm = new ResultSetMapping;
-        $rsm->addScalarResult('count(*)', 'count');
-
-        $player->kills = $this->doctrine->getManager()
-            ->createNativeQuery("SELECT count(*) FROM `player_deaths` WHERE `killed_by` in (select name from players where id = {$player->getId()}) AND is_player = 1", $rsm)
-            ->getSingleScalarResult();
+        $player->kills = $this->getPlayerFragsCount($player->getId());
 
         // Player Frags player::$pk [["name"]=> string( name of killed person ), ["level"]=> int( level of killed person), ["date"]=> int( when killed that person )], 
-        // ["unjustified"]=> int( sqlbool 0:false, 1:true )]] 
-        $rsm = new ResultSetMapping;
-        $rsm->addScalarResult('id', 'id');
-        $rsm->addScalarResult('fragName', 'name');
-        $rsm->addScalarResult('date', 'time');
-        $rsm->addScalarResult('fragLevel', 'level');
-        $rsm->addScalarResult('unjustified', 'unjustified');
-
-        $playerPK = $this->doctrine->getManager()
-            ->createNativeQuery("SELECT id, t1.name as fragName, t2.time as date, t2.level as fragLevel, t2.unjustified FROM players t1 INNER JOIN (SELECT * FROM `player_deaths` WHERE `killed_by` in (select name from players where id = {$player->getId()}) AND is_player = 1) t2 ON t1.id = t2.player_id ORDER BY date DESC LIMIT 10", $rsm)
-            ->getResult();
-        $playerPkTemp = [];
-        foreach ($playerPK as $key => $value)
-        {
-            $playerPkTemp[] = (object)[
-                'name' => $value['name'],
-                'level' => $value['level'],
-                'date' => $value['time'],
-                'unjustified' => $value['unjustified'],
-            ];
-        }
-        $playerPK = null;
-
-        //\var_dump($playerPkTemp);
-        $player->pk = $playerPkTemp;
-
-
+        // ["unjustified"]=> int( sqlbool 0:false, 1:true )]]
+        $player->pk = $this->getPlayerFrags($player->getId());
         // ONLINE
-        $rsm = new ResultSetMapping;
-        $rsm->addScalarResult('player_id', 'id');
+        $player->online = $this->isPlayerOnline($player->getId());
 
-        $playerOnline = $this->doctrine->getManager()
-            ->createNativeQuery("SELECT * FROM players_online WHERE player_id = {$player->getId()}", $rsm)
-            ->getResult();
-        if ( empty($playerOnline) )
-            $player->online = false;
-        else
-            $player->online = true;
+        //Deaths by Players  player::$deathsByPlayers [["names"]=> string( exploded in view by "," ), ["level"]=> int(), ["date"]=> int()]]
+        $player->deathsByPlayers = $this->getPlayerDeathsByPlayers($player->getId());
 
-        //Deaths by Players  player::$deathsByPlayers [["names"]=> string( exploded in view by "," ), ["level"]=> int(), ["date"]=> int()]] 
-        $rsm = new ResultSetMapping;
-        $rsm->addScalarResult('killed_by', 'names');
-        $rsm->addScalarResult('level', 'level');
-        $rsm->addScalarResult('time', 'date');
-        $rsm->addScalarResult('unjustified', 'unjustified');
-
-        $deathsByPlayers = $this->doctrine->getManager()
-            ->createNativeQuery("SELECT time,level,killed_by,unjustified FROM `player_deaths` WHERE `player_id` = {$player->getId()} AND is_player = 1", $rsm)
-            ->getArrayResult();
-
-        $player->deathsByPlayers = $deathsByPlayers;
-
-        //Deaths by Monsters  player::$deathsByMonsters [["killers"]=> string( exploded in view by "," ), ["level"]=> int(), ["date"]=> int()]] 
-        $rsm = new ResultSetMapping;
-        $rsm->addScalarResult('killed_by', 'killers');
-        $rsm->addScalarResult('level', 'level');
-        $rsm->addScalarResult('time', 'date');
-        $rsm->addScalarResult('unjustified', 'unjustified');
-
-        $deathsByMonsters = $this->doctrine->getManager()
-            ->createNativeQuery("SELECT time,level,killed_by,unjustified FROM `player_deaths` WHERE `player_id` = {$player->getId()} AND is_player = 0", $rsm)
-            ->getResult();
-
-        $player->deathsByMonsters = $deathsByMonsters;
+        //Deaths by Monsters  player::$deathsByMonsters [["killers"]=> string( exploded in view by "," ), ["level"]=> int(), ["date"]=> int()]]
+        $player->deathsByMonsters = $this->getPlayerDeathsByMonsters($player->getId());
 
         //player::$guild [["guildName"]=> string(), ["rankName"]=> string(), ["guildId"]=> string()]]
-        $member = $this->doctrine
-            ->getRepository(\App\Entity\TFS12\GuildMembership::class)
-            ->findOneBy([
-                'player' => $player,
-            ]);
-
-
-        if ( $member !== null )
-        {
-            $player->guilds = [
-                "guildName" => $member->getGuild()->getName(),
-                "rankName" => $member->getRank()->getName(),
-                "guildId" => $member->getGuild()->getId(),
-            ];
-        } else
-        {
-            $player->guilds = "No Membership";
-        }
+        $player->guilds = $this->getPlayerGuildMembership($player);
         // EXP DIFF
-        $rsm = new ResultSetMapping;
-        $rsm->addScalarResult('expDiff', 'expDiff');
-        try
-        {
-            $expDiff = $this->doctrine->getManager()
-                ->createNativeQuery("SELECT (t1.experience - expBefore) as expDiff FROM players t1 INNER JOIN (SELECT player_id, exp as expBefore FROM today_exp) t2 ON t1.id = t2.player_id where id = {$player->getId()}", $rsm)
-                ->getSingleScalarResult();
-        } catch (\Exception $e)
-        {
-            $expDiff = 0;
-        }
-        $player->expDiff = $expDiff;
+        $player->expDiff = $this->getPlayerTodayExp($player->getId());
 
 
         $player->skills = [
@@ -156,7 +66,7 @@ class PlayersStrategy12 implements IPlayersStrategy
             'isOnline' => $player->online,
             'vocation' => $player->getVocation(),
             'level' => $player->getLevel(),
-            'experience' => $player->getExperience(),
+            'experience' => $player-a>getExperience(),
             'maglevel' => $player->getMaglevel(),
             'health' => $player->getHealth(),
             'healthmax' => $player->getHealthmax(),
@@ -179,7 +89,7 @@ class PlayersStrategy12 implements IPlayersStrategy
         return $finalResult;*/
         $pplayer = new Player($player->getId());
         $pplayer->setName($player->getName())
-            ->setIsOnline($player->isOnline())
+            ->setIsOnline($this->isPlayerOnline($player->getId()))
             ->setVocation($player->getVocation())
             ->setLevel($player->getLevel())
             ->setExperience($player->getExperience())
@@ -228,5 +138,117 @@ class PlayersStrategy12 implements IPlayersStrategy
         return $onlines;
     }
 
+    public function getPlayerFrags(int $id)
+    {
+        $rsm = new ResultSetMapping;
+        $rsm->addScalarResult('id', 'id');
+        $rsm->addScalarResult('fragName', 'name');
+        $rsm->addScalarResult('date', 'time');
+        $rsm->addScalarResult('fragLevel', 'level');
+        $rsm->addScalarResult('unjustified', 'unjustified');
+
+        $playerPK = $this->doctrine->getManager()
+            ->createNativeQuery("SELECT id, t1.name as fragName, t2.time as date, t2.level as fragLevel, t2.unjustified FROM players t1 INNER JOIN (SELECT * FROM `player_deaths` WHERE `killed_by` in (select name from players where id = {$id}) AND is_player = 1) t2 ON t1.id = t2.player_id ORDER BY date DESC LIMIT " . Configs::$config['deathListLimit'], $rsm)
+            ->getResult();
+        $playerPkTemp = [];
+        foreach ($playerPK as $key => $value)
+        {
+            $playerPkTemp[] = (object)[
+                'name' => $value['name'],
+                'level' => $value['level'],
+                'date' => $value['time'],
+                'unjustified' => $value['unjustified'],
+            ];
+        }
+
+        return $playerPkTemp;
+    }
+
+    public function getPlayerFragsCount(int $id)
+    {
+        $rsm = new ResultSetMapping;
+        $rsm->addScalarResult('count(*)', 'count');
+
+        return (int)$this->doctrine->getManager()
+            ->createNativeQuery("SELECT count(*) FROM `player_deaths` WHERE `killed_by` in (select name from players where id = {$id}) AND is_player = 1", $rsm)
+            ->getSingleScalarResult();
+    }
+
+    public function isPlayerOnline(int $id)
+    {
+        $rsm = new ResultSetMapping;
+        $rsm->addScalarResult('player_id', 'id');
+
+        $playerOnline = $this->doctrine->getManager()
+            ->createNativeQuery("SELECT * FROM players_online WHERE player_id = {$id}", $rsm)
+            ->getResult();
+        if ( empty($playerOnline) )
+            return false;
+        else
+            return true;
+    }
+
+    public function getPlayerDeathsByPlayers(int $id)
+    {
+        $rsm = new ResultSetMapping;
+        $rsm->addScalarResult('killed_by', 'names');
+        $rsm->addScalarResult('level', 'level');
+        $rsm->addScalarResult('time', 'date');
+        $rsm->addScalarResult('unjustified', 'unjustified');
+
+        return $this->doctrine->getManager()
+            ->createNativeQuery("SELECT time,level,killed_by,unjustified FROM `player_deaths` WHERE `player_id` = {$id} AND is_player = 1 LIMIT " . Configs::$config['deathListLimit'], $rsm)
+            ->getArrayResult();
+    }
+
+    public function getPlayerDeathsByMonsters(int $id)
+    {
+        $rsm = new ResultSetMapping;
+        $rsm->addScalarResult('killed_by', 'killers');
+        $rsm->addScalarResult('level', 'level');
+        $rsm->addScalarResult('time', 'date');
+        $rsm->addScalarResult('unjustified', 'unjustified');
+
+        return $this->doctrine->getManager()
+            ->createNativeQuery("SELECT time,level,killed_by,unjustified FROM `player_deaths` WHERE `player_id` = {$id} AND is_player = 0 LIMIT " . Configs::$config['deathListLimit'], $rsm)
+            ->getResult();
+    }
+
+    public function getPlayerGuildMembership($player)
+    {
+        $member = $this->doctrine
+            ->getRepository(\App\Entity\TFS12\GuildMembership::class)
+            ->findOneBy([
+                'player' => $player,
+            ]);
+
+
+        if ( $member !== null )
+        {
+            return [
+                "guildName" => $member->getGuild()->getName(),
+                "rankName" => $member->getRank()->getName(),
+                "guildId" => $member->getGuild()->getId(),
+            ];
+        } else
+        {
+            return "No Membership";
+        }
+    }
+
+    public function getPlayerTodayExp(int $id)
+    {
+        $rsm = new ResultSetMapping;
+        $rsm->addScalarResult('expDiff', 'expDiff');
+        try
+        {
+            return $this->doctrine->getManager()
+                ->createNativeQuery("SELECT (t1.experience - expBefore) as expDiff FROM players t1 INNER JOIN (SELECT player_id, exp as expBefore FROM today_exp) t2 ON t1.id = t2.player_id where id = {$id}", $rsm)
+                ->getSingleScalarResult();
+        } catch (\Exception $e)
+        {
+            return 0;
+        }
+    }
 
 }
