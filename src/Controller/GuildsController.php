@@ -216,7 +216,7 @@ class GuildsController extends Controller
         $choiceMember = [];
         foreach ($members as $key => $value)
         {
-            $rank;
+            $rank = null;
             foreach ($ranks as $key2 => $value2)
             {
                 if ( (int)$value2 == (int)$value['rankId'] )

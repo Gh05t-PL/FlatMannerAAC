@@ -68,7 +68,7 @@ class AccountsStrategy04 implements IAccountsStrategy
             ->find($accId);
 
         if ( !empty($changes['password']) )
-            $account->setPassword($changes['password']);
+            $account->setPassword($this->encodePassword($changes['password']));
         if ( !empty($changes['email']) )
             $account->setEmail($changes['email']);
 
@@ -142,12 +142,19 @@ class AccountsStrategy04 implements IAccountsStrategy
     {
         $account = new \App\Entity\TFS04\Accounts();
         $account->setName($formData['account']);
-        $account->setPassword($formData['password']);
+        $account->setPassword($this->encodePassword($formData['password']));
         $account->setEmail($formData['email']);
         $em = $this->doctrine->getManager();
 
         $em->persist($account);
         $em->flush();
+    }
+
+    private function encodePassword(string $password): string
+    {
+        if ( Configs::$config['passwordHashing'] === "plain" )
+            return $password;
+        return \hash(Configs::$config['passwordHashing'], $password);
     }
 
 

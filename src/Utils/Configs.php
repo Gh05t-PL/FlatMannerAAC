@@ -15,6 +15,9 @@ class Configs
          *
          */
         'version' => "0.4",
+
+        //Password hashing algorithm string accepted by php function \hash($algo, $data) e.g. "sha1" or "plain"
+        'passwordHashing' => "plain",
         'dir' => "C:/Users/wiktor/Desktop/OTS/ots2",
 
         'template' => "thora",

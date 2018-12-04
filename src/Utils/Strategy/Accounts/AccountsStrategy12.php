@@ -3,6 +3,7 @@
 namespace App\Utils\Strategy\Accounts;
 
 
+use App\Utils\Configs;
 use Doctrine\ORM\Query\ResultSetMapping;
 
 class AccountsStrategy12 implements IAccountsStrategy
@@ -38,8 +39,6 @@ class AccountsStrategy12 implements IAccountsStrategy
 
     public function getAccountBy($criteria)
     {
-        if ( isset($criteria['password']) )
-            $criteria['password'] = sha1($criteria['password']);
         $account = $this->doctrine
             ->getRepository(\App\Entity\TFS12\Accounts::class)
             ->findOneBy($criteria);
@@ -73,7 +72,7 @@ class AccountsStrategy12 implements IAccountsStrategy
             ->find($accId);
 
         if ( !empty($changes['password']) )
-            $account->setPassword(sha1($changes['password']));
+            $account->setPassword($this->encodePassword($changes['password']));
         if ( !empty($changes['email']) )
             $account->setEmail($changes['email']);
 
@@ -140,7 +139,7 @@ class AccountsStrategy12 implements IAccountsStrategy
     {
         $account = new \App\Entity\TFS12\Accounts();
         $account->setName($formData['account']);
-        $account->setPassword(sha1($formData['password']));
+        $account->setPassword($this->encodePassword($formData['password']));
         $account->setEmail($formData['email']);
         $em = $this->doctrine->getManager();
 
@@ -148,6 +147,12 @@ class AccountsStrategy12 implements IAccountsStrategy
         $em->flush();
     }
 
+    private function encodePassword(string $password): string
+    {
+        if ( Configs::$config['passwordHashing'] === "plain" )
+            return $password;
+        return \hash(Configs::$config['passwordHashing'], $password);
+    }
 
     /**
      * CHECKERS
