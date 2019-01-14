@@ -18,9 +18,6 @@ use App\Entity\FmaacNews;
 
 use Doctrine\ORM\Query\ResultSetMapping;
 
-use App\Utils\Strategy\Accounts\AccountsStrategy04;
-use App\Utils\Strategy\Accounts\AccountsStrategy12;
-
 use App\Utils\Strategy\StrategyClient;
 
 use App\Utils\Configs;
@@ -164,7 +161,7 @@ class AdminPanelController extends Controller
     /**
      * @Route("/admin/edit/player/{name}", name="adminPanel_edit_player")
      */
-    public function editCharacter($name = "", Request $request, StrategyClient $strategy, LoginHelper $loginHelper)
+    public function editCharacter(Request $request, StrategyClient $strategy, LoginHelper $loginHelper, $name = "")
     {
 
         if ( !empty($request->request->all()) )

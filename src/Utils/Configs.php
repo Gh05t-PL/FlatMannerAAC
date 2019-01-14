@@ -10,11 +10,11 @@ class Configs
         /**
          * AVAILABLE VERSIONS
          *
-         * "0.4"
-         * "1.2"
+         * "TFS04"
+         * "TFS12"
          *
          */
-        'version' => "0.4",
+        'version' => "TFS04",
 
         //Password hashing algorithm string accepted by php function \hash($algo, $data) e.g. "sha1" or "plain"
         'passwordHashing' => "plain",

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utils\Strategy\Highscores;
+namespace App\Utils\Strategy;
 
 interface IHighscoreStrategy
 {

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Utils\Strategy\Guilds;
+namespace App\Utils\Strategy\TFS12;
 
 
 use Doctrine\ORM\Query\ResultSetMapping;
 
-class GuildsStrategy12 implements IGuildsStrategy
+class GuildsStrategy implements \App\Utils\Strategy\IGuildsStrategy
 {
 
     private $doctrine;
@@ -33,7 +33,7 @@ class GuildsStrategy12 implements IGuildsStrategy
                 'motd' => $value->getMotd(),
                 'members' => count($this->doctrine
                     ->getRepository(\App\Entity\TFS12\GuildMembership::class)
-                    ->findBy(['guild' => $value->getId()]))
+                    ->findBy(['guild' => $value->getId()])),
             ];
         }
 

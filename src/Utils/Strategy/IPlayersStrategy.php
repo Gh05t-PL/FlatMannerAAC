@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Utils\Strategy\Players;
+namespace App\Utils\Strategy;
 
 use App\Utils\Strategy\UnifiedEntities\Player;
 
 interface IPlayersStrategy
 {
 
-    public function getPlayerByName(string $name): Player;
+    public function getPlayerByName(string $name): ?Player;
 
     public function getPlayerBy($criteria);
 

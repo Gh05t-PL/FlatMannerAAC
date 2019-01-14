@@ -30,7 +30,7 @@ class NewsController extends Controller
     /**
      * @Route("/news/{page}", name="news", requirements={"page"="\d+"})
      */
-    public function news($page = 1, SessionInterface $session, StrategyClient $strategy)
+    public function news(SessionInterface $session, StrategyClient $strategy, $page = 1)
     {
         $newsCount = count($this->getDoctrine()
             ->getRepository(FmaacNews::class)
@@ -65,7 +65,7 @@ class NewsController extends Controller
     /**
      * @Route("/article/{id}", name="article", requirements={"id"="\d+"})
      */
-    public function article($id = 1, SessionInterface $session, StrategyClient $strategy)
+    public function article(SessionInterface $session, StrategyClient $strategy, $id = 1)
     {
 
         $article = $this->getDoctrine()

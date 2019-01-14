@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Utils\Strategy\Players;
+namespace App\Utils\Strategy\TFS04;
 
 
 use App\Utils\Configs;
+use App\Utils\Strategy\UnifiedEntities\Account;
 use App\Utils\Strategy\UnifiedEntities\Player;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class PlayersStrategy04 implements IPlayersStrategy
+class PlayersStrategy implements \App\Utils\Strategy\IPlayersStrategy
 {
 
     private $doctrine;
@@ -18,27 +19,7 @@ class PlayersStrategy04 implements IPlayersStrategy
         $this->doctrine = $doctrine;
     }
 
-
-    public function getPlayerSkills(int $id)
-    {
-        $playerSkills = $this->doctrine
-            ->getRepository(\App\Entity\TFS04\PlayerSkill::class)
-            ->findBy([
-                'player' => $id,
-            ]);
-        $playerskillstemp = [];
-        foreach ($playerSkills as $key => $value)
-        {
-            $playerskillstemp[] = (object)[
-                'value' => $value->getValue(),
-            ];
-
-        }
-        return $playerskillstemp;
-    }
-
-
-    function getPlayerByName(string $name): Player
+    function getPlayerByName(string $name): ?Player
     {
         //TFS0.4
         $config['ver'] = "0.4";
@@ -52,7 +33,7 @@ class PlayersStrategy04 implements IPlayersStrategy
             return null;
 
 
-        // Player Frags player::$pk [["name"]=> string( name of killed person ), ["level"]=> int( level of killed person), ["date"]=> int( when killed that person )], 
+        // Player Frags player::$pk [["name"]=> string( name of killed person ), ["level"]=> int( level of killed person), ["date"]=> int( when killed that person )],
         // ["unjustified"]=> int( sqlbool 0:false, 1:true )]]
         $playerPK = $this->getPlayerFrags($player->getId());
         $player->kills = $this->getPlayerFragsCount($player->getId());
@@ -124,55 +105,6 @@ class PlayersStrategy04 implements IPlayersStrategy
         return $pplayer;
     }
 
-    /*
-     *
-     *     public function getPlayerBy($criteria)
-        {
-            $player = $this->doctrine
-                ->getRepository(\App\Entity\TFS04\Players::class)
-                ->findOneBy($criteria);
-            $pplayer = new Player($player->getId());
-            $pplayer->setName($player->getName())
-                ->setIsOnline($player->isOnline())
-                ->setVocation($player->getVocation())
-                ->setLevel($player->getLevel())
-                ->setExperience($player->getExperience())
-                ->setMaglevel($player->getMaglevel())
-                ->setHealth($player->getHealth())
-                ->setHealthmax($player->getHealthmax())
-                ->setMana($player->getMana())
-                ->setManamax($player->getManamax())
-                ->setSoul($player->getSoul())
-                ->setCap($player->getCap())
-                ->setStamina($player->getStamina())
-                ->setTownId($player->getTownId())
-                ->setLastlogin($player->getLastlogin())
-                ->setBalance($player->getBalance());
-            return $pplayer;
-        }
-
-     *
-     */
-
-    public function getPlayerBy($criteria)
-    {
-        return $this->doctrine
-            ->getRepository(\App\Entity\TFS04\Players::class)
-            ->findOneBy($criteria);
-    }
-
-
-    public function getOnlinePlayers()
-    {
-        $onlines = $this->doctrine
-            ->getRepository(\App\Entity\TFS04\Players::class)
-            ->findBy([
-                'online' => 1,
-            ]);
-
-        return $onlines;
-    }
-
     public function getPlayerFrags(int $id)
     {
         $playerPK = $this->doctrine
@@ -202,6 +134,36 @@ class PlayersStrategy04 implements IPlayersStrategy
 //        usort($playerPKTemp, $ff);
         return $playerPKTemp;
     }
+
+    /*
+     *
+     *     public function getPlayerBy($criteria)
+        {
+            $player = $this->doctrine
+                ->getRepository(\App\Entity\TFS04\Players::class)
+                ->findOneBy($criteria);
+            $pplayer = new Player($player->getId());
+            $pplayer->setName($player->getName())
+                ->setIsOnline($player->isOnline())
+                ->setVocation($player->getVocation())
+                ->setLevel($player->getLevel())
+                ->setExperience($player->getExperience())
+                ->setMaglevel($player->getMaglevel())
+                ->setHealth($player->getHealth())
+                ->setHealthmax($player->getHealthmax())
+                ->setMana($player->getMana())
+                ->setManamax($player->getManamax())
+                ->setSoul($player->getSoul())
+                ->setCap($player->getCap())
+                ->setStamina($player->getStamina())
+                ->setTownId($player->getTownId())
+                ->setLastlogin($player->getLastlogin())
+                ->setBalance($player->getBalance());
+            return $pplayer;
+        }
+
+     *
+     */
 
     public function getPlayerFragsCount(int $id)
     {
@@ -272,6 +234,77 @@ class PlayersStrategy04 implements IPlayersStrategy
         {
             return 0;
         }
+    }
+
+    public function getPlayerSkills(int $id)
+    {
+        $playerSkills = $this->doctrine
+            ->getRepository(\App\Entity\TFS04\PlayerSkill::class)
+            ->findBy([
+                'player' => $id,
+            ]);
+        $playerskillstemp = [];
+        foreach ($playerSkills as $key => $value)
+        {
+            $playerskillstemp[] = (object)[
+                'value' => $value->getValue(),
+            ];
+
+        }
+        return $playerskillstemp;
+    }
+
+    public function getPlayerBy($criteria): ?Player
+    {
+        $player = $this->doctrine
+            ->getRepository(\App\Entity\TFS04\Players::class)
+            ->findOneBy($criteria);
+        if ( $player === null )
+            return null;
+        $pplayer = new Player($player->getId(), $this->doctrine);
+        $account = new Account($player->getAccount()->getId());
+        $account->setName($player->getAccount()->getName())
+            ->setPassword($player->getAccount()->getPassword())
+            ->setGroupId($player->getAccount()->getGroupId())
+            ->setPoints($player->getAccount()->getPoints());
+
+        return $pplayer->setName($player->getName())
+            ->setIsOnline($player->isOnline())
+            ->setVocation($player->getVocation())
+            ->setLevel($player->getLevel())
+            ->setExperience($player->getExperience())
+            ->setMaglevel($player->getMaglevel())
+            ->setHealth($player->getHealth())
+            ->setHealthmax($player->getHealthmax())
+            ->setMana($player->getMana())
+            ->setManamax($player->getManamax())
+            ->setSoul($player->getSoul())
+            ->setCap($player->getCap())
+            ->setStamina($player->getStamina())
+            ->setTownId($player->getTownId())
+            ->setLastlogin($player->getLastlogin())
+            ->setBalance($player->getBalance())
+            ->setExpDiff($this->getPlayerTodayExp($player->getId()))
+            ->setAccount($account);
+    }
+
+    /**
+     * @return \App\Utils\Strategy\UnifiedEntities\Player[]
+     */
+    public function getOnlinePlayers()
+    {
+        $onlines = $this->doctrine
+            ->getRepository(\App\Entity\TFS04\Players::class)
+            ->findBy([
+                'online' => 1,
+            ]);
+        foreach ($onlines as $key => $value)
+        {
+            $onlines[$key] = (new Player())->setName($value->getName())
+                ->setLevel($value->getLevel())
+                ->setVocation($value->getVocation());
+        }
+        return $onlines;
     }
 
 

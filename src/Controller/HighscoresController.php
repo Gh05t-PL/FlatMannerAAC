@@ -26,7 +26,7 @@ class HighscoresController extends Controller
      *      "filter"="level|mlvl|fist|club|sword|axe|distance|shielding|fishing"
      * })
      */
-    public function highscores($filter = "level", $page = 1, SessionInterface $session, StrategyClient $strategy)
+    public function highscores(SessionInterface $session, StrategyClient $strategy, $filter = "level", $page = 1)
     {
         /*
         * Config

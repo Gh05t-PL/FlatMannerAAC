@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utils\Strategy\Accounts;
+namespace App\Utils\Strategy;
 
 interface IAccountsStrategy
 {

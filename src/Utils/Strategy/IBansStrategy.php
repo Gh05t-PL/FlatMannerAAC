@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utils\Strategy\Bans;
+namespace App\Utils\Strategy;
 
 interface IBansStrategy
 {

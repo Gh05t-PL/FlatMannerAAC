@@ -36,12 +36,9 @@ class FmaacShopLogs
     private $datetime;
 
     /**
-     * @var \Accounts
+     * @var int
      *
-     * @ORM\ManyToOne(targetEntity="Accounts")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="account_id", referencedColumnName="id")
-     * })
+     * @ORM\Column(name="account_id", type="integer", nullable=false)
      */
     private $account;
 

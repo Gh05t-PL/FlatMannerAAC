@@ -77,7 +77,9 @@ class AccountController extends Controller
             ->getForm();
 
         $form->handleRequest($request);
+        //var_dump($form->getName());
         $errors = [];
+
         if ( $form->isSubmitted() && $form->isValid() )
         {
 
@@ -136,6 +138,8 @@ class AccountController extends Controller
                 $errors[] = "Passwords don't match";
             if ( $formData['email'] != $formData['repeatEmail'] )
                 $errors[] = "E-mails don't match";
+            if ( preg_match("/^[a-zA-Z0-9.!#$%&'*+\/\\=?^_`{|}~-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/", $formData['email']) === 0 )
+                $errors[] = "E-mail invalid";
             if ( strlen($formData['account']) > 20 || strlen($formData['account']) < 6 )
                 $errors[] = "Account Name must contain at least 6 characters and must be shorter than 20 characters";
             if ( strlen($formData['password']) > 20 || strlen($formData['password']) < 6 )
@@ -268,9 +272,7 @@ class AccountController extends Controller
 
         if ( empty($errors) )
         {
-            $em = $this->getDoctrine()->getManager();
-            $em->remove($player);
-            $em->flush();
+            $player->delete();
 
             //LOG ACTION
             $logger->setAction(4); // action 4 = delete char

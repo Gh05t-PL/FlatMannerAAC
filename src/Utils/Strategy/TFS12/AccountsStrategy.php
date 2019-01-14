@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Utils\Strategy\Accounts;
+namespace App\Utils\Strategy\TFS12;
 
 
+use App\Utils\Configs;
 use Doctrine\ORM\Query\ResultSetMapping;
 
-class AccountsStrategy04 implements IAccountsStrategy
+class AccountsStrategy implements \App\Utils\Strategy\IAccountsStrategy
 {
 
     private $doctrine;
@@ -19,7 +20,7 @@ class AccountsStrategy04 implements IAccountsStrategy
     public function getAccountById($id)
     {
         $account = $this->doctrine
-            ->getRepository(\App\Entity\TFS04\Accounts::class)
+            ->getRepository(\App\Entity\TFS12\Accounts::class)
             ->find($id);
 
         return $account;
@@ -29,7 +30,7 @@ class AccountsStrategy04 implements IAccountsStrategy
     public function getAccountChars($id)
     {
         $chars = $this->doctrine
-            ->getRepository(\App\Entity\TFS04\Players::class)
+            ->getRepository(\App\Entity\TFS12\Players::class)
             ->findBy(['account' => $id]);
 
         return $chars;
@@ -39,7 +40,7 @@ class AccountsStrategy04 implements IAccountsStrategy
     public function getAccountBy($criteria)
     {
         $account = $this->doctrine
-            ->getRepository(\App\Entity\TFS04\Accounts::class)
+            ->getRepository(\App\Entity\TFS12\Accounts::class)
             ->findOneBy($criteria);
 
         return $account;
@@ -48,12 +49,15 @@ class AccountsStrategy04 implements IAccountsStrategy
 
     public function getNoGuildPlayers($accId)
     {
-        $charsTemp = $this->doctrine->getRepository(\App\Entity\TFS04\Players::class)->findBy(['account' => $accId]);
+        $charsTemp = $this->doctrine->getRepository(\App\Entity\TFS12\Players::class)->findBy(['account' => $accId]);
         $chars = [];
 
         foreach ($charsTemp as $key => $value)
         {
-            if ( $value->getRankId() == 0 )
+            if ( $this->doctrine
+                    ->getRepository(\App\Entity\TFS12\GuildMembership::class)
+                    ->findBy(['player' => $value->getId()]) == null
+            )
                 $chars[$value->getName()] = $value->getId();
         }
         $charsTemp = null;
@@ -64,7 +68,7 @@ class AccountsStrategy04 implements IAccountsStrategy
     public function changeAccountDetails($accId, $changes)
     {
         $account = $this->doctrine
-            ->getRepository(\App\Entity\TFS04\Accounts::class)
+            ->getRepository(\App\Entity\TFS12\Accounts::class)
             ->find($accId);
 
         if ( !empty($changes['password']) )
@@ -77,15 +81,21 @@ class AccountsStrategy04 implements IAccountsStrategy
         $em->flush();
     }
 
+    private function encodePassword(string $password): string
+    {
+        if ( Configs::$config['passwordHashing'] === "plain" )
+            return $password;
+        return \hash(Configs::$config['passwordHashing'], $password);
+    }
 
     public function createCharacter($formData, $accId, $cfg)
     {
-        $player = new \App\Entity\TFS04\Players();
+        $player = new \App\Entity\TFS12\Players();
 
         $player->setName(ucwords(strtolower($formData['name'])));
         $player->setSex($formData['sex']);
         $player->setVocation($formData['vocation']);
-        $player->setAccount($this->doctrine->getRepository(\App\Entity\TFS04\Accounts::class)->find($accId));
+        $player->setAccount($this->doctrine->getRepository(\App\Entity\TFS12\Accounts::class)->find($accId));
         $player->setLevel($cfg['startStats']['level']);
         $player->setCap($cfg['startStats']['cap']);
         $player->setMaglevel($cfg['startStats']['magiclevel']);
@@ -106,25 +116,18 @@ class AccountsStrategy04 implements IAccountsStrategy
 
         $player->setExperience(expToLevel($cfg['startStats']['level']));
 
+        //SKILLS
+        $player->setSkillFist($cfg['startStats']['skill'])
+            ->setSkillClub($cfg['startStats']['skill'])
+            ->setSkillSword($cfg['startStats']['skill'])
+            ->setSkillAxe($cfg['startStats']['skill'])
+            ->setSkillDist($cfg['startStats']['skill'])
+            ->setSkillShielding($cfg['startStats']['skill'])
+            ->setSkillFishing($cfg['startStats']['skill']);
+
         $em = $this->doctrine->getManager();
         $em->persist($player);
         // SAVE PLAYER
-        $em->flush();
-
-        // GET SKILLS
-        $skills = $this->doctrine
-            ->getRepository(\App\Entity\TFS04\PlayerSkill::class)
-            ->findBy([
-                'player' => $player,
-            ]);
-
-        // SET STARTING SKILLS
-        foreach ($skills as $key => $value)
-        {
-            $value->setValue($cfg['startStats']['skill']);
-            $em->persist($value);
-        }
-        // SAVE PLAYER SKILLS
         $em->flush();
 
 
@@ -137,10 +140,9 @@ class AccountsStrategy04 implements IAccountsStrategy
         ]);
     }
 
-
     public function createAccount($formData)
     {
-        $account = new \App\Entity\TFS04\Accounts();
+        $account = new \App\Entity\TFS12\Accounts();
         $account->setName($formData['account']);
         $account->setPassword($this->encodePassword($formData['password']));
         $account->setEmail($formData['email']);
@@ -150,24 +152,15 @@ class AccountsStrategy04 implements IAccountsStrategy
         $em->flush();
     }
 
-    private function encodePassword(string $password): string
-    {
-        if ( Configs::$config['passwordHashing'] === "plain" )
-            return $password;
-        return \hash(Configs::$config['passwordHashing'], $password);
-    }
-
-
     /**
      * CHECKERS
      */
     public function isPlayerName($name)
     {
-        if ( $this->doctrine->getRepository(\App\Entity\TFS04\Players::class)->findOneBy(['name' => $name]) !== null )
+        if ( $this->doctrine->getRepository(\App\Entity\TFS12\Players::class)->findOneBy(['name' => $name]) !== null )
             return true;
 
         return false;
     }
-
 
 }

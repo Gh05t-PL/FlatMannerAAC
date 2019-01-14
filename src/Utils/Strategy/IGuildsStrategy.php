@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utils\Strategy\Guilds;
+namespace App\Utils\Strategy;
 
 interface IGuildsStrategy
 {

@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Utils\Strategy\Players;
+namespace App\Utils\Strategy\TFS12;
 
 
 use App\Utils\Configs;
+use App\Utils\Strategy\UnifiedEntities\Account;
 use App\Utils\Strategy\UnifiedEntities\Player;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class PlayersStrategy12 implements IPlayersStrategy
+class PlayersStrategy implements \App\Utils\Strategy\IPlayersStrategy
 {
 
     private $doctrine;
@@ -19,7 +20,7 @@ class PlayersStrategy12 implements IPlayersStrategy
     }
 
 
-    function getPlayerByName(string $name): Player
+    function getPlayerByName(string $name): ?Player
     {
         $player = $this->doctrine
             ->getRepository(\App\Entity\TFS12\Players::class)
@@ -116,26 +117,14 @@ class PlayersStrategy12 implements IPlayersStrategy
 
     }
 
-
-    public function getPlayerBy($criteria)
-    {
-        return $this->doctrine
-            ->getRepository(\App\Entity\TFS12\Players::class)
-            ->findOneBy($criteria);
-    }
-
-
-    public function getOnlinePlayers()
+    public function getPlayerFragsCount(int $id)
     {
         $rsm = new ResultSetMapping;
-        $rsm->addScalarResult('name', 'name');
-        $rsm->addScalarResult('level', 'level');
-        $rsm->addScalarResult('vocation', 'vocation');
+        $rsm->addScalarResult('count(*)', 'count');
 
-        $onlines = $this->doctrine->getManager()
-            ->createNativeQuery("SELECT name, level, vocation FROM players t1 INNER JOIN (SELECT * FROM `players_online` WHERE 1) t2 ON t1.id = t2.`player_id`", $rsm)
-            ->getResult();
-        return $onlines;
+        return (int)$this->doctrine->getManager()
+            ->createNativeQuery("SELECT count(*) FROM `player_deaths` WHERE `killed_by` in (select name from players where id = {$id}) AND is_player = 1", $rsm)
+            ->getSingleScalarResult();
     }
 
     public function getPlayerFrags(int $id)
@@ -162,16 +151,6 @@ class PlayersStrategy12 implements IPlayersStrategy
         }
 
         return $playerPkTemp;
-    }
-
-    public function getPlayerFragsCount(int $id)
-    {
-        $rsm = new ResultSetMapping;
-        $rsm->addScalarResult('count(*)', 'count');
-
-        return (int)$this->doctrine->getManager()
-            ->createNativeQuery("SELECT count(*) FROM `player_deaths` WHERE `killed_by` in (select name from players where id = {$id}) AND is_player = 1", $rsm)
-            ->getSingleScalarResult();
     }
 
     public function isPlayerOnline(int $id)
@@ -249,6 +228,62 @@ class PlayersStrategy12 implements IPlayersStrategy
         {
             return 0;
         }
+    }
+
+    public function getPlayerBy($criteria): ?Player
+    {
+        $player = $this->doctrine
+            ->getRepository(\App\Entity\TFS12\Players::class)
+            ->findOneBy($criteria);
+        if ( $player === null )
+            return null;
+        $pplayer = new Player($player->getId());
+        $account = new Account($player->getAccount()->getId());
+        $account->setName($player->getAccount()->getName())
+            ->setPassword($player->getAccount()->getPassword())
+            ->setGroupId($player->getAccount()->getGroupId())
+            ->setPoints($player->getAccount()->getPoints());
+
+        return $pplayer->setName($player->getName())
+            ->setIsOnline($this->isPlayerOnline($player->getId()))
+            ->setVocation($player->getVocation())
+            ->setLevel($player->getLevel())
+            ->setExperience($player->getExperience())
+            ->setMaglevel($player->getMaglevel())
+            ->setHealth($player->getHealth())
+            ->setHealthmax($player->getHealthmax())
+            ->setMana($player->getMana())
+            ->setManamax($player->getManamax())
+            ->setSoul($player->getSoul())
+            ->setCap($player->getCap())
+            ->setStamina($player->getStamina())
+            ->setTownId($player->getTownId())
+            ->setLastlogin($player->getLastlogin())
+            ->setBalance($player->getBalance())
+            ->setExpDiff($this->getPlayerTodayExp($player->getId()))
+            ->setAccount($account);
+    }
+
+    /**
+     * @return \App\Utils\Strategy\UnifiedEntities\Player[]
+     */
+    public function getOnlinePlayers()
+    {
+        $rsm = new ResultSetMapping;
+        $rsm->addScalarResult('name', 'name');
+        $rsm->addScalarResult('level', 'level');
+        $rsm->addScalarResult('vocation', 'vocation');
+
+        $onlines = $this->doctrine->getManager()
+            ->createNativeQuery("SELECT name, level, vocation FROM players t1 INNER JOIN (SELECT * FROM `players_online` WHERE 1) t2 ON t1.id = t2.`player_id`", $rsm)
+            ->getResult();
+        foreach ($onlines as $key => $value)
+        {
+            $onlines[$key] = (new Player())->setName($value->getName())
+                ->setLevel($value->getLevel())
+                ->setVocation($value->getVocation());
+        }
+        return $onlines;
     }
 
 }

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Utils\Strategy\Guilds;
+namespace App\Utils\Strategy\TFS04;
 
 
 use Doctrine\ORM\Query\ResultSetMapping;
 
-class GuildsStrategy04 implements IGuildsStrategy
+class GuildsStrategy implements \App\Utils\Strategy\IGuildsStrategy
 {
 
     private $doctrine;

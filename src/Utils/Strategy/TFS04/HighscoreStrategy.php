@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Utils\Strategy\Highscores;
+namespace App\Utils\Strategy\TFS04;
 
 
 use Doctrine\ORM\Query\ResultSetMapping;
 
-class HighscoreStrategy12 implements IHighscoreStrategy
+class HighscoreStrategy implements \App\Utils\Strategy\IHighscoreStrategy
 {
 
     private $doctrine;
@@ -19,7 +19,7 @@ class HighscoreStrategy12 implements IHighscoreStrategy
     function getPossibleCount()
     {
         $accessLimit = 3;
-        $query = $this->doctrine->getManager()->createQuery("SELECT p FROM App\Entity\TFS12\Players p WHERE p.groupId <= {$accessLimit} AND p.id > 1 ORDER BY p.level DESC, p.experience DESC, p.name ASC");
+        $query = $this->doctrine->getManager()->createQuery("SELECT p FROM App\Entity\TFS04\Players p WHERE p.groupId <= {$accessLimit} AND p.id > 1 ORDER BY p.level DESC, p.experience DESC, p.name ASC");
 
         $possibleCount = count($query->getResult());
 
@@ -42,36 +42,23 @@ class HighscoreStrategy12 implements IHighscoreStrategy
         $accessLimit = 3;
         $config['ver'] = "1.2";
 
-        $skills = [
-            0 => 'skillFist',
-            1 => 'skillClub',
-            2 => 'skillSword',
-            3 => 'skillAxe',
-            4 => 'skillDist',
-            5 => 'skillShielding',
-            6 => 'skillFishing',
-        ];
-        $tries = $skills[$skillId] . 'Tries';
-        $query = $this->doctrine->getManager()->createQuery("SELECT p FROM App\Entity\TFS12\Players p WHERE p.groupId <= {$accessLimit} ORDER BY p.{$skills[$skillId]} DESC, p.{$tries} DESC, p.name ASC");
+        $query = $this->doctrine->getManager()->createQuery("SELECT s, p FROM App\Entity\TFS04\PlayerSkill s JOIN s.player p WHERE s.skillid = {$skillId} AND p.groupId <= {$accessLimit} ORDER BY s.value DESC, s.count DESC, p.name ASC");
         $query->setMaxResults($resultsLimit)->setFirstResult($resultsLimit * ($page - 1));
 
         $result = $query->getResult();
-
-
-        $getSkill = 'get' . $skills[$skillId];
-
         $resultFinal = [];
         foreach ($result as $key => $value)
         {
             $resultFinal[] = (object)[
-                'name' => $value->getName(),
-                'skill' => $value->$getSkill(),
-                'groupid' => $value->getGroupid(),
+                'name' => $value->getPlayer()->getName(),
+                'skill' => $value->getValue(),
+                'groupid' => $value->getPlayer()->getGroupid(),
             ];
-            //\var_dump($value->getSkillClub());
         }
-        //\var_dump($resultFinal);
+        //var_dump($resultFinal);
+        // echo $resultFinal[1]->skill;
         return $resultFinal;
+
     }
 
 
@@ -91,13 +78,17 @@ class HighscoreStrategy12 implements IHighscoreStrategy
 
         if ( $filter === "level" )
         {
-            $query = $this->doctrine->getManager()->createQuery("SELECT p FROM App\Entity\TFS12\Players p WHERE p.groupId <= {$accessLimit} ORDER BY p.{$orders[$filter][0]} DESC, p.{$orders[$filter][1]} DESC, p.name ASC");
+
+            // fetch players with tutors and senior tutors
+            $query = $this->doctrine->getManager()->createQuery("SELECT p FROM App\Entity\TFS04\Players p WHERE p.groupId <= {$accessLimit} AND p.id > 1 ORDER BY p.{$orders[$filter][0]} DESC, p.{$orders[$filter][1]} DESC, p.name ASC");
             $query->setMaxResults($resultsLimit)->setFirstResult($resultsLimit * ($page - 1));
 
             $result = $query->getResult();
         } elseif ( $filter === "mlvl" )
         {
-            $query = $this->doctrine->getManager()->createQuery("SELECT p FROM App\Entity\TFS12\Players p WHERE p.groupId <= {$accessLimit} ORDER BY p.{$orders[$filter][0]} DESC, p.{$orders[$filter][1]} DESC, p.name ASC");
+
+            // fetch players with tutors and senior tutors
+            $query = $this->doctrine->getManager()->createQuery("SELECT p FROM App\Entity\TFS04\Players p WHERE p.groupId <= {$accessLimit} AND p.id > 1 ORDER BY p.{$orders[$filter][0]} DESC, p.{$orders[$filter][1]} DESC, p.name ASC");
             $query->setMaxResults($resultsLimit)->setFirstResult($resultsLimit * ($page - 1));
 
             $result = $query->getResult();

@@ -8,10 +8,13 @@
 
 namespace App\Utils\Strategy\UnifiedEntities;
 
+use App\Utils\Configs;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class Player
-{
+{// TODO active record?
     private $id = null;
+    private $account = null;
     private $name = null;
     private $isOnline = null;
     private $vocation = null;
@@ -36,9 +39,13 @@ class Player
     private $lastlogin = null;
     private $balance = null;
 
-    public function __construct($id)
+    // for active record
+    private $doctrine = null;
+
+    public function __construct(int $id = null, RegistryInterface $doctrine = null)
     {
         $this->id = $id;
+        $this->doctrine = $doctrine;
     }
 
     /**
@@ -472,5 +479,35 @@ class Player
         return $this;
     }
 
+    /**
+     * @return Account
+     */
+    public function getAccount()
+    {
+        return $this->account;
+    }
+
+    /**
+     * @param Account $account
+     * @return Player
+     */
+    public function setAccount($account)
+    {
+        $this->account = $account;
+        return $this;
+    }
+
+    public function delete()
+    {
+        $player = null;
+        $class = "\\App\\Entity\\" . Configs::$config['version'] . "\\Players";
+
+        $player = $this->doctrine->getRepository($class)->find($this->getId());
+
+        $em = $this->doctrine->getManager();
+        $em->remove($player);
+        $em->flush();
+
+    }
 
 }

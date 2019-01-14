@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Utils\Strategy\Bans;
+namespace App\Utils\Strategy\TFS04;
 
 
 use Doctrine\ORM\Query\ResultSetMapping;
 
-class BansStrategy12 implements IBansStrategy
+class BansStrategy implements \App\Utils\Strategy\IBansStrategy
 {
 
     private $doctrine;
@@ -25,7 +25,7 @@ class BansStrategy12 implements IBansStrategy
 
         $query = $this->doctrine
             ->getManager()
-            ->createNativeQuery("SELECT p.id as pid, p.name as name, expires_at as expires, banned_at FROM players p INNER JOIN (SELECT banned_at, expires_at,account_id FROM account_bans b WHERE b.expires_at > UNIX_TIMESTAMP()) t2 on p.account_id = t2.account_id", $rsm);
+            ->createNativeQuery("SELECT p.id as pid, p.name as name, expires FROM players p INNER JOIN (SELECT value, expires FROM bans b WHERE b.expires > UNIX_TIMESTAMP() AND b.type = 3) t2 on p.account_id = t2.value ORDER BY expires", $rsm);
         $query->setParameter(1, time());
 
         $result = $query->getResult();

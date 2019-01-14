@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utils\Strategy\News;
+namespace App\Utils\Strategy;
 
 interface INewsStrategy
 {

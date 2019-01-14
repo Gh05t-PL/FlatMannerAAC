@@ -89,9 +89,12 @@ class GuildsController extends Controller
 
         // CHECK IF ACCOUNT CONTAIN THIS CHAR
         $player = $strategy->getPlayers()->getPlayerBy(['id' => $playerId]);
+
         if ( $player->getAccount()->getId() != $session->get('account_id') )
         {
+            $re = new Elos;
             $error[] = "Account do not match to character";
+            $this->addFlash("error", "Account do not match to character");
             return $this->redirectToRoute('guild_management', ['id' => $id]);
         }
 
@@ -114,6 +117,7 @@ class GuildsController extends Controller
         if ( $isMemberAny )
         {
             $error[] = "You must leave your guild first";
+            $this->addFlash("error", "You must leave your guild first");
             return $this->redirectToRoute('guild_management', ['id' => $id]);
         }
 

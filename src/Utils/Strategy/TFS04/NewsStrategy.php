@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Utils\Strategy\News;
+namespace App\Utils\Strategy\TFS04;
 
 
 use Doctrine\ORM\Query\ResultSetMapping;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class NewsStrategy04 implements INewsStrategy
+class NewsStrategy implements \App\Utils\Strategy\INewsStrategy
 {
 
     private $doctrine;

@@ -1182,7 +1182,7 @@ class Players
     /**
      * @return Accounts
      */
-    public function getAccount()
+    public function getAccount(): ?Accounts
     {
         return $this->account;
     }

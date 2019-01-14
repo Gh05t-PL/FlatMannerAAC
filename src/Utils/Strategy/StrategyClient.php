@@ -12,56 +12,50 @@ class StrategyClient
     {
         //Configs::$config['version']
         $strategies = [
-            'accounts' => "App\Utils\Strategy\Accounts\AccountsStrategy",
-            'news' => "App\Utils\Strategy\News\NewsStrategy",
-            'players' => "App\Utils\Strategy\Players\PlayersStrategy",
-            'highscores' => "App\Utils\Strategy\Highscores\HighscoreStrategy",
-            'guilds' => "App\Utils\Strategy\Guilds\GuildsStrategy",
-            'bans' => "App\Utils\Strategy\Bans\BansStrategy",
+            'accounts' => "AccountsStrategy",
+            'news' => "NewsStrategy",
+            'players' => "PlayersStrategy",
+            'highscores' => "HighscoreStrategy",
+            'guilds' => "GuildsStrategy",
+            'bans' => "BansStrategy",
         ];
 
         foreach ($strategies as $key => $value)
         {
-            $val = $value . str_replace(".", "", Configs::$config['version']);
+            $val = "App\\Utils\\Strategy\\" . str_replace(".", "", Configs::$config['version']) . "\\" . $value;
             if ( !class_exists($val) )
-                throw new \Exception("Unsupported Server Version Exception");
+                throw new \Exception("Unsupported Server Version Exception (class " . $val . " Not Found)");
             $this->strategies[$key] = new $val($doctrine);
         }
 
     }
 
-/*
-    public function __get($property)
-    {
-        return $this->strategies[strtolower($property)];
-    }
-*/
-    public function getAccounts(): \App\Utils\Strategy\Accounts\IAccountsStrategy
+    public function getAccounts(): \App\Utils\Strategy\IAccountsStrategy
     {
         return $this->strategies['accounts'];
     }
 
-    public function getNews(): \App\Utils\Strategy\News\INewsStrategy
+    public function getNews(): \App\Utils\Strategy\INewsStrategy
     {
         return $this->strategies['news'];
     }
 
-    public function getPlayers(): \App\Utils\Strategy\Players\IPlayersStrategy
+    public function getPlayers(): \App\Utils\Strategy\IPlayersStrategy
     {
         return $this->strategies['players'];
     }
 
-    public function getHighscores(): \App\Utils\Strategy\Highscores\IHighscoreStrategy
+    public function getHighscores(): \App\Utils\Strategy\IHighscoreStrategy
     {
         return $this->strategies['highscores'];
     }
 
-    public function getGuilds(): \App\Utils\Strategy\Guilds\IGuildsStrategy
+    public function getGuilds(): \App\Utils\Strategy\IGuildsStrategy
     {
         return $this->strategies['guilds'];
     }
 
-    public function getBans(): \App\Utils\Strategy\Bans\IBansStrategy
+    public function getBans(): \App\Utils\Strategy\IBansStrategy
     {
         return $this->strategies['bans'];
     }
